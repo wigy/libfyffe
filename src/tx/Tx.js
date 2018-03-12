@@ -14,7 +14,8 @@ class Tx {
     if (typeof(data) !== 'object' || data === null) {
       throw new Error('Invalid initial data in constructor: ' + JSON.stringify(data))
     }
-    // Initialize default.
+    this.type = type;
+    // Initialize defaults.
     this.data = {
       total: undefined,
       target: undefined,
