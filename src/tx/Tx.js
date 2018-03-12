@@ -7,21 +7,26 @@ var cc = require('currency-codes');
 class Tx {
 
   constructor(type, data = {}) {
+    // Check the input.
     if (!type2class[type]) {
       throw new Error('Invalid TX type in constructor: ' + JSON.stringify(type))
     }
     if (typeof(data) !== 'object' || data === null) {
       throw new Error('Invalid initial data in constructor: ' + JSON.stringify(data))
     }
+    // Initialize default.
     this.data = {
       total: undefined,
-      currency: undefined,
+      target: undefined,
+      currency: config.currency,
     };
+    // Verify keys in data.
     Object.keys(data).forEach((key) => {
       if (!(key in this.data)) {
-        throw new Error('Invalid key' + JSON.stringify(key) + 'for transaction in ' + JSON.stringify(data));
+        throw new Error('Invalid key ' + JSON.stringify(key) + ' for transaction in ' + JSON.stringify(data));
       }
     });
+    // Implicitly validate each field.
     Object.assign(this, data);
   }
 
@@ -46,6 +51,17 @@ class Tx {
   }
   get currency() {
     return this.get('currency');
+  }
+
+  /**
+   * A tradeable commodity used in the transaction.
+   */
+  set target(val) {
+    this.isRegexMatch('target', val, /^[-A-Z0-9]+\**?$/);
+    this.data.target = val;
+  }
+  get target() {
+    return this.get('target');
   }
 
   /**
@@ -107,6 +123,20 @@ class Tx {
       return;
     }
     throw new Error('Invalid value ' + JSON.stringify(val) + ' for ' + JSON.stringify(name));
+  }
+
+  /**
+   * Check that the value matches the regex.
+   * @param {*} name
+   * @param {*} val
+   * @param {*} regex
+   */
+  isRegexMatch(name, val, regex) {
+    this.isString(name, val);
+    if (regex.test(val)) {
+      return;
+    }
+    throw new Error('Value ' + JSON.stringify(val) + ' for ' + JSON.stringify(name) + ' does not match ' + regex);
   }
 
   /**

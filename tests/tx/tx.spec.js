@@ -42,11 +42,27 @@ describe('class Tx', () => {
     assert.throws(() => Tx.create('fx-in', {currency: -1.0}), Error);
     assert.throws(() => Tx.create('fx-in', {currency: ''}), Error);
     assert.throws(() => Tx.create('fx-in', {currency: 'XYZ'}), Error);
-    assert.throws(() => Tx.create('fx-in', {}).currency, Error);
 
+    assert.equal(Tx.create('fx-in', {}).currency, 'EUR');
     assert.equal(Tx.create('fx-in', {currency: 'USD'}).currency, 'USD');
     assert.equal(Tx.create('fx-in', {currency: 'EUR'}).currency, 'EUR');
     assert.equal(Tx.create('fx-in', {currency: 'DKK'}).currency, 'DKK');
+  })
+
+  it('validates target correctly', () => {
+    assert.throws(() => Tx.create('buy', {target: null}), Error);
+    assert.throws(() => Tx.create('buy', {target: NaN}), Error);
+    assert.throws(() => Tx.create('buy', {target: undefined}), Error);
+    assert.throws(() => Tx.create('buy', {target: -1.0}), Error);
+    assert.throws(() => Tx.create('buy', {target: ''}), Error);
+    assert.throws(() => Tx.create('buy', {target: '?¤%&/'}), Error);
+    assert.throws(() => Tx.create('buy', {target: 'small'}), Error);
+    assert.throws(() => Tx.create('buy', {}).target, Error);
+
+    assert.equal(Tx.create('buy', {target: 'BTC'}).target, 'BTC');
+    assert.equal(Tx.create('buy', {target: '42'}).target, '42');
+    assert.equal(Tx.create('buy', {target: 'DTC**'}).target, 'DTC**');
+    assert.equal(Tx.create('buy', {target: '1CR'}).target, '1CR');
   })
 });
 
