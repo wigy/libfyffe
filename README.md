@@ -1,2 +1,3 @@
-# libfyffe
-Collection of common functionality for fintech projects.
+# LibFyffe
+
+A collection of common functionality for fintech-projects.
