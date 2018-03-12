@@ -5,18 +5,25 @@ const config = require('../config');
  */
 class Tx {
 
-  constructor(type) {
+  constructor(type, data = {}) {
     if (!type2class[type]) {
       throw new Error('Invalid TX type in constructor: ' + JSON.stringify(type))
     }
+    this.data = {};
+    Object.assign(this, data);
   }
 
-  static create(type) {
+  set total(val) {
+    // TODO: Validate and add the rest fields.
+    this.data.total = val;
+  }
+
+  static create(type, data = {}) {
     const constructor = type2class[type];
     if (!constructor) {
       throw new Error('Invalid TX type in create(): ' + JSON.stringify(type))
     }
-    return new constructor();
+    return new constructor(data);
   }
 }
 
@@ -25,8 +32,8 @@ class Tx {
  */
 class DepositTx extends Tx {
 
-  constructor() {
-    super('deposit');
+  constructor(data = {}) {
+    super('deposit', data);
   }
 }
 
@@ -35,8 +42,8 @@ class DepositTx extends Tx {
  */
 class WithdrawalTx extends Tx {
 
-  constructor() {
-    super('withdrawal');
+  constructor(data = {}) {
+    super('withdrawal', data);
   }
 }
 
@@ -45,8 +52,8 @@ class WithdrawalTx extends Tx {
  */
 class SellTx extends Tx {
 
-  constructor() {
-    super('sell');
+  constructor(data = {}) {
+    super('sell', data);
   }
 }
 
@@ -55,8 +62,8 @@ class SellTx extends Tx {
  */
 class BuyTx extends Tx {
 
-  constructor() {
-    super('buy');
+  constructor(data = {}) {
+    super('buy', data);
   }
 }
 
@@ -65,8 +72,8 @@ class BuyTx extends Tx {
  */
 class DividendTx extends Tx {
 
-  constructor() {
-    super('dividend');
+  constructor(data = {}) {
+    super('dividend', data);
   }
 }
 
@@ -75,8 +82,8 @@ class DividendTx extends Tx {
  */
 class FxInTx extends Tx {
 
-  constructor() {
-    super('fx-in');
+  constructor(data = {}) {
+    super('fx-in', data);
   }
 }
 
@@ -85,8 +92,8 @@ class FxInTx extends Tx {
  */
 class FxOutTx extends Tx {
 
-  constructor() {
-    super('fx-out');
+  constructor(data = {}) {
+    super('fx-out', 'data');
   }
 }
 
@@ -95,8 +102,8 @@ class FxOutTx extends Tx {
  */
 class InterestTx extends Tx {
 
-  constructor() {
-    super('interest');
+  constructor(data = {}) {
+    super('interest', data);
   }
 }
 
@@ -105,8 +112,8 @@ class InterestTx extends Tx {
  */
 class MoveInTx extends Tx {
 
-  constructor() {
-    super('move-in');
+  constructor(data = {}) {
+    super('move-in', data);
   }
 }
 
@@ -115,8 +122,8 @@ class MoveInTx extends Tx {
  */
 class MoveOutTx extends Tx {
 
-  constructor() {
-    super('move-out');
+  constructor(data = {}) {
+    super('move-out', data);
   }
 }
 

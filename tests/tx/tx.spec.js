@@ -19,6 +19,10 @@ describe('class Tx', () => {
     assert(Tx.create('move-in'));
     assert(Tx.create('move-out'));
   })
+
+  it('validates members', () => {
+    let tx = Tx.create('deposit', {total: 99});
+  })
 });
 
 describe('config', () => {
