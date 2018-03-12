@@ -1,10 +1,11 @@
 {
   "name": "libfyffe",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A collection of common functionality for fintech-projects.",
   "main": "src/index.js",
   "scripts": {
-    "test": "mocha 'tests/**/*.js'"
+    "test-watch": "mocha --watch 'tests/**/*.spec.js'",
+    "test": "mocha 'tests/**/*.spec.js'"
   },
   "repository": {
     "type": "git",
