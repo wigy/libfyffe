@@ -21,7 +21,12 @@ describe('class Tx', () => {
   })
 
   it('validates members', () => {
-    let tx = Tx.create('deposit', {total: 99});
+    assert.throws(() => Tx.create('deposit', {total: null}), Error);
+    assert.throws(() => Tx.create('deposit', {total: NaN}), Error);
+    assert.throws(() => Tx.create('deposit', {total: undefined}), Error);
+    assert.throws(() => Tx.create('deposit', {total: -1.0}), Error);
+
+    assert.throws(() => Tx.create('deposit', {}).total, Error);
   })
 });
 

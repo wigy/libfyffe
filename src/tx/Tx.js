@@ -9,15 +9,65 @@ class Tx {
     if (!type2class[type]) {
       throw new Error('Invalid TX type in constructor: ' + JSON.stringify(type))
     }
-    this.data = {};
+    this.data = {
+      total: undefined,
+    };
     Object.assign(this, data);
   }
 
+  /**
+   * Total is sum of all entry values on the debit side.
+   */
   set total(val) {
-    // TODO: Validate and add the rest fields.
+    this.isGeZero('total', val);
     this.data.total = val;
   }
+  get total() {
+    return this.get('total');
+  }
 
+  /**
+   * Verify that the given field is set and get its value.
+   * @param {String} name
+   * @return {any} Value of the field if set.
+   */
+  get(name) {
+    if (this.data[name] === undefined) {
+      throw new Error('Value ' + name + ' for tx ' + JSON.stringify(this.data) + ' not set.');
+    }
+    return this.data[name];
+  }
+
+  /**
+   * Check that value is a finite number and not NaN.
+   * @param {String} name
+   * @param {any} val
+   */
+  isNum(name, val) {
+    if (typeof(val) === 'number' && !isNaN(val) && val < Infinity && val > -Infinity) {
+      return;
+    }
+    throw new Error('Invalid value ' + JSON.stringify(val) + ' for ' + JSON.stringify(name));
+  }
+
+  /**
+   * Check that value is a finite number greater or equal to zero.
+   * @param {String} name
+   * @param {any} val
+   */
+  isGeZero(name, val) {
+    this.isNum(name, val);
+    if (val >= 0) {
+      return;
+    }
+    throw new Error('Invalid value ' + JSON.stringify(val) + ' for ' + JSON.stringify(name));
+  }
+
+  /**
+   * Create an instance of transaction.
+   * @param {String} type
+   * @param {Object} data
+   */
   static create(type, data = {}) {
     const constructor = type2class[type];
     if (!constructor) {
