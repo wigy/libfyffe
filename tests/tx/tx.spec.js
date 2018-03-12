@@ -8,7 +8,6 @@ describe('class Tx', () => {
   })
 
   it('can be created', () => {
-    config.set({x: 99})
     assert(Tx.create('deposit'));
     assert(Tx.create('withdrawal'));
     assert(Tx.create('sell'));
@@ -24,6 +23,11 @@ describe('class Tx', () => {
 
 describe('config', () => {
 
-  it('can be set', () => {
+  before(() => {
+    config.set({x: 99});
+  })
+
+  it('value can be set', () => {
+    assert.equal(config.x, 99);
   })
 });
