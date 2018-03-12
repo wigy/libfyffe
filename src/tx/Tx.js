@@ -9,9 +9,17 @@ class Tx {
     if (!type2class[type]) {
       throw new Error('Invalid TX type in constructor: ' + JSON.stringify(type))
     }
+    if (typeof(data) !== 'object' || data === null) {
+      throw new Error('Invalid initial data in constructor: ' + JSON.stringify(data))
+    }
     this.data = {
       total: undefined,
     };
+    Object.keys(data).forEach((key) => {
+      if (!(key in this.data)) {
+        throw new Error('Invalid key' + JSON.stringify(key) + 'for transaction in ' + JSON.stringify(data));
+      }
+    });
     Object.assign(this, data);
   }
 
@@ -143,7 +151,7 @@ class FxInTx extends Tx {
 class FxOutTx extends Tx {
 
   constructor(data = {}) {
-    super('fx-out', 'data');
+    super('fx-out', data);
   }
 }
 

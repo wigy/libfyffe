@@ -20,13 +20,19 @@ describe('class Tx', () => {
     assert(Tx.create('move-out'));
   })
 
-  it('validates members', () => {
+  it('validates members in general', () => {
+    assert.throws(() => Tx.create('deposit', {notHere: 1}), Error);
+  })
+
+  it('validates total correctly', () => {
     assert.throws(() => Tx.create('deposit', {total: null}), Error);
     assert.throws(() => Tx.create('deposit', {total: NaN}), Error);
     assert.throws(() => Tx.create('deposit', {total: undefined}), Error);
     assert.throws(() => Tx.create('deposit', {total: -1.0}), Error);
 
     assert.throws(() => Tx.create('deposit', {}).total, Error);
+    assert.equal(Tx.create('deposit', {total: 0.0123}).total, 0.0123);
+    assert.equal(Tx.create('deposit', {total: 1}).total, 1);
   })
 });
 
