@@ -1,3 +1,5 @@
+const config = require('../config');
+
 /**
  * Abstract base class for different transactions.
  */
@@ -19,7 +21,7 @@ class Tx {
 }
 
 /**
- * The primary account is receiving funds from outside.
+ * The primary currency account is receiving funds from the bank account.
  */
 class DepositTx extends Tx {
 
@@ -29,7 +31,7 @@ class DepositTx extends Tx {
 }
 
 /**
- * Funds are taken out from the primary account.
+ * Funds are taken out from the primary currency account and restored to the bank account.
  */
 class WithdrawalTx extends Tx {
 
