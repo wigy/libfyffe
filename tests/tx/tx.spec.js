@@ -29,10 +29,24 @@ describe('class Tx', () => {
     assert.throws(() => Tx.create('deposit', {total: NaN}), Error);
     assert.throws(() => Tx.create('deposit', {total: undefined}), Error);
     assert.throws(() => Tx.create('deposit', {total: -1.0}), Error);
-
     assert.throws(() => Tx.create('deposit', {}).total, Error);
+
     assert.equal(Tx.create('deposit', {total: 0.0123}).total, 0.0123);
     assert.equal(Tx.create('deposit', {total: 1}).total, 1);
+  })
+
+  it('validates currency correctly', () => {
+    assert.throws(() => Tx.create('fx-in', {currency: null}), Error);
+    assert.throws(() => Tx.create('fx-in', {currency: NaN}), Error);
+    assert.throws(() => Tx.create('fx-in', {currency: undefined}), Error);
+    assert.throws(() => Tx.create('fx-in', {currency: -1.0}), Error);
+    assert.throws(() => Tx.create('fx-in', {currency: ''}), Error);
+    assert.throws(() => Tx.create('fx-in', {currency: 'XYZ'}), Error);
+    assert.throws(() => Tx.create('fx-in', {}).currency, Error);
+
+    assert.equal(Tx.create('fx-in', {currency: 'USD'}).currency, 'USD');
+    assert.equal(Tx.create('fx-in', {currency: 'EUR'}).currency, 'EUR');
+    assert.equal(Tx.create('fx-in', {currency: 'DKK'}).currency, 'DKK');
   })
 });
 

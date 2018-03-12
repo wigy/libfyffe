@@ -1,4 +1,5 @@
 const config = require('../config');
+var cc = require('currency-codes');
 
 /**
  * Abstract base class for different transactions.
@@ -14,6 +15,7 @@ class Tx {
     }
     this.data = {
       total: undefined,
+      currency: undefined,
     };
     Object.keys(data).forEach((key) => {
       if (!(key in this.data)) {
@@ -35,6 +37,18 @@ class Tx {
   }
 
   /**
+   * Currency is the currency used in the transaction.
+   */
+  set currency(val) {
+    this.isString('currency', val);
+    this.check('currency', val, (val) => cc.code(val));
+    this.data.currency = val;
+  }
+  get currency() {
+    return this.get('currency');
+  }
+
+  /**
    * Verify that the given field is set and get its value.
    * @param {String} name
    * @return {any} Value of the field if set.
@@ -47,12 +61,36 @@ class Tx {
   }
 
   /**
+   * Check that the value fulfills the validator function.
+   * @param {String} name
+   * @param {any} val
+   * @param {Function} fn
+   */
+  check(name, val, fn) {
+    if (!fn(val)) {
+      throw new Error('Value ' + val + ' is not legal for ' + JSON.stringify(name));
+    }
+  }
+
+  /**
    * Check that value is a finite number and not NaN.
    * @param {String} name
    * @param {any} val
    */
   isNum(name, val) {
     if (typeof(val) === 'number' && !isNaN(val) && val < Infinity && val > -Infinity) {
+      return;
+    }
+    throw new Error('Invalid value ' + JSON.stringify(val) + ' for ' + JSON.stringify(name));
+  }
+
+  /**
+   * Check that value is a string.
+   * @param {String} name
+   * @param {any} val
+   */
+  isString(name, val) {
+    if (typeof(val) === 'string') {
       return;
     }
     throw new Error('Invalid value ' + JSON.stringify(val) + ' for ' + JSON.stringify(name));
