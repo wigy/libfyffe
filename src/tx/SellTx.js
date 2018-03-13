@@ -7,6 +7,6 @@ const Tx = require('./Tx');
 module.exports = class SellTx extends Tx {
 
   constructor(data = {}) {
-    super('sell', { target: undefined, amount: undefined, currency: config.currency, rate: undefined, fee: 0.0 }, data);
+    super('sell', { target: undefined, amount: undefined, currency: config.currency, rate: undefined, fee: 0.0, stock: undefined, avg: undefined }, data);
   }
 }

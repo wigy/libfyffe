@@ -6,6 +6,6 @@ const Tx = require('./Tx');
 module.exports = class MoveInTx extends Tx {
 
   constructor(data = {}) {
-    super('move-in', { target: undefined, amount: undefined} , data);
+    super('move-in', { target: undefined, amount: undefined, stock: undefined, avg: undefined} , data);
   }
 }

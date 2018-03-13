@@ -26,7 +26,7 @@ class Tx {
   /**
    * Construct a transaction.
    * @param {String} type Lower-case name of the transaction type.
-   * @param {Object} add Additional fields by their initial values.
+   * @param {Object} add Additional fields activated by their initial values.
    * @param {Object} data Actual data content to initialize.
    */
   constructor(type, add = {}, data = {}) {
@@ -117,6 +117,28 @@ class Tx {
   }
   get tax() {
     return this.get('tax');
+  }
+
+  /**
+   * The average price of the commodity after this transaction.
+   */
+  set avg(val) {
+    validator.isGeZero('avg', val);
+    this.data.avg = val;
+  }
+  get avg() {
+    return this.get('avg');
+  }
+
+  /**
+   * The total amount of commodity owned after this transaction.
+   */
+  set stock(val) {
+    validator.isNum('stock', val);
+    this.data.stock = val;
+  }
+  get stock() {
+    return this.get('stock');
   }
 
 
