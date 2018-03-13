@@ -68,5 +68,12 @@ module.exports = {
       ret += ' ' + module.exports.unit(unit);
     }
     return ret;
+  },
+
+  /**
+   * Round a number to two decimals.
+   */
+  cents: function(num) {
+    return Math.round(100 * num) / 100;
   }
 };
