@@ -1,4 +1,5 @@
 const config = require('../config');
+const validator = require('../data/validator');
 var cc = require('currency-codes');
 
 /**
@@ -6,7 +7,13 @@ var cc = require('currency-codes');
  */
 class Tx {
 
-  constructor(type, data = {}) {
+  /**
+   * Construct a transaction.
+   * @param {String} type Lower-case name of the transaction type.
+   * @param {Object} add Additional fields by their initial values.
+   * @param {Object} data Actual data content to initialize.
+   */
+  constructor(type, add = {}, data = {}) {
     // Check the input.
     if (!type2class[type]) {
       throw new Error('Invalid TX type in constructor: ' + JSON.stringify(type))
@@ -16,11 +23,9 @@ class Tx {
     }
     this.type = type;
     // Initialize defaults.
-    this.data = {
+    this.data = Object.assign({
       total: undefined,
-      target: undefined,
-      currency: config.currency,
-    };
+    }, add);
     // Verify keys in data.
     Object.keys(data).forEach((key) => {
       if (!(key in this.data)) {
@@ -35,7 +40,7 @@ class Tx {
    * Total is sum of all entry values on the debit side.
    */
   set total(val) {
-    this.isGeZero('total', val);
+    validator.isGeZero('total', val);
     this.data.total = val;
   }
   get total() {
@@ -46,8 +51,8 @@ class Tx {
    * Currency is the currency used in the transaction.
    */
   set currency(val) {
-    this.isString('currency', val);
-    this.check('currency', val, (val) => cc.code(val));
+    validator.isString('currency', val);
+    validator.check('currency', val, (val) => cc.code(val));
     this.data.currency = val;
   }
   get currency() {
@@ -55,15 +60,49 @@ class Tx {
   }
 
   /**
+   * Currency conversion rate at the time of the transaction.
+   */
+  set rate(val) {
+    validator.isGtZero('rate', val);
+    this.data.rate = val;
+  }
+  get rate() {
+    return this.get('rate');
+  }
+
+  /**
    * A tradeable commodity used in the transaction.
    */
   set target(val) {
-    this.isRegexMatch('target', val, /^[-A-Z0-9]+\**?$/);
+    validator.isRegexMatch('target', val, /^[-A-Z0-9]+\**?$/);
     this.data.target = val;
   }
   get target() {
     return this.get('target');
   }
+
+  /**
+   * Service fee charged for the transaction.
+   */
+  set fee(val) {
+    validator.isGeZero('fee', val);
+    this.data.fee = val;
+  }
+  get fee() {
+    return this.get('fee');
+  }
+
+  /**
+   * Tax deducted from the income.
+   */
+  set tax(val) {
+    validator.isGeZero('tax', val);
+    this.data.tax = val;
+  }
+  get tax() {
+    return this.get('tax');
+  }
+
 
   /**
    * Verify that the given field is set and get its value.
@@ -75,69 +114,6 @@ class Tx {
       throw new Error('Value ' + name + ' for tx ' + JSON.stringify(this.data) + ' not set.');
     }
     return this.data[name];
-  }
-
-  /**
-   * Check that the value fulfills the validator function.
-   * @param {String} name
-   * @param {any} val
-   * @param {Function} fn
-   */
-  check(name, val, fn) {
-    if (!fn(val)) {
-      throw new Error('Value ' + val + ' is not legal for ' + JSON.stringify(name));
-    }
-  }
-
-  /**
-   * Check that value is a finite number and not NaN.
-   * @param {String} name
-   * @param {any} val
-   */
-  isNum(name, val) {
-    if (typeof(val) === 'number' && !isNaN(val) && val < Infinity && val > -Infinity) {
-      return;
-    }
-    throw new Error('Invalid value ' + JSON.stringify(val) + ' for ' + JSON.stringify(name));
-  }
-
-  /**
-   * Check that value is a string.
-   * @param {String} name
-   * @param {any} val
-   */
-  isString(name, val) {
-    if (typeof(val) === 'string') {
-      return;
-    }
-    throw new Error('Invalid value ' + JSON.stringify(val) + ' for ' + JSON.stringify(name));
-  }
-
-  /**
-   * Check that value is a finite number greater or equal to zero.
-   * @param {String} name
-   * @param {any} val
-   */
-  isGeZero(name, val) {
-    this.isNum(name, val);
-    if (val >= 0) {
-      return;
-    }
-    throw new Error('Invalid value ' + JSON.stringify(val) + ' for ' + JSON.stringify(name));
-  }
-
-  /**
-   * Check that the value matches the regex.
-   * @param {*} name
-   * @param {*} val
-   * @param {*} regex
-   */
-  isRegexMatch(name, val, regex) {
-    this.isString(name, val);
-    if (regex.test(val)) {
-      return;
-    }
-    throw new Error('Value ' + JSON.stringify(val) + ' for ' + JSON.stringify(name) + ' does not match ' + regex);
   }
 
   /**
@@ -160,7 +136,7 @@ class Tx {
 class DepositTx extends Tx {
 
   constructor(data = {}) {
-    super('deposit', data);
+    super('deposit', {}, data);
   }
 }
 
@@ -170,7 +146,7 @@ class DepositTx extends Tx {
 class WithdrawalTx extends Tx {
 
   constructor(data = {}) {
-    super('withdrawal', data);
+    super('withdrawal', {}, data);
   }
 }
 
@@ -180,7 +156,7 @@ class WithdrawalTx extends Tx {
 class SellTx extends Tx {
 
   constructor(data = {}) {
-    super('sell', data);
+    super('sell', { target: undefined, amount: undefined, currency: config.currency, rate: undefined, fee: 0.0 }, data);
   }
 }
 
@@ -190,7 +166,7 @@ class SellTx extends Tx {
 class BuyTx extends Tx {
 
   constructor(data = {}) {
-    super('buy', data);
+    super('buy', { target: undefined, amount: undefined, currency: config.currency, rate: undefined, fee: 0.0 }, data);
   }
 }
 
@@ -200,7 +176,7 @@ class BuyTx extends Tx {
 class DividendTx extends Tx {
 
   constructor(data = {}) {
-    super('dividend', data);
+    super('dividend', { currency: config.currency, rate: undefined, tax: 0.0 }, data);
   }
 }
 
@@ -210,7 +186,7 @@ class DividendTx extends Tx {
 class FxInTx extends Tx {
 
   constructor(data = {}) {
-    super('fx-in', data);
+    super('fx-in', { target: undefined, amount: undefined, currency: undefined, rate: undefined, fee: 0.0 }, data);
   }
 }
 
@@ -220,7 +196,7 @@ class FxInTx extends Tx {
 class FxOutTx extends Tx {
 
   constructor(data = {}) {
-    super('fx-out', data);
+    super('fx-out', { target: undefined, amount: undefined, currency: undefined, rate: undefined, fee: 0.0 }, data);
   }
 }
 
@@ -230,7 +206,7 @@ class FxOutTx extends Tx {
 class InterestTx extends Tx {
 
   constructor(data = {}) {
-    super('interest', data);
+    super('interest', { currency: config.currency, rate: undefined }, data);
   }
 }
 
@@ -240,7 +216,7 @@ class InterestTx extends Tx {
 class MoveInTx extends Tx {
 
   constructor(data = {}) {
-    super('move-in', data);
+    super('move-in', { target: undefined, amount: undefined} , data);
   }
 }
 
@@ -250,7 +226,7 @@ class MoveInTx extends Tx {
 class MoveOutTx extends Tx {
 
   constructor(data = {}) {
-    super('move-out', data);
+    super('move-out', { target: undefined, amount: undefined}, data);
   }
 }
 
