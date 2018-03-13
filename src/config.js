@@ -18,6 +18,11 @@ config.set({
   services: {},
   // A map from fund tags to fund names.
   funds: {},
+  // Various flags affecting library behavior.
+  flags: {
+    // If set, do not generate profit/loss entries for selling.
+    noProfit: false,
+  },
   // Account numbers.
   accounts: {
     // Primary bank account.
@@ -34,8 +39,9 @@ config.set({
       btc: null,
     },
     // Tax accounts.
-    tax: {
+    taxes: {
       source: null,
+      income: null
     },
     // Accounts for loaning currencies.
     loans: {

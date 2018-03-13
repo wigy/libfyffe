@@ -98,6 +98,19 @@ module.exports = class Tx {
   }
 
   /**
+   * The total amount of commodity changed owner in this transaction.
+   *
+   * Negative for giving out and positive when receiving.
+   */
+  set amount(val) {
+    validator.isNum('amount', val);
+    this.data.amount = val;
+  }
+  get amount() {
+    return this.get('amount');
+  }
+
+  /**
    * Service fee charged for the transaction.
    */
   set fee(val) {
@@ -154,11 +167,41 @@ module.exports = class Tx {
   }
 
   /**
+   * Find the configured account number.
+   * @param {String} arg1 Main category name in the config for accounts or account name.
+   * @return {String} [arg2] Account name in the config.
+   */
+  getAccount(arg1, arg2 = null) {
+    let acc, conf = config.accounts;
+    if (arg2 !== null) {
+      conf = conf[arg1];
+      if (!conf) {
+        throw new Error('There is no such configured account category as ' + JSON.stringify(arg1))
+      }
+      acc = arg2;
+    } else {
+      acc = arg1;
+    }
+
+    acc = acc.toLowerCase();
+    if (!acc in conf) {
+      throw new Error('There is no such configuration for accounts as ' + JSON.stringify(acc))
+    }
+
+    const ret = conf[acc];
+    if (!ret) {
+      throw new Error('Account ' + JSON.stringify(acc) + ' is not configured.');
+    }
+
+    return ret;
+  }
+
+  /**
    * Collect atomic transaction entries for the transaction.
    * @return {Array<Entry>}
    */
-  get entries() {
-
+  getEntries() {
+    throw new Error('A transaction class in ' + types[this.type] + ' does not implement `getEntries()`.')
   }
 
   /**
