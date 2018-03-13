@@ -3,6 +3,22 @@ const validator = require('../data/validator');
 var cc = require('currency-codes');
 
 /**
+ * A map from valid type names to the module paths implementing them.
+ */
+const types = {
+  deposit: './DepositTx',
+  withdrawal: './WithdrawalTx',
+  sell: './SellTx',
+  buy: './BuyTx',
+  dividend: './DividendTx',
+  'fx-in': './FxInTx',
+  'fx-out': './FxOutTx',
+  interest: './InterestTx',
+  'move-in': './MoveInTx',
+  'move-out': './MoveOutTx',
+}
+
+/**
  * Abstract base class for different transactions.
  */
 class Tx {
@@ -15,7 +31,7 @@ class Tx {
    */
   constructor(type, add = {}, data = {}) {
     // Check the input.
-    if (!type2class[type]) {
+    if (!types[type]) {
       throw new Error('Invalid TX type in constructor: ' + JSON.stringify(type))
     }
     if (typeof(data) !== 'object' || data === null) {
@@ -122,125 +138,13 @@ class Tx {
    * @param {Object} data
    */
   static create(type, data = {}) {
-    const constructor = type2class[type];
-    if (!constructor) {
+    if (!types[type]) {
       throw new Error('Invalid TX type in create(): ' + JSON.stringify(type))
     }
+    const constructor = require(types[type]);
+
     return new constructor(data);
   }
-}
-
-/**
- * The primary currency account is receiving funds from the bank account.
- */
-class DepositTx extends Tx {
-
-  constructor(data = {}) {
-    super('deposit', {}, data);
-  }
-}
-
-/**
- * Funds are taken out from the primary currency account and restored to the bank account.
- */
-class WithdrawalTx extends Tx {
-
-  constructor(data = {}) {
-    super('withdrawal', {}, data);
-  }
-}
-
-/**
- * A tradeable commodity is sold.
- */
-class SellTx extends Tx {
-
-  constructor(data = {}) {
-    super('sell', { target: undefined, amount: undefined, currency: config.currency, rate: undefined, fee: 0.0 }, data);
-  }
-}
-
-/**
- * A tradeable commodity is bought.
- */
-class BuyTx extends Tx {
-
-  constructor(data = {}) {
-    super('buy', { target: undefined, amount: undefined, currency: config.currency, rate: undefined, fee: 0.0 }, data);
-  }
-}
-
-/**
- * A dividend is distributed to some currency account.
- */
-class DividendTx extends Tx {
-
-  constructor(data = {}) {
-    super('dividend', { currency: config.currency, rate: undefined, tax: 0.0 }, data);
-  }
-}
-
-/**
- * The primary currency is traded to another currency.
- */
-class FxInTx extends Tx {
-
-  constructor(data = {}) {
-    super('fx-in', { target: undefined, amount: undefined, currency: undefined, rate: undefined, fee: 0.0 }, data);
-  }
-}
-
-/**
- * Another currency is traded to the primary currency.
- */
-class FxOutTx extends Tx {
-
-  constructor(data = {}) {
-    super('fx-out', { target: undefined, amount: undefined, currency: undefined, rate: undefined, fee: 0.0 }, data);
-  }
-}
-
-/**
- * An interest is paid for loan.
- */
-class InterestTx extends Tx {
-
-  constructor(data = {}) {
-    super('interest', { currency: config.currency, rate: undefined }, data);
-  }
-}
-
-/**
- * Tradeable commodity is transferred in to the system.
- */
-class MoveInTx extends Tx {
-
-  constructor(data = {}) {
-    super('move-in', { target: undefined, amount: undefined} , data);
-  }
-}
-
-/**
- * Tradeable commodity is transferred out of the system.
- */
-class MoveOutTx extends Tx {
-
-  constructor(data = {}) {
-    super('move-out', { target: undefined, amount: undefined}, data);
-  }
-}
-
-const type2class = {
-  deposit: DepositTx,
-  withdrawal: WithdrawalTx,
-  sell: SellTx,
-  buy: BuyTx,
-  dividend: DividendTx,
-  'fx-in': FxInTx,
-  'fx-out': FxOutTx,
-  interest: InterestTx,
-  'move-in': MoveInTx,
-  'move-out': MoveOutTx,
 }
 
 module.exports = Tx;
