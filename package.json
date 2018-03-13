@@ -22,6 +22,6 @@
     "cryptocurrencies": "^2.0.0",
     "currency-codes": "^1.1.2",
     "mocha": "^5.0.4",
-    "sprintf": "^0.1.5"
+    "sprintf-js": "^1.1.1"
   }
 }

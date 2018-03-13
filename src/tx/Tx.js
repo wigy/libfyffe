@@ -21,7 +21,7 @@ const types = {
 /**
  * Abstract base class for different transactions.
  */
-class Tx {
+module.exports = class Tx {
 
   /**
    * Construct a transaction.
@@ -141,7 +141,6 @@ class Tx {
     return this.get('stock');
   }
 
-
   /**
    * Verify that the given field is set and get its value.
    * @param {String} name
@@ -152,6 +151,14 @@ class Tx {
       throw new Error('Value ' + name + ' for tx ' + JSON.stringify(this.data) + ' not set.');
     }
     return this.data[name];
+  }
+
+  /**
+   * Collect atomic transaction entries for the transaction.
+   * @return {Array<Entry>}
+   */
+  get entries() {
+
   }
 
   /**
@@ -168,5 +175,3 @@ class Tx {
     return new constructor(data);
   }
 }
-
-module.exports = Tx;

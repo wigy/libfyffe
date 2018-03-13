@@ -1,4 +1,4 @@
-const sprintf = require('sprintf');
+const sprintf = require('sprintf-js').sprintf;
 
 // Multiplier used to round trade amounts.
 const DIGITS = 100000000;
