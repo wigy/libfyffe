@@ -3,6 +3,15 @@ const config = require('../../src/config');
 const assert = require('assert');
 
 describe('class Tx', () => {
+
+  before(() => {
+    config.set({
+      service: 'Service-Z',
+      accounts: {
+      }
+    })
+  })
+
   it('cannot be instantiated without type', () => {
     assert.throws(() => new Tx(), Error);
   })
@@ -42,8 +51,8 @@ describe('class Tx', () => {
     assert.throws(() => Tx.create('fx-in', {currency: -1.0}), Error);
     assert.throws(() => Tx.create('fx-in', {currency: ''}), Error);
     assert.throws(() => Tx.create('fx-in', {currency: 'XYZ'}), Error);
-    assert.throws(() => Tx.create('fx-in', {}).currency, Error);
 
+    assert.equal(Tx.create('fx-in', {}).currency, 'EUR');
     assert.equal(Tx.create('fx-in', {currency: 'USD'}).currency, 'USD');
     assert.equal(Tx.create('fx-in', {currency: 'EUR'}).currency, 'EUR');
     assert.equal(Tx.create('fx-out', {currency: 'DKK'}).currency, 'DKK');
@@ -116,15 +125,13 @@ describe('class Tx', () => {
     assert.equal(Tx.create('dividend', {tax: 0}).tax, 0);
     assert.equal(Tx.create('dividend', {}).tax, 0);
   })
-});
 
-describe('config', () => {
+  it('provides correct texts for transactions', () => {
 
-  before(() => {
-    config.set({x: 99});
-  })
-
-  it('value can be set', () => {
-    assert.equal(config.x, 99);
+    assert.equal(Tx.create('deposit', {total: 1}).getText(), 'Talletus Service-Z-palveluun');
+    assert.equal(Tx.create('withdrawal', {total: 1}).getText(), 'Nosto Service-Z-palvelusta');
+    assert.equal(Tx.create('dividend', {tax: 1.1}).getText(), 1.1);
+    assert.equal(Tx.create('buy', {target: 'BTC'}).getText(), 'BTC');
+    assert.equal(Tx.create('fx-in', {currency: 'USD'}).getText(), 'USD');
   })
 });

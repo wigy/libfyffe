@@ -14,6 +14,8 @@ let config = new Config();
 config.set({
   // Abbreviation of the primary currency.
   currency: 'EUR',
+  // Language used in entry descriptions.
+  language: 'fi',
   // A map from service tags to service names.
   services: {},
   // A map from fund tags to fund names.

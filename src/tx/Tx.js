@@ -205,6 +205,13 @@ module.exports = class Tx {
   }
 
   /**
+   * Describe the transaction.
+   */
+  getText() {
+    throw new Error('A transaction class in ' + types[this.type] + ' does not implement `getText()`.')
+  }
+
+  /**
    * Create an instance of transaction.
    * @param {String} type
    * @param {Object} data

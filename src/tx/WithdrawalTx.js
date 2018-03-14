@@ -1,6 +1,7 @@
 const config = require('../config');
 const Tx = require('./Tx');
 const num = require('../util/num');
+const text = require('../util/text');
 
 /**
  * Funds are taken out from the primary currency account and restored to the bank account.
@@ -24,5 +25,9 @@ module.exports = class WithdrawalTx extends Tx {
       {number: this.getAccount('bank'), amount: num.cents(this.total)},
       {number: this.getAccount('currencies', config.currency), amount: num.cents(-this.total)},
     ];
+  }
+
+  getText() {
+    return text.get('withdrawal');
   }
 }
