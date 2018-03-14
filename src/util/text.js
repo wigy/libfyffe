@@ -10,12 +10,14 @@ const texts = {
       withdrawal: 'Nosto C{service}-palvelusta',
       buy: 'Osto +{amount} {target}',
       sell: 'Myynti +{amount} {target}',
+      dividend: 'Osinko {amount} x {target}'
     },
     options: {
       average: 'k.h. ${avg} {$}/{target}',
       averageNow: 'k.h. nyt ${avg} {$}/{target}',
       stock: 'yht. #{stock} {target}',
       stockNow: 'jälj. #{stock} {target}',
+      rate: 'kurssi {rate} {currency}/{$}'
     }
   }
 };
@@ -32,7 +34,8 @@ const texts = {
  * * #{var} - Variable value is taken from the target and transformed to decimal.
  * * ${var} - Variable value is taken from the target and transformed to currency.
  * *  {$} - Replace with currency symbol of configured currency.
- * *
+ *
+ * Note: value of the variable named currency is automatically converted to currency symbol.
  */
 function substitute(text, target) {
   ret = text;
@@ -91,7 +94,8 @@ function substitute(text, target) {
     if (target[variable] === undefined) {
       throw new Error('Cannot translate text ' + JSON.stringify(text) + ' since variable `' + variable + '` not found from target.');
     }
-    ret = ret.replace(regex, target[variable]);
+    const isCurrency = /^currency$/.test(variable);
+    ret = ret.replace(regex, isCurrency ? getSymbolFromCurrency(target[variable]) : target[variable]);
   }
 
   return ret;

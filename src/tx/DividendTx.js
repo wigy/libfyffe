@@ -1,6 +1,7 @@
 const config = require('../config');
 const Tx = require('./Tx');
 const num = require('../util/num');
+const text = require('../util/text');
 
 /**
  * A dividend is distributed to some currency account.
@@ -8,7 +9,7 @@ const num = require('../util/num');
 module.exports = class DividendTx extends Tx {
 
   constructor(data = {}) {
-    super('dividend', { currency: config.currency, rate: undefined, tax: 0.0 }, data);
+    super('dividend', { currency: config.currency, rate: undefined, tax: 0.0, target: undefined, amount: undefined }, data);
   }
 
   getEntries() {
@@ -26,5 +27,13 @@ module.exports = class DividendTx extends Tx {
     }
 
     return ret;
+  }
+
+  getText() {
+    let opts = [];
+    if (this.currency !== config.currency) {
+      opts.push(text.option('rate', this));
+    }
+    return text.withOptions(text.tx(this), opts);
   }
 }

@@ -171,5 +171,17 @@ describe('class Tx', () => {
       total: 11000
     }).getText(), 'Myynti -0.55555556 BTC (k.h. 11,000.00 €/BTC, jälj. 1.1 BTC)');
 
+    assert.equal(Tx.create('dividend', {
+      total: 10,
+      target: 'TSLA',
+      amount: 5,
+      rate: 0.86,
+      currency: 'USD'
+    }).getText(), 'Osinko 5 x TSLA (kurssi 0.86 $/€)');
+    assert.equal(Tx.create('dividend', {
+      total: 10,
+      target: 'NOKIA',
+      amount: 10
+    }).getText(), 'Osinko 10 x NOKIA');
   })
 });
