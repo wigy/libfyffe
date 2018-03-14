@@ -1,6 +1,7 @@
 const config = require('../config');
 const Tx = require('./Tx');
 const num = require('../util/num');
+const text = require('../util/text');
 
 /**
  * An interest is paid for loan.
@@ -16,5 +17,9 @@ module.exports = class InterestTx extends Tx {
       {number: this.getAccount('currencies', this.currency), amount: num.cents(-this.total)},
       {number: this.getAccount('interest'), amount: num.cents(this.total)},
     ];
+  }
+
+  getText() {
+    return text.tx(this);
   }
 }

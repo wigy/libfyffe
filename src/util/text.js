@@ -10,14 +10,21 @@ const texts = {
       withdrawal: 'Nosto C{service}-palvelusta',
       buy: 'Osto +{amount} {target}',
       sell: 'Myynti +{amount} {target}',
-      dividend: 'Osinko {amount} x {target}'
+      dividend: 'Osinko {amount} x {target}',
+      'fx-in': 'Valuutanvaihto £{currency} -> £{target}',
+      'fx-out': 'Valuutanvaihto £{target} -> £{currency}',
+      interest: 'C{service} lainakorko',
+      'move-in': 'Siirto C{service}-palveluun +{amount} {target}',
+      'move-out': 'Siirto C{service}-palvelusta +{amount} {target}',
     },
     options: {
       average: 'k.h. ${avg} {$}/{target}',
       averageNow: 'k.h. nyt ${avg} {$}/{target}',
       stock: 'yht. #{stock} {target}',
       stockNow: 'jälj. #{stock} {target}',
-      rate: 'kurssi {rate} {currency}/{$}'
+      rate: 'kurssi {rate} £{currency}/{$}',
+      inRate: 'kurssi {rate} £{target}/£{currency}',
+      outRate: 'kurssi {rate} £{currency}/£{target}'
     }
   }
 };
@@ -33,9 +40,9 @@ const texts = {
  * * +{var} - Variable value is taken from the target and transformed to signed decimal.
  * * #{var} - Variable value is taken from the target and transformed to decimal.
  * * ${var} - Variable value is taken from the target and transformed to currency.
+ * * £{var} - Variable value is replaced with the corresponding currency symbol.
  * *  {$} - Replace with currency symbol of configured currency.
  *
- * Note: value of the variable named currency is automatically converted to currency symbol.
  */
 function substitute(text, target) {
   ret = text;
@@ -87,6 +94,17 @@ function substitute(text, target) {
     ret = ret.replace(regex, num.currency(target[variable]));
   }
 
+  // Replace variables with currency symbol.
+  regex = /£\{(\w+)\}/;
+  while(match = regex.exec(ret)) {
+    const variable = match[1];
+    if (target[variable] === undefined) {
+      throw new Error('Cannot translate text ' + JSON.stringify(text) + ' since variable `' + variable + '` not found from target.');
+    }
+    const sym = getSymbolFromCurrency(target[variable]) || target[variable];
+    ret = ret.replace(regex, sym);
+  }
+
   // Replace variables as they are.
   regex = /\{(\w+)\}/;
   while(match = regex.exec(ret)) {
@@ -95,7 +113,7 @@ function substitute(text, target) {
       throw new Error('Cannot translate text ' + JSON.stringify(text) + ' since variable `' + variable + '` not found from target.');
     }
     const isCurrency = /^currency$/.test(variable);
-    ret = ret.replace(regex, isCurrency ? getSymbolFromCurrency(target[variable]) : target[variable]);
+    ret = ret.replace(regex, target[variable]);
   }
 
   return ret;

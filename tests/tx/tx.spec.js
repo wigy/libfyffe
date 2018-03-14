@@ -183,5 +183,32 @@ describe('class Tx', () => {
       target: 'NOKIA',
       amount: 10
     }).getText(), 'Osinko 10 x NOKIA');
+
+    assert.equal(Tx.create('fx-in', {
+      total: 5,
+      rate: 0.86,
+      target: 'USD'
+    }).getText(), 'Valuutanvaihto € -> $ (kurssi 0.86 $/€)');
+    assert.equal(Tx.create('fx-out', {
+      total: 5,
+      rate: 1.01,
+      currency: 'USD',
+      target: 'DKK'
+    }).getText(), 'Valuutanvaihto kr -> $ (kurssi 1.01 $/kr)');
+
+    assert.equal(Tx.create('interest', {total: 9.99}).getText(), 'Service-Z lainakorko');
+
+    assert.equal(Tx.create('move-in', {
+      total: 500,
+      amount: 123/999,
+      stock: 222/999,
+      target: 'LTC'
+    }).getText(), 'Siirto Service-Z-palveluun +0.12312312 LTC (yht. 0.22222222 LTC)');
+    assert.equal(Tx.create('move-out', {
+      total: 500,
+      amount: -567/999,
+      stock: 0,
+      target: 'LTC'
+    }).getText(), 'Siirto Service-Z-palvelusta -0.56756757 LTC (jälj. 0 LTC)');
   })
 });
