@@ -9,7 +9,7 @@ const text = require('../util/text');
 module.exports = class FxOutTx extends Tx {
 
   constructor(data = {}) {
-    super('fx-out', { target: config.currency, amount: undefined, currency: undefined, rate: undefined, fee: 0.0 }, data);
+    super('fx-out', { target: undefined, amount: undefined, currency: config.currency, rate: undefined, fee: 0.0 }, data);
   }
 
   getEntries() {

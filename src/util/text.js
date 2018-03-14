@@ -4,29 +4,7 @@ const num = require('./num');
 
 // Translation table.
 const texts = {
-  fi: {
-    tx: {
-      deposit: 'Talletus C{service}-palveluun',
-      withdrawal: 'Nosto C{service}-palvelusta',
-      buy: 'Osto +{amount} {target}',
-      sell: 'Myynti +{amount} {target}',
-      dividend: 'Osinko {amount} x {target}',
-      'fx-in': 'Valuutanvaihto £{currency} -> £{target}',
-      'fx-out': 'Valuutanvaihto £{target} -> £{currency}',
-      interest: 'C{service} lainakorko',
-      'move-in': 'Siirto C{service}-palveluun +{amount} {target}',
-      'move-out': 'Siirto C{service}-palvelusta +{amount} {target}'
-    },
-    options: {
-      average: 'k.h. ${avg} {$}/{target}', // eslint-disable-line
-      averageNow: 'k.h. nyt ${avg} {$}/{target}', // eslint-disable-line
-      stock: 'yht. #{stock} {target}',
-      stockNow: 'jälj. #{stock} {target}',
-      rate: 'kurssi {rate} £{currency}/{$}',
-      inRate: 'kurssi {rate} £{target}/£{currency}',
-      outRate: 'kurssi {rate} £{currency}/£{target}'
-    }
-  }
+  fi: require('../../data/texts/fi.json')
 };
 
 /**

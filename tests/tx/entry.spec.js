@@ -8,6 +8,7 @@ describe('entries', () => {
 
   before(() => {
     config.set({
+      currency: 'EUR',
       accounts: {
         bank: 'BANK',
         currencies: {
