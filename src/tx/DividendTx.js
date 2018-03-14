@@ -36,4 +36,4 @@ module.exports = class DividendTx extends Tx {
     }
     return text.withOptions(text.tx(this), opts);
   }
-}
+};

@@ -15,11 +15,11 @@ const texts = {
       'fx-out': 'Valuutanvaihto £{target} -> £{currency}',
       interest: 'C{service} lainakorko',
       'move-in': 'Siirto C{service}-palveluun +{amount} {target}',
-      'move-out': 'Siirto C{service}-palvelusta +{amount} {target}',
+      'move-out': 'Siirto C{service}-palvelusta +{amount} {target}'
     },
     options: {
-      average: 'k.h. ${avg} {$}/{target}',
-      averageNow: 'k.h. nyt ${avg} {$}/{target}',
+      average: 'k.h. ${avg} {$}/{target}', // eslint-disable-line
+      averageNow: 'k.h. nyt ${avg} {$}/{target}', // eslint-disable-line
       stock: 'yht. #{stock} {target}',
       stockNow: 'jälj. #{stock} {target}',
       rate: 'kurssi {rate} £{currency}/{$}',
@@ -45,28 +45,28 @@ const texts = {
  *
  */
 function substitute(text, target) {
-  ret = text;
+  let match;
+  let ret = text;
 
   // Replace special symbols.
   let regex = /\{([$])\}/;
-  while(match = regex.exec(ret)) {
-    const symbol = match[1];
+  while ((match = regex.exec(ret))) {
     ret = ret.replace(regex, getSymbolFromCurrency(config.currency) || config.currency);
   }
 
   // Replace configuration variables.
   regex = /C\{(\w+)\}/;
-  while(match = regex.exec(ret)) {
+  while ((match = regex.exec(ret))) {
     const variable = match[1];
     if (config[variable] === undefined) {
       throw new Error('Cannot translate text ' + JSON.stringify(text) + ' since `' + variable + '` not configured.');
     }
-    ret = ret.replace(regex, config[variable])
+    ret = ret.replace(regex, config[variable]);
   }
 
   // Replace variables with signed number.
   regex = /\+\{(\w+)\}/;
-  while(match = regex.exec(ret)) {
+  while ((match = regex.exec(ret))) {
     const variable = match[1];
     if (target[variable] === undefined) {
       throw new Error('Cannot translate text ' + JSON.stringify(text) + ' since variable `' + variable + '` not found from target.');
@@ -76,7 +76,7 @@ function substitute(text, target) {
 
   // Replace variables with fixed decimal number.
   regex = /#\{(\w+)\}/;
-  while(match = regex.exec(ret)) {
+  while ((match = regex.exec(ret))) {
     const variable = match[1];
     if (target[variable] === undefined) {
       throw new Error('Cannot translate text ' + JSON.stringify(text) + ' since variable `' + variable + '` not found from target.');
@@ -86,7 +86,7 @@ function substitute(text, target) {
 
   // Replace variables with currency.
   regex = /\$\{(\w+)\}/;
-  while(match = regex.exec(ret)) {
+  while ((match = regex.exec(ret))) {
     const variable = match[1];
     if (target[variable] === undefined) {
       throw new Error('Cannot translate text ' + JSON.stringify(text) + ' since variable `' + variable + '` not found from target.');
@@ -96,7 +96,7 @@ function substitute(text, target) {
 
   // Replace variables with currency symbol.
   regex = /£\{(\w+)\}/;
-  while(match = regex.exec(ret)) {
+  while ((match = regex.exec(ret))) {
     const variable = match[1];
     if (target[variable] === undefined) {
       throw new Error('Cannot translate text ' + JSON.stringify(text) + ' since variable `' + variable + '` not found from target.');
@@ -107,12 +107,11 @@ function substitute(text, target) {
 
   // Replace variables as they are.
   regex = /\{(\w+)\}/;
-  while(match = regex.exec(ret)) {
+  while ((match = regex.exec(ret))) {
     const variable = match[1];
     if (target[variable] === undefined) {
       throw new Error('Cannot translate text ' + JSON.stringify(text) + ' since variable `' + variable + '` not found from target.');
     }
-    const isCurrency = /^currency$/.test(variable);
     ret = ret.replace(regex, target[variable]);
   }
 

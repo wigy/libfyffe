@@ -15,7 +15,7 @@ module.exports = class FxInTx extends Tx {
   getEntries() {
     return [
       {number: this.getAccount('currencies', this.target), amount: num.cents(this.total)},
-      {number: this.getAccount('currencies', this.currency), amount: num.cents(-this.total)},
+      {number: this.getAccount('currencies', this.currency), amount: num.cents(-this.total)}
     ];
   }
 
@@ -23,4 +23,4 @@ module.exports = class FxInTx extends Tx {
     let opts = [text.option('inRate', this)];
     return text.withOptions(text.tx(this), opts);
   }
-}
+};

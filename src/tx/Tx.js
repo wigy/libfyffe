@@ -15,8 +15,8 @@ const types = {
   'fx-out': './FxOutTx',
   interest: './InterestTx',
   'move-in': './MoveInTx',
-  'move-out': './MoveOutTx',
-}
+  'move-out': './MoveOutTx'
+};
 
 /**
  * Abstract base class for different transactions.
@@ -32,15 +32,15 @@ module.exports = class Tx {
   constructor(type, add = {}, data = {}) {
     // Check the input.
     if (!types[type]) {
-      throw new Error('Invalid TX type in constructor: ' + JSON.stringify(type))
+      throw new Error('Invalid TX type in constructor: ' + JSON.stringify(type));
     }
-    if (typeof(data) !== 'object' || data === null) {
-      throw new Error('Invalid initial data in constructor: ' + JSON.stringify(data))
+    if (typeof (data) !== 'object' || data === null) {
+      throw new Error('Invalid initial data in constructor: ' + JSON.stringify(data));
     }
     this.type = type;
     // Initialize defaults.
     this.data = Object.assign({
-      total: undefined,
+      total: undefined
     }, add);
     // Verify keys in data.
     Object.keys(data).forEach((key) => {
@@ -172,11 +172,12 @@ module.exports = class Tx {
    * @return {String} [arg2] Account name in the config.
    */
   getAccount(arg1, arg2 = null) {
-    let acc, conf = config.accounts;
+    let acc;
+    let conf = config.accounts;
     if (arg2 !== null) {
       conf = conf[arg1];
       if (!conf) {
-        throw new Error('There is no such configured account category as ' + JSON.stringify(arg1))
+        throw new Error('There is no such configured account category as ' + JSON.stringify(arg1));
       }
       acc = arg2;
     } else {
@@ -184,8 +185,8 @@ module.exports = class Tx {
     }
 
     acc = acc.toLowerCase();
-    if (!acc in conf) {
-      throw new Error('There is no such configuration for accounts as ' + JSON.stringify(acc))
+    if (!(acc in conf)) {
+      throw new Error('There is no such configuration for accounts as ' + JSON.stringify(acc));
     }
 
     const ret = conf[acc];
@@ -201,14 +202,14 @@ module.exports = class Tx {
    * @return {Array<Entry>}
    */
   getEntries() {
-    throw new Error('A transaction class in ' + types[this.type] + ' does not implement `getEntries()`.')
+    throw new Error('A transaction class in ' + types[this.type] + ' does not implement `getEntries()`.');
   }
 
   /**
    * Describe the transaction.
    */
   getText() {
-    throw new Error('A transaction class in ' + types[this.type] + ' does not implement `getText()`.')
+    throw new Error('A transaction class in ' + types[this.type] + ' does not implement `getText()`.');
   }
 
   /**
@@ -218,10 +219,10 @@ module.exports = class Tx {
    */
   static create(type, data = {}) {
     if (!types[type]) {
-      throw new Error('Invalid TX type in create(): ' + JSON.stringify(type))
+      throw new Error('Invalid TX type in create(): ' + JSON.stringify(type));
     }
     const constructor = require(types[type]);
 
     return new constructor(data);
   }
-}
+};

@@ -23,7 +23,7 @@ config.set({
   // Various flags affecting library behavior.
   flags: {
     // If set, do not generate profit/loss entries for selling.
-    noProfit: false,
+    noProfit: false
   },
   // Account numbers.
   accounts: {
@@ -32,13 +32,13 @@ config.set({
     // Currency accounts for trading.
     currencies: {
       eur: null,
-      usd: null,
+      usd: null
     },
     // Accounts for holding tradeable targets.
     targets: {
       shares: null,
       eth: null,
-      btc: null,
+      btc: null
     },
     // Tax accounts.
     taxes: {

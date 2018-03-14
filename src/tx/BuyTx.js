@@ -14,24 +14,23 @@ module.exports = class BuyTx extends Tx {
 
   getEntries() {
     if (this.fee) {
-      const amount = num.cents(this.total - this.fee);
       return [
         {number: this.getAccount('targets', this.target), amount: num.cents(this.total - this.fee)},
         {number: this.getAccount('fees'), amount: num.cents(this.fee)},
-        {number: this.getAccount('currencies', config.currency), amount: num.cents(-this.total)},
+        {number: this.getAccount('currencies', config.currency), amount: num.cents(-this.total)}
       ];
     }
     return [
       {number: this.getAccount('targets', this.target), amount: num.cents(this.total)},
-      {number: this.getAccount('currencies', config.currency), amount: num.cents(-this.total)},
-  ];
+      {number: this.getAccount('currencies', config.currency), amount: num.cents(-this.total)}
+    ];
   }
 
   getText() {
     let opts = [text.option('stock', this)];
     if (!config.flags.noProfit) {
-      opts.push(text.option('averageNow', this))
+      opts.push(text.option('averageNow', this));
     }
     return text.withOptions(text.tx(this), opts);
   }
-}
+};

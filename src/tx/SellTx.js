@@ -15,7 +15,7 @@ module.exports = class SellTx extends Tx {
   getEntries() {
     const total = num.cents(this.total - this.fee);
     let ret = [
-      {number: this.getAccount('currencies', config.currency), amount: total},
+      {number: this.getAccount('currencies', config.currency), amount: total}
     ];
     if (this.fee) {
       ret.push({number: this.getAccount('fees'), amount: this.fee});
@@ -47,9 +47,9 @@ module.exports = class SellTx extends Tx {
   getText() {
     let opts = [];
     if (!config.flags.noProfit) {
-      opts.push(text.option('average', this))
+      opts.push(text.option('average', this));
     }
-    opts.push(text.option('stockNow', this))
+    opts.push(text.option('stockNow', this));
     return text.withOptions(text.tx(this), opts);
   }
-}
+};

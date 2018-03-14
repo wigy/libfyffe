@@ -17,7 +17,7 @@ module.exports = {
    * @param {any} val
    */
   isNum: (name, val) => {
-    if (typeof(val) === 'number' && !isNaN(val) && val < Infinity && val > -Infinity) {
+    if (typeof (val) === 'number' && !isNaN(val) && val < Infinity && val > -Infinity) {
       return;
     }
     throw new Error('Invalid value ' + JSON.stringify(val) + ' for ' + JSON.stringify(name));
@@ -29,7 +29,7 @@ module.exports = {
    * @param {any} val
    */
   isString: (name, val) => {
-    if (typeof(val) === 'string') {
+    if (typeof (val) === 'string') {
       return;
     }
     throw new Error('Invalid value ' + JSON.stringify(val) + ' for ' + JSON.stringify(name));

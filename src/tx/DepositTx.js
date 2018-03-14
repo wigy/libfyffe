@@ -18,16 +18,16 @@ module.exports = class DepositTx extends Tx {
       return [
         {number: this.getAccount('currencies', config.currency), amount: num.cents(amount)},
         {number: this.getAccount('fees'), amount: num.cents(this.fee)},
-        {number: this.getAccount('bank'), amount: num.cents(-this.total)},
+        {number: this.getAccount('bank'), amount: num.cents(-this.total)}
       ];
     }
     return [
       {number: this.getAccount('currencies', config.currency), amount: num.cents(this.total)},
-      {number: this.getAccount('bank'), amount: num.cents(-this.total)},
+      {number: this.getAccount('bank'), amount: num.cents(-this.total)}
     ];
   }
 
   getText() {
     return text.tx(this);
   }
-}
+};

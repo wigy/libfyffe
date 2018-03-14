@@ -12,7 +12,7 @@ module.exports = {
   /**
    * Trim a number with optional unit to the constant amount of decimals.
    */
-  trimSigned: function(num, unit=null) {
+  trimSigned: function(num, unit = null) {
     let ret;
 
     if (Math.abs(num) < 1 / DIGITS) {
@@ -28,8 +28,8 @@ module.exports = {
       ret = '+' + ret;
     }
 
-    ret = ret.replace(/(.+)\.(.*)(0+)$/,'$1.$2');
-    ret = ret.replace(/\.$/,'');
+    ret = ret.replace(/(.+)\.(.*)(0+)$/, '$1.$2');
+    ret = ret.replace(/\.$/, '');
     ret = ret === '+' ? '+0' : ret;
 
     if (unit !== null) {
@@ -42,7 +42,7 @@ module.exports = {
   /**
    * Trim a number with optional unit to the constant amount of decimals without '+'.
    */
-  trim: function(num, unit=null) {
+  trim: function(num, unit = null) {
     return module.exports.trimSigned(num, unit).replace(/^\+/, '');
   },
 
@@ -58,7 +58,7 @@ module.exports = {
   /**
    * Convert a number to currency with unit.
    */
-  currency: function(num, unit, digits=2) {
+  currency: function(num, unit, digits = 2) {
     let [body, decimals] = sprintf('%.' + digits + 'f', num).split('.');
     if (body.length > 3) {
       body = body.substr(0, body.length - 3) + ',' + body.substr(body.length - 3);
