@@ -35,8 +35,3 @@ module.exports = class BuyTx extends Tx {
     return text.withOptions(text.tx(this), opts);
   }
 }
-/*
-if (!this.importer.config.noProfit) {
-  parenthesis.push('k.h. nyt ' + num.currency(this.targetAverage, '€/'  + this.target));
-}
-*/

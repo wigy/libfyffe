@@ -9,11 +9,13 @@ const texts = {
       deposit: 'Talletus C{service}-palveluun',
       withdrawal: 'Nosto C{service}-palvelusta',
       buy: 'Osto +{amount} {target}',
+      sell: 'Myynti +{amount} {target}',
     },
     options: {
-      stock: 'yht. #{amount} {target}',
-      average: 'k.h.',
+      average: 'k.h. ${avg} {$}/{target}',
       averageNow: 'k.h. nyt ${avg} {$}/{target}',
+      stock: 'yht. #{stock} {target}',
+      stockNow: 'jälj. #{stock} {target}',
     }
   }
 };

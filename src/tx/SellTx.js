@@ -1,6 +1,7 @@
 const config = require('../config');
 const Tx = require('./Tx');
 const num = require('../util/num');
+const text = require('../util/text');
 
 /**
  * A tradeable commodity is sold.
@@ -41,5 +42,14 @@ module.exports = class SellTx extends Tx {
     }
 
     return ret;
+  }
+
+  getText() {
+    let opts = [];
+    if (!config.flags.noProfit) {
+      opts.push(text.option('average', this))
+    }
+    opts.push(text.option('stockNow', this))
+    return text.withOptions(text.tx(this), opts);
   }
 }

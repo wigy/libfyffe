@@ -10,7 +10,7 @@ describe('class Tx', () => {
       service: 'Service-Z',
       accounts: {
       }
-    })
+    });
   })
 
   it('cannot be instantiated without type', () => {
@@ -131,12 +131,45 @@ describe('class Tx', () => {
 
     assert.equal(Tx.create('deposit', {total: 1}).getText(), 'Talletus Service-Z-palveluun');
     assert.equal(Tx.create('withdrawal', {total: 1}).getText(), 'Nosto Service-Z-palvelusta');
+
+    config.set({
+      flags: {
+        noProfit: true
+      }
+    });
     assert.equal(Tx.create('buy', {
       target: 'BTC',
       amount: 5/9,
-      stock: 0.1,
+      stock: 2.1,
       avg: 11000,
       total: 11000
-    }).getText(), 'Osto +0.55555556 BTC (yht. 0.55555556 BTC, k.h. nyt 11,000.00 €/BTC)');
+    }).getText(), 'Osto +0.55555556 BTC (yht. 2.1 BTC)');
+    assert.equal(Tx.create('sell', {
+      target: 'BTC',
+      amount: -5/9,
+      stock: 1.1,
+      avg: 11000,
+      total: 11000
+    }).getText(), 'Myynti -0.55555556 BTC (jälj. 1.1 BTC)');
+    config.set({
+      flags: {
+        noProfit: false
+      }
+    });
+    assert.equal(Tx.create('buy', {
+      target: 'BTC',
+      amount: 5/9,
+      stock: 10.1,
+      avg: 11000,
+      total: 11000
+    }).getText(), 'Osto +0.55555556 BTC (yht. 10.1 BTC, k.h. nyt 11,000.00 €/BTC)');
+    assert.equal(Tx.create('sell', {
+      target: 'BTC',
+      amount: -5/9,
+      stock: 1.1,
+      avg: 11000,
+      total: 11000
+    }).getText(), 'Myynti -0.55555556 BTC (k.h. 11,000.00 €/BTC, jälj. 1.1 BTC)');
+
   })
 });
