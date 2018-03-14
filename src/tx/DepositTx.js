@@ -28,6 +28,6 @@ module.exports = class DepositTx extends Tx {
   }
 
   getText() {
-    return text.get('deposit');
+    return text.tx(this);
   }
 }

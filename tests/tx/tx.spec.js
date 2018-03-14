@@ -6,6 +6,7 @@ describe('class Tx', () => {
 
   before(() => {
     config.set({
+      language: 'fi',
       service: 'Service-Z',
       accounts: {
       }
@@ -130,8 +131,12 @@ describe('class Tx', () => {
 
     assert.equal(Tx.create('deposit', {total: 1}).getText(), 'Talletus Service-Z-palveluun');
     assert.equal(Tx.create('withdrawal', {total: 1}).getText(), 'Nosto Service-Z-palvelusta');
-    assert.equal(Tx.create('dividend', {tax: 1.1}).getText(), 1.1);
-    assert.equal(Tx.create('buy', {target: 'BTC'}).getText(), 'BTC');
-    assert.equal(Tx.create('fx-in', {currency: 'USD'}).getText(), 'USD');
+    assert.equal(Tx.create('buy', {
+      target: 'BTC',
+      amount: 5/9,
+      stock: 0.1,
+      avg: 11000,
+      total: 11000
+    }).getText(), 'Osto +0.55555556 BTC (yht. 0.55555556 BTC, k.h. nyt 11,000.00 €/BTC)');
   })
 });

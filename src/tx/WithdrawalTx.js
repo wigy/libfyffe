@@ -28,6 +28,6 @@ module.exports = class WithdrawalTx extends Tx {
   }
 
   getText() {
-    return text.get('withdrawal');
+    return text.tx(this);
   }
 }

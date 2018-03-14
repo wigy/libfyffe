@@ -1,6 +1,7 @@
 const config = require('../config');
 const Tx = require('./Tx');
 const num = require('../util/num');
+const text = require('../util/text');
 
 /**
  * A tradeable commodity is bought.
@@ -25,4 +26,17 @@ module.exports = class BuyTx extends Tx {
       {number: this.getAccount('currencies', config.currency), amount: num.cents(-this.total)},
   ];
   }
+
+  getText() {
+    let opts = [text.option('stock', this)];
+    if (!config.flags.noProfit) {
+      opts.push(text.option('averageNow', this))
+    }
+    return text.withOptions(text.tx(this), opts);
+  }
 }
+/*
+if (!this.importer.config.noProfit) {
+  parenthesis.push('k.h. nyt ' + num.currency(this.targetAverage, '€/'  + this.target));
+}
+*/
