@@ -1,6 +1,6 @@
 const Tx = require('./Tx');
 const num = require('../util/num');
-const text = require('../util/text');
+const text = require('../text/make');
 
 /**
  * Tradeable commodity is transferred out of the system.

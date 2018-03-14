@@ -1,7 +1,7 @@
 const config = require('../config');
 const Tx = require('./Tx');
 const num = require('../util/num');
-const text = require('../util/text');
+const text = require('../text/make');
 
 /**
  * An interest is paid for loan.

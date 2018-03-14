@@ -1,6 +1,6 @@
 const getSymbolFromCurrency = require('currency-symbol-map');
 const config = require('../config');
-const num = require('./num');
+const num = require('../util/num');
 
 // Translation table.
 const texts = {
