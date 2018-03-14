@@ -11,11 +11,11 @@ describe('class Tx', () => {
       accounts: {
       }
     });
-  })
+  });
 
   it('cannot be instantiated without type', () => {
     assert.throws(() => new Tx(), Error);
-  })
+  });
 
   it('can be created', () => {
     assert(Tx.create('deposit'));
@@ -28,11 +28,11 @@ describe('class Tx', () => {
     assert(Tx.create('interest'));
     assert(Tx.create('move-in'));
     assert(Tx.create('move-out'));
-  })
+  });
 
   it('validates members in general', () => {
     assert.throws(() => Tx.create('deposit', {notHere: 1}), Error);
-  })
+  });
 
   it('validates total correctly', () => {
     assert.throws(() => Tx.create('deposit', {total: null}), Error);
@@ -43,7 +43,7 @@ describe('class Tx', () => {
 
     assert.equal(Tx.create('deposit', {total: 0.0123}).total, 0.0123);
     assert.equal(Tx.create('deposit', {total: 1}).total, 1);
-  })
+  });
 
   it('validates currency correctly', () => {
     assert.throws(() => Tx.create('fx-in', {currency: null}), Error);
@@ -57,7 +57,7 @@ describe('class Tx', () => {
     assert.equal(Tx.create('fx-in', {currency: 'USD'}).currency, 'USD');
     assert.equal(Tx.create('fx-in', {currency: 'EUR'}).currency, 'EUR');
     assert.equal(Tx.create('fx-out', {currency: 'DKK'}).currency, 'DKK');
-  })
+  });
 
   it('validates rate correctly', () => {
     assert.throws(() => Tx.create('dividend', {rate: null}), Error);
@@ -70,7 +70,7 @@ describe('class Tx', () => {
 
     assert.equal(Tx.create('dividend', {rate: 1.1}).rate, 1.1);
     assert.equal(Tx.create('dividend', {rate: 0.000001}).rate, 0.000001);
-  })
+  });
 
   it('validates target correctly', () => {
     assert.throws(() => Tx.create('buy', {target: null}), Error);
@@ -86,7 +86,7 @@ describe('class Tx', () => {
     assert.equal(Tx.create('buy', {target: '42'}).target, '42');
     assert.equal(Tx.create('buy', {target: 'DTC**'}).target, 'DTC**');
     assert.equal(Tx.create('buy', {target: '1CR'}).target, '1CR');
-  })
+  });
 
   it('validates amount correctly', () => {
     assert.throws(() => Tx.create('sell', {rate: null}), Error);
@@ -99,7 +99,7 @@ describe('class Tx', () => {
 
     assert.equal(Tx.create('sell', {rate: 1.1}).rate, 1.1);
     assert.equal(Tx.create('sell', {rate: 0.000001}).rate, 0.000001);
-  })
+  });
 
   it('validates fee correctly', () => {
     assert.throws(() => Tx.create('sell', {fee: null}), Error);
@@ -112,7 +112,7 @@ describe('class Tx', () => {
     assert.equal(Tx.create('sell', {fee: 0.000001}).fee, 0.000001);
     assert.equal(Tx.create('sell', {fee: 0}).fee, 0);
     assert.equal(Tx.create('sell', {}).fee, 0);
-  })
+  });
 
   it('validates tax correctly', () => {
     assert.throws(() => Tx.create('dividend', {tax: null}), Error);
@@ -125,7 +125,7 @@ describe('class Tx', () => {
     assert.equal(Tx.create('dividend', {tax: 0.000001}).tax, 0.000001);
     assert.equal(Tx.create('dividend', {tax: 0}).tax, 0);
     assert.equal(Tx.create('dividend', {}).tax, 0);
-  })
+  });
 
   it('provides correct texts for transactions', () => {
 
@@ -139,14 +139,14 @@ describe('class Tx', () => {
     });
     assert.equal(Tx.create('buy', {
       target: 'BTC',
-      amount: 5/9,
+      amount: 5 / 9,
       stock: 2.1,
       avg: 11000,
       total: 11000
     }).getText(), 'Osto +0.55555556 BTC (yht. 2.1 BTC)');
     assert.equal(Tx.create('sell', {
       target: 'BTC',
-      amount: -5/9,
+      amount: -5 / 9,
       stock: 1.1,
       avg: 11000,
       total: 11000
@@ -158,14 +158,14 @@ describe('class Tx', () => {
     });
     assert.equal(Tx.create('buy', {
       target: 'BTC',
-      amount: 5/9,
+      amount: 5 / 9,
       stock: 10.1,
       avg: 11000,
       total: 11000
     }).getText(), 'Osto +0.55555556 BTC (yht. 10.1 BTC, k.h. nyt 11,000.00 €/BTC)');
     assert.equal(Tx.create('sell', {
       target: 'BTC',
-      amount: -5/9,
+      amount: -5 / 9,
       stock: 1.1,
       avg: 11000,
       total: 11000
@@ -200,15 +200,15 @@ describe('class Tx', () => {
 
     assert.equal(Tx.create('move-in', {
       total: 500,
-      amount: 123/999,
-      stock: 222/999,
+      amount: 123 / 999,
+      stock: 222 / 999,
       target: 'LTC'
     }).getText(), 'Siirto Service-Z-palveluun +0.12312312 LTC (yht. 0.22222222 LTC)');
     assert.equal(Tx.create('move-out', {
       total: 500,
-      amount: -567/999,
+      amount: -567 / 999,
       stock: 0,
       target: 'LTC'
     }).getText(), 'Siirto Service-Z-palvelusta -0.56756757 LTC (jälj. 0 LTC)');
-  })
+  });
 });
