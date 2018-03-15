@@ -16,14 +16,18 @@ config.set({
   currency: 'EUR',
   // Language used in entry descriptions.
   language: 'fi',
-  // A map from service tags to service names.
-  services: {},
-  // A map from fund tags to fund names.
-  funds: {},
+  // Current service name.
+  service: null,
+  // Current fund name.
+  fund: null,
   // Various flags affecting library behavior.
   flags: {
     // If set, do not generate profit/loss entries for selling.
-    noProfit: false
+    noProfit: false,
+    // If set, avoid doing permanent changes.
+    dryRun: false,
+    // If set, show verbose debug information.
+    debug: false
   },
   // Account numbers.
   accounts: {

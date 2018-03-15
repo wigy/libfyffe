@@ -1,3 +1,4 @@
 module.exports = {
-  num: require('./num')
+  num: require('./num'),
+  cli: require('./cli')
 };

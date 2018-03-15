@@ -1,3 +1,3 @@
 module.exports = {
-  Tx: require('./tx')
+  Tx: require('./Tx')
 };
