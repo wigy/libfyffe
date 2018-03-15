@@ -42,7 +42,7 @@ class Cli {
       if (!match && this.__options[opt]) {
         this.options[opt] = true;
       } else {
-        if (!this.__options[match[1]]) {
+        if (!match || !this.__options[match[1]]) {
           console.error('Invalid option', opt);
           process.exit(4);
         }
@@ -50,6 +50,13 @@ class Cli {
       }
       this.__remaining.splice(2, 1);
     }
+  }
+
+  /**
+   * Count non-option arguments.
+   */
+  argc() {
+    return this.__remaining.length - 2;
   }
 
   /**
