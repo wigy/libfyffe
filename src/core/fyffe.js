@@ -1,6 +1,7 @@
 const Stock = require('./Stock');
 const Accounts = require('./Accounts');
 const Ledger = require('./Ledger');
+const config = require('../config');
 
 /**
  * A system instance for transforming and inspecting financial data.
@@ -23,13 +24,48 @@ class Fyffe {
     this.dbs[dbName] = knex;
   }
 
-  async loadBalances(dbName) {
-    // TODO: Mechnism to load balances.
+  /**
+   * Set up account information from `tilitin`-database.
+   * @param {String} dbName
+   */
+  async loadAccounts(dbName) {
+    return this.dbs[dbName]
+      .select('id', 'number', 'name')
+      .from('account')
+      .then((accounts) => {
+        this.accounts.loadAccounts(accounts);
+      });
   }
 
+  /**
+   * Update balances from the `tilitin`-database.
+   * @param {String} dbName
+   */
+  async loadBalances(dbName) {
+    const knex = this.dbs[dbName];
+    const accountNumbers = Object.keys(config.getAllAccounts());
+    return Promise.all(accountNumbers.map((number) => {
+      return knex.select(knex.raw('SUM(debit * amount) + SUM((debit - 1) * amount) AS total'))
+        .from('entry')
+        .where({account_id: this.accounts.getId(number)})
+        .andWhere('description', '<>', 'Alkusaldo')
+        .then((data) => {
+          this.accounts.setBalance(number, data[0].total || 0);
+        });
+    }));
+  }
+
+  /**
+   * Import data from files into the system.
+   * @param {String} format
+   * @param {Array<String>} files
+   */
   async import(format, files) {
-    console.log(format, files);
-    // TODO: Mechanism to fill in data from external source.
+    const module = require('../data/import/' + format);
+    let data = null;
+    await module.loadFiles(files)
+      .then((content) => (data = content));
+    console.log(data);
   }
 
   async export() {

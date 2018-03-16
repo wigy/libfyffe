@@ -22,8 +22,10 @@
   "dependencies": {
     "clone": "^2.1.1",
     "cryptocurrencies": "^2.0.0",
+    "csvtojson": "^1.1.9",
     "currency-codes": "^1.1.2",
     "currency-symbol-map": "^4.0.4",
+    "neat-dump": "^1.0.15",
     "sprintf-js": "^1.1.1"
   },
   "devDependencies": {

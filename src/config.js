@@ -4,8 +4,29 @@ const clone = require('clone');
  * Library configuration.
  */
 class Config {
+
   set(config) {
     Object.assign(this, clone(config));
+  }
+
+  /**
+   * Collect defined account numbers.
+   * @return {Object} A mapping from account numbers to configuration variable names.
+   */
+  getAllAccounts() {
+    let ret = {};
+    const collect = (accounts, prefix) => {
+      Object.keys(accounts).forEach((acc) => {
+        if (accounts[acc] === null) {
+        } else if (typeof (accounts[acc]) === 'object') {
+          collect(accounts[acc], acc + '.' + prefix);
+        } else {
+          ret[accounts[acc]] = prefix + acc;
+        }
+      });
+    };
+    collect(this.accounts, '');
+    return ret;
   }
 }
 
