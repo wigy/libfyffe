@@ -61,7 +61,7 @@ class Cli {
 
   /**
    * Append a new arg and check if it has been given in command-line already.
-   * @param {string} name Name of the arg.
+   * @param {String} name Name of the arg.
    * @param {array|string} values A list of values or value description.
    * @param {function|parseFloat|parseInt} check Checker function for validity.
    */

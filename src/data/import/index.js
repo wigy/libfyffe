@@ -8,7 +8,7 @@ class Import {
 
   /**
    * Read in the data from the file and store it internally.
-   * @param {string} file A path to the file.
+   * @param {String} file A path to the file.
    * @return {Promise<any>} Promise resolving to the parsed data.
    */
   async load(file) {
@@ -27,7 +27,7 @@ class Import {
   /**
    * A loader for CSV file.
    *
-   * @param {string} file A path to the file.
+   * @param {String} file A path to the file.
    * @param {Object} opts Options for CSV-reader.
    * @return {Promise<Array<Object>>}
    *
