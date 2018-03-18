@@ -22,4 +22,7 @@ module.exports = class InterestTx extends Tx {
   getText() {
     return text.tx(this);
   }
+
+  updateStock(stock) {
+  }
 };

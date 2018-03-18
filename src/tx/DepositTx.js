@@ -30,4 +30,7 @@ module.exports = class DepositTx extends Tx {
   getText() {
     return text.tx(this);
   }
+
+  updateStock(stock) {
+  }
 };

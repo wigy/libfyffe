@@ -29,4 +29,7 @@ module.exports = class WithdrawalTx extends Tx {
   getText() {
     return text.tx(this);
   }
+
+  updateStock(stock) {
+  }
 };

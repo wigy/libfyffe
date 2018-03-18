@@ -21,4 +21,10 @@ module.exports = class MoveInTx extends Tx {
   getText() {
     return text.withOptions(text.tx(this), [text.option('stock', this)]);
   }
+
+  updateStock(stock) {
+    const {amount, avg} = stock.add(this.amount, this.target, this.total);
+    this.stock = amount;
+    this.avg = avg;
+  }
 };

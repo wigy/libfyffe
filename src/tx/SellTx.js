@@ -52,4 +52,10 @@ module.exports = class SellTx extends Tx {
     opts.push(text.option('stockNow', this));
     return text.withOptions(text.tx(this), opts);
   }
+
+  updateStock(stock) {
+    const {amount, avg} = stock.add(this.amount, this.target, this.total - this.fee);
+    this.stock = amount;
+    this.avg = avg;
+  }
 };

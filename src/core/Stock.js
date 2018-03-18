@@ -8,7 +8,13 @@ module.exports = class Stock {
     this.average = {};
   }
 
-  // TODO: Docs.
+  /**
+   * Add commodity to the stock.
+   * @param {Number} count
+   * @param {String} target
+   * @param {Number} price
+   * @return {Object} An object containing `amount` and `avg`.
+   */
   add(count, target, price) {
 
     this.average[target] = this.average[target] || 0;
@@ -22,6 +28,7 @@ module.exports = class Stock {
     if (count > 0) {
       this.average[target] = (oldPrice + price) / newTotal;
     }
+    return {amount: this.stock[target], avg: this.average[target]};
   }
 
   del(count, target) {

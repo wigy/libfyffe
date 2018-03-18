@@ -21,4 +21,10 @@ module.exports = class MoveOutTx extends Tx {
   getText() {
     return text.withOptions(text.tx(this), [text.option('stockNow', this)]);
   }
+
+  updateStock(stock) {
+    const {amount, avg} = stock.add(this.amount, this.target, this.total);
+    this.stock = amount;
+    this.avg = avg;
+  }
 };
