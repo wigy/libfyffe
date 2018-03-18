@@ -60,7 +60,7 @@ module.exports = {
    */
   currency: function(num, unit, digits = 2) {
     let [body, decimals] = sprintf('%.' + digits + 'f', num).split('.');
-    if (body.length > 3) {
+    if (body.length > (body[0] === '-' ? 4 : 3)) {
       body = body.substr(0, body.length - 3) + ',' + body.substr(body.length - 3);
     }
     let ret = body + '.' + decimals;
