@@ -5,19 +5,30 @@ module.exports = class Stock {
 
   constructor() {
     this.stock = {};
+    this.average = {};
   }
 
   // TODO: Docs.
-  // TODO: Count also average price along the way.
-  add(count, item) {
-    this.stock[item] = this.get(item) + count;
+  add(count, target, price) {
+
+    this.average[target] = this.average[target] || 0;
+
+    const oldTotal = this.get(target);
+    const oldAverage = this.average[target];
+    const oldPrice = oldTotal * oldAverage;
+
+    this.stock[target] = oldTotal + count;
+    const newTotal = this.stock[target];
+    if (count > 0) {
+      this.average[target] = (oldPrice + price) / newTotal;
+    }
   }
 
-  del(count, item) {
-    this.stock[item] = this.get(item) - count;
+  del(count, target) {
+    this.stock[target] = this.get(target) - count;
   }
 
-  get(item) {
-    return (this.stock[item] || 0);
+  get(target) {
+    return (this.stock[target] || 0);
   }
 };

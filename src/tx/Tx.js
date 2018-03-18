@@ -172,10 +172,19 @@ module.exports = class Tx {
    * @return {any} Value of the field if set.
    */
   get(name) {
-    if (this.data[name] === undefined) {
+    if (!this.has(name)) {
       throw new Error('Value ' + name + ' for tx ' + JSON.stringify(this.data) + ' not set.');
     }
     return this.data[name];
+  }
+
+  /**
+   * Check if the given field is set.
+   * @param {String} name
+   * @return {Boolean} True if set.
+   */
+  has(name) {
+    return this.data[name] !== undefined;
   }
 
   /**

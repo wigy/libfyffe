@@ -104,8 +104,12 @@ class Fyffe {
 
     // Convert raw group data to transactions.
     let txs = data.map((group) => importer.createTransaction(group));
+    this.ledger.add(txs);
 
-    console.log(txs);
+    // Initialize stock for commodities and currencies.
+    this.ledger.getTargets().forEach((target) => this.stock.add(0, target, 0.00));
+    this.ledger.getCurrencies().forEach((currency) => this.stock.add(0, currency, 0.00));
+    console.log(this.stock);
   }
 
   async export() {
