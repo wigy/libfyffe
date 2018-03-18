@@ -1,7 +1,9 @@
+const promiseSeq = require('promise-sequential');
 const Stock = require('./Stock');
 const Accounts = require('./Accounts');
 const Ledger = require('./Ledger');
 const config = require('../config');
+const tilitintin = require('../data/tilitintin');
 
 /**
  * A system instance for transforming and inspecting financial data.
@@ -29,6 +31,7 @@ class Fyffe {
    * @param {String} dbName
    */
   async loadAccounts(dbName) {
+    // TODO: Move to data/tilitintin
     return this.dbs[dbName]
       .select('id', 'number', 'name')
       .from('account')
@@ -42,8 +45,10 @@ class Fyffe {
    * @param {String} dbName
    */
   async loadBalances(dbName) {
+    // TODO: Move to data/tilitintin
     const knex = this.dbs[dbName];
     const accountNumbers = Object.keys(config.getAllAccounts());
+    // TODO: Find the last period and count it from there.
     return Promise.all(accountNumbers.map((number) => {
       return knex.select(knex.raw('SUM(debit * amount) + SUM((debit - 1) * amount) AS total'))
         .from('entry')
@@ -57,15 +62,29 @@ class Fyffe {
 
   /**
    * Import data from files into the system.
+   * @param {String} dbName
    * @param {String} format
    * @param {Array<String>} files
    */
-  async import(format, files) {
-    const module = require('../data/import/' + format);
+  async import(dbName, format, files) {
+    const knex = this.dbs[dbName];
+    const importer = require('../data/import/' + format);
+
+    // Collect raw data.
     let data = null;
-    await module.loadFiles(files)
+    await importer.loadFiles(files)
       .then((content) => (data = content));
-    console.log(data);
+
+    // Form groups and remove those already imported.
+    data = importer.makeGrouping(data);
+    // TODO: Service tags?
+    data = await (async () => {
+      const promises = data.map((group) => () => tilitintin.imports.has(knex, 'CoinM', group.id));
+      return promiseSeq(promises)
+        .then((results) => {
+          return data.filter((group, i) => !results[i]);
+        });
+    })();
   }
 
   async export() {

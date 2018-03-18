@@ -26,6 +26,7 @@
     "currency-codes": "^1.1.2",
     "currency-symbol-map": "^4.0.4",
     "neat-dump": "^1.0.15",
+    "promise-sequential": "^1.1.1",
     "sprintf-js": "^1.1.1"
   },
   "devDependencies": {

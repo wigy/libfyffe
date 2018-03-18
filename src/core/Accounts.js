@@ -47,7 +47,7 @@ module.exports = class Stock {
     Object.values(this.accounts).forEach((account) => {
       if (account.balance !== null) {
         d.yellow('  ', account.number, account.name);
-        d.yellow('       ', num.currency(account.balance, config.currency));
+        d.green('       ', num.currency(account.balance, config.currency));
       }
     });
   }

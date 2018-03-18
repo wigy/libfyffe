@@ -1,5 +1,6 @@
 const fs = require('fs');
 const csv = require('csvtojson');
+const path = require('path');
 
 /**
  * Base class for importing data.
@@ -71,6 +72,43 @@ class Import {
       });
     });
   }
+
+  /**
+   * Generate unique transaction ID.
+   * @param {Array<Object>} group
+   */
+  id(group) {
+    throw new Error('Importer does not implement id().');
+  }
+
+  /**
+   * Fallback ID if nothing better available for identifying transactions.
+   */
+  fileAndLineId(group) {
+    let id = path.basename(this.file);
+    id += ':';
+    id += group.map((group) => group.__lineNumber).sort((a, b) => a - b).join(',');
+    return id;
+  }
+
+  /**
+   * Split input data to groups and generate IDs.
+   * @param {Array<any>} entries
+   * @return {Promise<Array<Array<any>>>}
+   */
+  makeGrouping(entries) {
+    let groups = this.grouping(entries);
+    // Generate IDs.
+    groups.forEach((group, i) => {
+      const id = this.id(group);
+      if (id === null || id === undefined || /undefined/.test(id)) {
+        throw new Error('Invalid ID ' + JSON.stringify(id) + ' generated for a group ' + JSON.stringify(group));
+      }
+      group.id = id + '';
+    });
+    return groups;
+  }
+
 }
 
 module.exports = Import;
