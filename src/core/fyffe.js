@@ -77,14 +77,24 @@ class Fyffe {
 
     // Form groups and remove those already imported.
     data = importer.makeGrouping(data);
-    // TODO: Service tags?
     data = await (async () => {
+      if (config.flags.force) {
+        return data;
+      }
+      // TODO: Service tags?
       const promises = data.map((group) => () => tilitintin.imports.has(knex, 'CoinM', group.id));
       return promiseSeq(promises)
         .then((results) => {
           return data.filter((group, i) => !results[i]);
         });
     })();
+
+    // Sort it according to the timestamps.
+    const sorter = (a, b) => {
+      return importer.time(a[0]) - importer.time(b[0]);
+    };
+    data = data.sort(sorter);
+    console.log(data);
   }
 
   async export() {

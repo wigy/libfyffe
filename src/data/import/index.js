@@ -82,6 +82,34 @@ class Import {
   }
 
   /**
+   * Get the date from the original entry.
+   * @param {Object} entry Original data entry.
+   * @return {string} the date in YYYY-MM-DD format.
+   */
+  date(entry) {
+    throw new Error('Importer does not implement date().');
+  }
+
+  /**
+   * Get the more accurate time from the original entry useful for sorting.
+   * @param {Object} entry Original data entry.
+   * @return {number} A number that can be compared, when sorting entries.
+   */
+  time(entry) {
+    throw new Error('Importer does not implement time().');
+  }
+
+  /**
+   * Reorganize entries so that they are grouped to the arrays forming one single transaction.
+   *
+   * @param {Array<any>} entries
+   * @return {Promise<Array<Array<any>>>}
+   */
+  grouping(entries) {
+    throw new Error('Importer does not implement grouping().');
+  }
+
+  /**
    * Fallback ID if nothing better available for identifying transactions.
    */
   fileAndLineId(group) {

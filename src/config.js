@@ -48,7 +48,9 @@ config.set({
     // If set, avoid doing permanent changes.
     dryRun: false,
     // If set, show verbose debug information.
-    debug: false
+    debug: false,
+    // If set, force the operation.
+    force: false
   },
   // Account numbers.
   accounts: {
