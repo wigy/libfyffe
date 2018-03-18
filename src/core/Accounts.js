@@ -31,6 +31,13 @@ module.exports = class Stock {
   }
 
   /**
+   * Get the account by its number.
+   */
+  get(number) {
+    return this.accounts[number] || null;
+  }
+
+  /**
    * Set the balance for account.
    * @param {String} number
    * @param {Number} balance

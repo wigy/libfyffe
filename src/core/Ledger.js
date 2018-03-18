@@ -1,5 +1,8 @@
 const Accounts = require('./Accounts');
 const Tx = require('../tx/Tx');
+const num = require('../util/num');
+const config = require('../config');
+const d = require('neat-dump');
 
 /**
  * A container for storing transactions.
@@ -52,5 +55,19 @@ module.exports = class Stock {
       tx.apply(this.accounts, stock);
     });
     this.notApplied.clear();
+  }
+
+  /**
+   * Dump transactions loaded to the screen.
+   * @param {String} title
+   */
+  showTransactions(title) {
+    d.purple(title);
+    this.txs.forEach((tx) => {
+      d.green('  ', num.currency(tx.total, config.currency), tx.getText());
+      tx.getEntries().forEach((entry) => {
+        d.yellow('       ', entry.number, this.accounts.get(entry.number).name, num.currency(entry.amount, config.currency));
+      });
+    });
   }
 };
