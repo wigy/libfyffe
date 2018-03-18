@@ -36,17 +36,17 @@ class CoinmotionImport extends Import {
     return Object.values(ret);
   }
 
-  recognize(txo) {
+  recognize(group) {
 
-    if (txo.src.length === 1) {
-      switch (txo.src[0].Type) {
+    if (group.length === 1) {
+      switch (group[0].Type) {
         case 'Deposit':
           return 'deposit';
       }
     }
 
-    if (txo.src.length >= 2) {
-      switch (txo.src[0].Type) {
+    if (group.length >= 2) {
+      switch (group[0].Type) {
         case 'Buy':
         case 'Buy stop':
         case 'Limit buy':
@@ -57,33 +57,33 @@ class CoinmotionImport extends Import {
       }
     }
 
-    throw new Error('Cannot recognize entry ' + JSON.stringify(txo));
+    throw new Error('Cannot recognize entry ' + JSON.stringify(group));
   }
 
-  currency(txo) {
+  currency(group) {
     return 'EUR';
   }
 
-  rate(txo) {
+  rate(group) {
     return 1.0;
   }
 
-  total(txo) {
+  total(group, obj) {
     let total = 0;
-    txo.src.forEach((entry) => {
+    group.forEach((entry) => {
       if (entry.Account === 'EUR') {
         total += Math.abs(parseFloat(entry.Amount.replace(/ €/, '')));
       }
     });
-    if (txo.type === 'sell') {
-      total += this.fee(txo, true);
+    if (obj.type === 'sell') {
+      total += this.fee(group, true);
     }
     return Math.round(total * 100) / 100;
   }
 
-  fee(txo, noRounding = false) {
+  fee(group, noRounding = false) {
     let total = 0;
-    txo.src.forEach((entry) => {
+    group.forEach((entry) => {
       if (entry.Account === 'EUR') {
         total += Math.abs(parseFloat(entry.Fee.replace(/ €/, '')));
       }
@@ -91,29 +91,29 @@ class CoinmotionImport extends Import {
     return noRounding ? total : Math.round(total * 100) / 100;
   }
 
-  tax(txo) {
+  tax(group) {
     return null;
   }
 
-  target(txo) {
-    const crypto = txo.src.filter((entry) => entry.Account !== 'EUR');
+  target(group) {
+    const crypto = group.filter((entry) => entry.Account !== 'EUR');
     if (crypto.length) {
       switch (crypto[0].Account) {
         case 'BTC':
           return 'BTC';
       }
     }
-    throw new Error('Cannot recognize trade target for ' + JSON.stringify(txo.src));
+    throw new Error('Cannot recognize trade target for ' + JSON.stringify(group));
   }
 
-  amount(txo) {
+  amount(group, obj) {
     let total = 0;
-    txo.src.forEach((entry) => {
-      if (entry.Account === txo.target) {
+    group.forEach((entry) => {
+      if (entry.Account === obj.target) {
         total += Math.abs(parseFloat(entry.Amount.replace(/ [A-Z]+/, '')));
       }
     });
-    return txo.type === 'sell' ? -total : total;
+    return obj.type === 'sell' ? -total : total;
   }
 }
 

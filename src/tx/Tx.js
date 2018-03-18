@@ -40,6 +40,7 @@ module.exports = class Tx {
     this.type = type;
     // Initialize defaults.
     this.data = Object.assign({
+      date: undefined,
       total: undefined
     }, add);
     // Verify keys in data.
@@ -50,6 +51,17 @@ module.exports = class Tx {
     });
     // Implicitly validate each field.
     Object.assign(this, data);
+  }
+
+  /**
+   * Transaction date
+   */
+  set date(val) {
+    validator.isRegexMatch('date', val, /^\d\d\d\d-\d\d-\d\d$/);
+    this.data.date = val;
+  }
+  get date() {
+    return this.get('date');
   }
 
   /**

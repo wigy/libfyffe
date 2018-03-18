@@ -94,7 +94,18 @@ class Fyffe {
       return importer.time(a[0]) - importer.time(b[0]);
     };
     data = data.sort(sorter);
-    console.log(data);
+
+    // Preprocess each item in every group.
+    for (let i = 0; i < data.length; i++) {
+      for (let j = 0; j < data[i].length; j++) {
+        data[i][j] = importer.trimItem(data[i][j]);
+      }
+    }
+
+    // Convert raw group data to transactions.
+    let txs = data.map((group) => importer.createTransaction(group));
+
+    console.log(txs);
   }
 
   async export() {

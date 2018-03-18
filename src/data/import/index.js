@@ -1,6 +1,7 @@
 const fs = require('fs');
 const csv = require('csvtojson');
 const path = require('path');
+const Tx = require('../../tx/Tx');
 
 /**
  * Base class for importing data.
@@ -108,6 +109,92 @@ class Import {
   grouping(entries) {
     throw new Error('Importer does not implement grouping().');
   }
+  /**
+   * Recognize the type of the transaction.
+   *
+   * @param {Array<Object>} group A source data group.
+   * @return {string} One of the valid transaction types.
+   */
+  recognize(group) {
+    throw new Error('Importer does not implement recognize().');
+  }
+
+  /**
+   * Calculate transaction total as positive number.
+   *
+   * @param {Array<Object>} group A source data group.
+   * @param {Object} obj Data known so far.
+   * @return {Number}
+   */
+  total(group, obj) {
+    throw new Error('Importer does not implement total().');
+  }
+
+  /**
+   * Find out currency as 'EUR' or 'USD'.
+   *
+   * @param {Array<Object>} group A source data group.
+   * @param {Object} obj Data known so far.
+   * @return {String}
+   */
+  currency(group, obj) {
+    throw new Error('Importer does not implement currency().');
+  }
+
+  /**
+   * Find out currency conversion rate to default currency.
+   *
+   * @param {Array<Object>} group A source data group.
+   * @param {Object} obj Data known so far.
+   * @return {Number}
+   */
+  rate(group, obj) {
+    throw new Error('Importer does not implement rate().');
+  }
+
+  /**
+   * Look up for the trade target
+   *
+   * @param {Array<Object>} group A source data group.
+   * @param {Object} obj Data known so far.
+   * @return {string}
+   */
+  target(group, obj) {
+    throw new Error('Importer does not implement target().');
+  }
+
+  /**
+   * Look up for the amount of the target to trade.
+   *
+   * @param {Array<Object>} group A source data group.
+   * @param {Object} obj Data known so far.
+   * @return {Number} Amount traded.
+   */
+  amount(group, obj) {
+    throw new Error('Importer does not implement amount().');
+  }
+
+  /**
+   * Look up for the service fee.
+   *
+   * @param {Array<Object>} group A source data group.
+   * @param {Object} obj Data known so far.
+   * @return {Number} Service fee.
+   */
+  fee(group, obj) {
+    throw new Error('Importer does not implement fee().');
+  }
+
+  /**
+   * Look up for the tax.
+   *
+   * @param {Array<Object>} group A source data group.
+   * @param {Object} obj Data known so far.
+   * @return {Number} Amount of tax deducted.
+   */
+  tax(group, obj) {
+    throw new Error('Importer does not implement tax().');
+  }
 
   /**
    * Fallback ID if nothing better available for identifying transactions.
@@ -137,6 +224,37 @@ class Import {
     return groups;
   }
 
+  /**
+   * Pre-process imported data object.
+   */
+  trimItem(obj) {
+    return obj;
+  }
+
+  /**
+   * Convert a source data group to transaction.
+   * @param {Array<Object>} group
+   */
+  createTransaction(group) {
+    let obj = {};
+    obj.date = this.date(group[0]);
+    obj.type = this.recognize(group);
+    if (obj.type !== 'withdrawal' && obj.type !== 'deposit') {
+      obj.currency = this.currency(group, obj);
+      obj.rate = this.rate(group, obj);
+    }
+    obj.total = this.total(group, obj);
+    obj.fee = this.fee(group, obj);
+    if (obj.type !== 'withdrawal' && obj.type !== 'deposit' && obj.type !== 'buy' && obj.type !== 'sell') {
+      obj.tax = this.tax(group, obj);
+    }
+    if (obj.type !== 'withdrawal' && obj.type !== 'deposit') {
+      obj.target = this.target(group, obj);
+    }
+    const type = obj.type;
+    delete obj.type;
+    return Tx.create(type, obj);
+  }
 }
 
 module.exports = Import;
