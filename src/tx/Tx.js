@@ -18,6 +18,8 @@ const types = {
   'move-out': './MoveOutTx'
 };
 
+let nextId = 1;
+
 /**
  * Abstract base class for different transactions.
  */
@@ -38,6 +40,8 @@ module.exports = class Tx {
       throw new Error('Invalid initial data in constructor: ' + JSON.stringify(data));
     }
     this.type = type;
+    this.id = nextId++;
+
     // Initialize defaults.
     this.data = Object.assign({
       date: undefined,
@@ -231,6 +235,15 @@ module.exports = class Tx {
    */
   getText() {
     throw new Error('A transaction class in ' + types[this.type] + ' does not implement `getText()`.');
+  }
+
+  /**
+   * Apply the transaction to the stock.
+   * @param {Accounts} accounts
+   * @param {Stock} stock
+   */
+  apply(accounts, stock) {
+    throw new Error('A transaction class in ' + types[this.type] + ' does not implement `apply()`.');
   }
 
   /**

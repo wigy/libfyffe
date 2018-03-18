@@ -7,6 +7,7 @@ module.exports = class Stock {
 
   constructor() {
     this.txs = [];
+    this.notApplied = new Set();
   }
 
   /**
@@ -16,6 +17,7 @@ module.exports = class Stock {
   add(tx) {
     if (tx instanceof Tx) {
       this.txs.push(tx);
+      this.notApplied.add(tx);
     } else if (tx instanceof Array) {
       tx.forEach((t) => this.add(t));
     } else {
@@ -37,5 +39,16 @@ module.exports = class Stock {
   getCurrencies() {
     let targets = this.txs.filter(tx => tx.has('currency')).map(tx => tx.currency);
     return [...new Set(targets)];
+  }
+
+  /**
+   * Apply all transactions not yet applied to the stock.
+   * @param {Stock} stock
+   */
+  apply(accounts, stock) {
+    this.notApplied.forEach((tx) => {
+      tx.apply(accounts, stock);
+    });
+    this.notApplied.clear();
   }
 };

@@ -251,6 +251,9 @@ class Import {
     if (obj.type !== 'withdrawal' && obj.type !== 'deposit') {
       obj.target = this.target(group, obj);
     }
+    if (obj.type !== 'withdrawal' && obj.type !== 'deposit' && obj.type !== 'fx') {
+      obj.amount = this.amount(group, obj);
+    }
     const type = obj.type;
     delete obj.type;
     return Tx.create(type, obj);

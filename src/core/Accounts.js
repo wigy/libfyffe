@@ -40,6 +40,15 @@ module.exports = class Stock {
   }
 
   /**
+   * Transfer the given amount to/from account.
+   * @param {String} number
+   * @param {Number} amount
+   */
+  transfer(number, amount) {
+    this.accounts[number].balance = (this.accounts[number].balance || 0) + amount;
+  }
+
+  /**
    * Display currently loaded balances.
    */
   showBalances(title) {

@@ -30,4 +30,8 @@ module.exports = class DepositTx extends Tx {
   getText() {
     return text.tx(this);
   }
+
+  apply(accounts, stock) {
+    accounts.transfer(this.getAccount('currencies', config.currency), this.total - this.fee);
+  }
 };

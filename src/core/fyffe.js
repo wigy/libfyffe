@@ -109,7 +109,9 @@ class Fyffe {
     // Initialize stock for commodities and currencies.
     this.ledger.getTargets().forEach((target) => this.stock.add(0, target, 0.00));
     this.ledger.getCurrencies().forEach((currency) => this.stock.add(0, currency, 0.00));
-    console.log(this.stock);
+    // TODO: Implement collectHistory() from legacy import.
+
+    this.ledger.apply(this.accounts, this.stock);
   }
 
   async export() {
