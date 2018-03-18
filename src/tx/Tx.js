@@ -238,12 +238,23 @@ module.exports = class Tx {
   }
 
   /**
-   * Apply the transaction to the stock.
+   * Apply the transaction to the stock and accounts.
    * @param {Accounts} accounts
    * @param {Stock} stock
    */
   apply(accounts, stock) {
-    throw new Error('A transaction class in ' + types[this.type] + ' does not implement `apply()`.');
+    this.getEntries().forEach((entry) => {
+      accounts.transfer(entry.number, entry.amount);
+    });
+    this.updateStock(stock);
+  }
+
+  /**
+   * Update stock according to this transaction.
+   * @param {Stock} stock
+   */
+  updateStock(stock) {
+    throw new Error('A transaction class in ' + types[this.type] + ' does not implement `updateStock()`.');
   }
 
   /**
