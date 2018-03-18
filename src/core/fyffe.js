@@ -1,6 +1,5 @@
 const promiseSeq = require('promise-sequential');
 const Stock = require('./Stock');
-const Accounts = require('./Accounts');
 const Ledger = require('./Ledger');
 const config = require('../config');
 const tilitintin = require('../data/tilitintin');
@@ -12,7 +11,6 @@ class Fyffe {
 
   constructor() {
     this.stock = new Stock();
-    this.accounts = new Accounts();
     this.ledger = new Ledger();
     this.dbs = {};
   }
@@ -36,7 +34,7 @@ class Fyffe {
       .select('id', 'number', 'name')
       .from('account')
       .then((accounts) => {
-        this.accounts.loadAccounts(accounts);
+        this.ledger.accounts.loadAccounts(accounts);
       });
   }
 
@@ -52,10 +50,10 @@ class Fyffe {
     return Promise.all(accountNumbers.map((number) => {
       return knex.select(knex.raw('SUM(debit * amount) + SUM((debit - 1) * amount) AS total'))
         .from('entry')
-        .where({account_id: this.accounts.getId(number)})
+        .where({account_id: this.ledger.accounts.getId(number)})
         .andWhere('description', '<>', 'Alkusaldo')
         .then((data) => {
-          this.accounts.setBalance(number, data[0].total || 0);
+          this.ledger.accounts.setBalance(number, data[0].total || 0);
         });
     }));
   }
@@ -111,7 +109,7 @@ class Fyffe {
     this.ledger.getCurrencies().forEach((currency) => this.stock.add(0, currency, 0.00));
     // TODO: Implement collectHistory() from legacy import.
 
-    this.ledger.apply(this.accounts, this.stock);
+    this.ledger.apply(this.stock);
   }
 
   async export() {

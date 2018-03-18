@@ -1,3 +1,4 @@
+const Accounts = require('./Accounts');
 const Tx = require('../tx/Tx');
 
 /**
@@ -8,6 +9,7 @@ module.exports = class Stock {
   constructor() {
     this.txs = [];
     this.notApplied = new Set();
+    this.accounts = new Accounts();
   }
 
   /**
@@ -45,9 +47,9 @@ module.exports = class Stock {
    * Apply all transactions not yet applied to the stock.
    * @param {Stock} stock
    */
-  apply(accounts, stock) {
+  apply(stock) {
     this.notApplied.forEach((tx) => {
-      tx.apply(accounts, stock);
+      tx.apply(this.accounts, stock);
     });
     this.notApplied.clear();
   }
