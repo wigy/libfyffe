@@ -59,9 +59,10 @@ class Fyffe {
   /**
    * Update balances from the `tilitin`-database.
    * @param {String} dbName
+   * @param {String} date
    */
-  async loadBalances(dbName) {
-    return tilitintin.accounts.getBalances(this.dbs[dbName], Object.keys(config.getAllAccounts()))
+  async loadBalances(dbName, date = null) {
+    return tilitintin.accounts.getBalances(this.dbs[dbName], Object.keys(config.getAllAccounts()), date)
       .then((data) => {
         Object.keys(data).forEach((num) => (this.ledger.accounts.setBalance(num, data[num])));
       });
@@ -115,6 +116,13 @@ class Fyffe {
     };
     data = data.sort(sorter);
 
+    // Find the first date and get balances for it.
+    const firstDate = importer.date(data[0][0]);
+    await this.loadBalances(dbName, firstDate);
+    if (config.flags.debug) {
+      this.ledger.accounts.showBalances('Initial balances:');
+    }
+
     // Preprocess each item in every group.
     for (let i = 0; i < data.length; i++) {
       for (let j = 0; j < data[i].length; j++) {
@@ -132,6 +140,11 @@ class Fyffe {
     // TODO: Implement collectHistory() from legacy import.
 
     this.ledger.apply(this.stock);
+
+    if (config.flags.debug) {
+      this.ledger.showTransactions('Transactions:');
+      this.ledger.accounts.showBalances('Final balances:');
+    }
   }
 
   async export() {

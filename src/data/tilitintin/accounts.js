@@ -27,17 +27,20 @@ function getAll(knex) {
  * Get the balances for the given accounts.
  * @param {Knex} knex Knex-instance configured for the database.
  * @param {Array<String>} numbers
+ * @param {String} date If given as `YYYY-MM-DD`, calculate balance before the given date.
  */
-function getBalances(knex, numbers) {
-  // TODO: Find the last period and count it from there.
+function getBalances(knex, numbers, date = null) {
+  const stamp = date === null ? new Date().getTime() : new Date(date + ' 00:00:00').getTime();
   return getIdsByNumber(knex, numbers)
     .then((idByNumber) => {
       return Promise.all(numbers.map((number) => {
         number = parseInt(number);
         return knex.select(knex.raw('SUM(debit * amount) + SUM((debit - 1) * amount) AS total, ' + number + ' as number'))
           .from('entry')
+          .join('document', 'document.id', '=', 'entry.document_id')
           .where({account_id: idByNumber[number]})
           .andWhere('description', '<>', 'Alkusaldo')
+          .andWhere('document.date', '<', stamp)
           .then((data) => data[0]);
       }))
         .then((data) => {
