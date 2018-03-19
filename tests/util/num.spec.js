@@ -25,6 +25,7 @@ describe('num', () => {
     assert.equal(num.currency(100000, 'FOO'), '100,000.00 FOO');
     assert.equal(num.currency(1 / 9, 'FOO'), '0.11 FOO');
     assert.equal(num.currency(-856, 'FOO'), '-856.00 FOO');
+    assert.equal(num.currency(-0.00000001, 'FOO'), '0.00 FOO');
   });
 
   it('can round currencies', () => {

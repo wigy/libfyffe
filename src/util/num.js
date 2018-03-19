@@ -63,6 +63,9 @@ module.exports = {
     if (body.length > (body[0] === '-' ? 4 : 3)) {
       body = body.substr(0, body.length - 3) + ',' + body.substr(body.length - 3);
     }
+    if (body === '-0') {
+      body = '0';
+    }
     let ret = body + '.' + decimals;
     if (unit) {
       ret += ' ' + module.exports.unit(unit);
