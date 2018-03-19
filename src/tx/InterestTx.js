@@ -12,7 +12,7 @@ module.exports = class InterestTx extends Tx {
     super('interest', { currency: config.currency, rate: undefined }, data);
   }
 
-  getEntries() {
+  getMyEntries() {
     return [
       {number: this.getAccount('currencies', this.currency), amount: num.cents(-this.total)},
       {number: this.getAccount('interest'), amount: num.cents(this.total)}

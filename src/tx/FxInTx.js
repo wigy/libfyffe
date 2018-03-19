@@ -14,7 +14,7 @@ module.exports = class FxInTx extends Tx {
 
   // TODO: Add check that amount is positive.
 
-  getEntries() {
+  getMyEntries() {
     return [
       {number: this.getAccount('currencies', this.target), amount: num.cents(this.total)},
       {number: this.getAccount('currencies', this.currency), amount: num.cents(-this.total)}

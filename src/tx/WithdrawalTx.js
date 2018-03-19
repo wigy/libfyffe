@@ -12,7 +12,7 @@ module.exports = class WithdrawalTx extends Tx {
     super('withdrawal', { fee: 0.0 }, data);
   }
 
-  getEntries() {
+  getMyEntries() {
     if (this.fee) {
       return [
         {number: this.getAccount('bank'), amount: num.cents(this.total - this.fee)},

@@ -11,7 +11,7 @@ module.exports = class MoveInTx extends Tx {
     super('move-in', { target: undefined, amount: undefined, stock: undefined, avg: undefined }, data);
   }
 
-  getEntries() {
+  getMyEntries() {
     // Note: this is only partial entry.
     return [
       {number: this.getAccount('targets', this.target), amount: num.cents(this.total)}

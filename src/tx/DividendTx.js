@@ -12,7 +12,7 @@ module.exports = class DividendTx extends Tx {
     super('dividend', { currency: config.currency, rate: undefined, tax: 0.0, target: undefined, amount: undefined }, data);
   }
 
-  getEntries() {
+  getMyEntries() {
     let ret = [
       {number: this.getAccount('dividends'), amount: num.cents(-this.total)}
     ];

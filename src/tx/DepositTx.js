@@ -12,7 +12,7 @@ module.exports = class DepositTx extends Tx {
     super('deposit', { fee: 0.0 }, data);
   }
 
-  getEntries() {
+  getMyEntries() {
     if (this.fee) {
       const amount = num.cents(this.total - this.fee);
       return [

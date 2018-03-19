@@ -12,7 +12,7 @@ module.exports = class BuyTx extends Tx {
     super('buy', { target: undefined, amount: undefined, currency: config.currency, rate: undefined, fee: 0.0, stock: undefined, avg: undefined }, data);
   }
 
-  getEntries() {
+  getMyEntries() {
     if (this.fee) {
       return [
         {number: this.getAccount('targets', this.target), amount: num.cents(this.total - this.fee)},

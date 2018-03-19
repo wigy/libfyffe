@@ -223,10 +223,18 @@ module.exports = class Tx {
   }
 
   /**
-   * Collect atomic transaction entries for the transaction.
+   * Collect all atomic transaction entries for the transaction including chained sub-transaction.
    * @return {Array<Entry>}
    */
   getEntries() {
+    return this.getMyEntries();
+  }
+
+  /**
+   * Collect atomic transaction entries for this transaction.
+   * @return {Array<Entry>}
+   */
+  getMyEntries() {
     throw new Error('A transaction class in ' + types[this.type] + ' does not implement `getEntries()`.');
   }
 

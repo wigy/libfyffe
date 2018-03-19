@@ -14,7 +14,7 @@ module.exports = class FxOutTx extends Tx {
 
   // TODO: Add check that amount is negative.
 
-  getEntries() {
+  getMyEntries() {
     return [
       {number: this.getAccount('currencies', this.currency), amount: num.cents(this.total)},
       {number: this.getAccount('currencies', this.target), amount: num.cents(-this.total)}
