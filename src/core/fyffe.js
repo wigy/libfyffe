@@ -92,6 +92,9 @@ class Fyffe {
     const knex = this.dbs[dbName];
     const importer = require('../data/import/' + format);
 
+    await this.loadTags(dbName);
+    await this.loadAccounts(dbName);
+
     // Collect raw data.
     let data = null;
     await importer.loadFiles(files)
