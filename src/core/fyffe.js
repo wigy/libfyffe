@@ -50,10 +50,7 @@ class Fyffe {
    * @param {String} dbName
    */
   async loadAccounts(dbName) {
-    // TODO: Move to data/tilitintin
-    return this.dbs[dbName]
-      .select('id', 'number', 'name')
-      .from('account')
+    return tilitintin.accounts.getAll(this.dbs[dbName])
       .then((accounts) => {
         this.ledger.accounts.loadAccounts(accounts);
       });
@@ -80,6 +77,20 @@ class Fyffe {
   }
 
   /**
+   * Fetch the configured service tag or throw an exception.
+   * @return {Tag}
+   */
+  getServiceTag() {
+    if (!config.service) {
+      throw new Error('Service not configured.');
+    }
+    if (!config.tags[config.service]) {
+      throw new Error('No tag configured for service ' + JSON.stringify(config.service));
+    }
+    return config.tags[config.service];
+  }
+
+  /**
    * Import data from files into the system.
    * @param {String} dbName
    * @param {String} format
@@ -100,8 +111,7 @@ class Fyffe {
       if (config.flags.force) {
         return data;
       }
-      // TODO: Service tags?
-      const promises = data.map((group) => () => tilitintin.imports.has(knex, 'CoinM', group.id));
+      const promises = data.map((group) => () => tilitintin.imports.has(knex, this.getServiceTag().tag, group.id));
       return promiseSeq(promises)
         .then((results) => {
           return data.filter((group, i) => !results[i]);

@@ -1,3 +1,5 @@
+const Tag = require('../Tag');
+
 /**
  * Check if tags table is available.
  * @param {Knex} knex Knex-instance configured for the database.
@@ -42,7 +44,8 @@ function getAll(knex) {
   return ensure(knex)
     .then(() => {
       return knex.select('*').from('tags').orderBy('order');
-    });
+    })
+    .then((tags) => tags.map((tag) => new Tag(tag)));
 }
 
 /**
