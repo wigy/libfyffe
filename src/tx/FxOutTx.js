@@ -2,6 +2,7 @@ const config = require('../config');
 const Tx = require('./Tx');
 const num = require('../util/num');
 const text = require('../text/make');
+const validator = require('../data/validator');
 
 /**
  * The `target` currency is traded out and another `currency` is received in.
@@ -12,7 +13,10 @@ module.exports = class FxOutTx extends Tx {
     super('fx-out', { target: undefined, amount: undefined, currency: config.currency, rate: undefined, fee: 0.0 }, data);
   }
 
-  // TODO: Add check that amount is negative.
+  set amount(val) {
+    validator.isLtZero('amount', val);
+    this.data.amount = val;
+  }
 
   getMyEntries() {
     return [

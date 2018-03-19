@@ -2,6 +2,7 @@ const config = require('../config');
 const Tx = require('./Tx');
 const num = require('../util/num');
 const text = require('../text/make');
+const validator = require('../data/validator');
 
 /**
  * The `target` currency is traded in and another `currency` is given out.
@@ -12,7 +13,10 @@ module.exports = class FxInTx extends Tx {
     super('fx-in', { target: undefined, amount: undefined, currency: config.currency, rate: undefined, fee: 0.0 }, data);
   }
 
-  // TODO: Add check that amount is positive.
+  set amount(val) {
+    validator.isGtZero('amount', val);
+    this.data.amount = val;
+  }
 
   getMyEntries() {
     return [

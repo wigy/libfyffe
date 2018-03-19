@@ -62,6 +62,19 @@ module.exports = {
   },
 
   /**
+   * Check that value is a finite number less than zero.
+   * @param {String} name
+   * @param {any} val
+   */
+  isLtZero: (name, val) => {
+    module.exports.isNum(name, val);
+    if (val < 0) {
+      return;
+    }
+    throw new Error('Invalid value ' + JSON.stringify(val) + ' for ' + JSON.stringify(name));
+  },
+
+  /**
    * Check that the value matches the regex.
    * @param {*} name
    * @param {*} val
