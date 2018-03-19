@@ -25,6 +25,8 @@ class Config {
       service: null,
       // Current fund name.
       fund: null,
+      // Mapping from tags and their full names to tag objects.
+      tags: {},
       // Various flags affecting library behavior.
       flags: {
         // If set, do not generate profit/loss entries for selling.

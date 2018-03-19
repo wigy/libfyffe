@@ -12,6 +12,7 @@ class Fyffe {
   constructor() {
     this.stock = new Stock();
     this.ledger = new Ledger();
+    // Configured and named knex-instances.
     this.dbs = {};
   }
 
@@ -22,6 +23,26 @@ class Fyffe {
    */
   setDb(dbName, knex) {
     this.dbs[dbName] = knex;
+  }
+
+  /**
+   * Load tag information from `tilitin`-database and add to config.
+   * @param {String} dbName
+   */
+  async loadTags(dbName) {
+    return tilitintin.tags.getAll(this.dbs[dbName])
+      .then((data) => {
+        data.forEach((tag) => {
+          if (config.tags[tag.name]) {
+            throw new Error('Duplicate tag ' + JSON.stringify(tag) + ' in config ' + JSON.stringify(config.tags[tag.name]));
+          }
+          if (config.tags[tag.tag]) {
+            throw new Error('Duplicate tag ' + JSON.stringify(tag) + ' in config ' + JSON.stringify(config.tags[tag.tag]));
+          }
+          config.tags[tag.tag] = tag;
+          config.tags[tag.name] = tag;
+        });
+      });
   }
 
   /**
