@@ -61,19 +61,10 @@ class Fyffe {
    * @param {String} dbName
    */
   async loadBalances(dbName) {
-    // TODO: Move to data/tilitintin
-    const knex = this.dbs[dbName];
-    const accountNumbers = Object.keys(config.getAllAccounts());
-    // TODO: Find the last period and count it from there.
-    return Promise.all(accountNumbers.map((number) => {
-      return knex.select(knex.raw('SUM(debit * amount) + SUM((debit - 1) * amount) AS total'))
-        .from('entry')
-        .where({account_id: this.ledger.accounts.getId(number)})
-        .andWhere('description', '<>', 'Alkusaldo')
-        .then((data) => {
-          this.ledger.accounts.setBalance(number, data[0].total || 0);
-        });
-    }));
+    return tilitintin.accounts.getBalances(this.dbs[dbName], Object.keys(config.getAllAccounts()))
+      .then((data) => {
+        Object.keys(data).forEach((num) => (this.ledger.accounts.setBalance(num, data[num])));
+      });
   }
 
   /**
