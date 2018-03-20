@@ -112,6 +112,9 @@ class Fyffe {
           return data.filter((group, i) => !results[i]);
         });
     })();
+    if (data.length === 0) {
+      return;
+    }
 
     // Sort it according to the timestamps.
     const sorter = (a, b) => {

@@ -33,4 +33,8 @@ module.exports = class DepositTx extends Tx {
 
   updateStock(stock) {
   }
+
+  static match() {
+    return null;
+  }
 };

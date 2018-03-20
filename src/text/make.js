@@ -14,20 +14,19 @@ const texts = {
  *
  * Special notations in the text are handled according to the following:
  * * C{var} - Variable value is taken from the library configuration.
- * *  {var} - Variable value is taken from the target object as is.
+ * * ={var} - Variable value is taken from the target object as is.
  * * +{var} - Variable value is taken from the target and transformed to signed decimal.
  * * #{var} - Variable value is taken from the target and transformed to decimal.
  * * ${var} - Variable value is taken from the target and transformed to currency.
  * * £{var} - Variable value is replaced with the corresponding currency symbol.
- * *  {$} - Replace with currency symbol of configured currency.
- *
+ * * X{$} - Replace with currency symbol of configured currency.
  */
 function substitute(text, target) {
   let match;
   let ret = text;
 
   // Replace special symbols.
-  let regex = /\{([$])\}/;
+  let regex = /X\{([$])\}/;
   while ((match = regex.exec(ret))) {
     ret = ret.replace(regex, getSymbolFromCurrency(config.currency) || config.currency);
   }
@@ -84,7 +83,7 @@ function substitute(text, target) {
   }
 
   // Replace variables as they are.
-  regex = /\{(\w+)\}/;
+  regex = /=\{(\w+)\}/;
   while ((match = regex.exec(ret))) {
     const variable = match[1];
     if (target[variable] === undefined) {
@@ -131,5 +130,10 @@ module.exports = {
       ret += ' (' + opts.join(', ') + ')';
     }
     return ret;
-  }
+  },
+
+  /**
+   * Get the text catalog.
+   */
+  catalog: () => texts
 };

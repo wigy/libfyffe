@@ -1,3 +1,4 @@
 module.exports = {
-  Tx: require('./Tx')
+  Tx: require('./Tx'),
+  parser: require('./parser')
 };

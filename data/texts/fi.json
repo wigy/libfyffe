@@ -2,22 +2,22 @@
   "tx": {
     "deposit": "Talletus C{service}-palveluun",
     "withdrawal": "Nosto C{service}-palvelusta",
-    "buy": "Osto +{amount} {target}",
-    "sell": "Myynti +{amount} {target}",
-    "dividend": "Osinko {amount} x {target}",
+    "buy": "Osto +{amount} ={target}",
+    "sell": "Myynti +{amount} ={target}",
+    "dividend": "Osinko ={amount} x ={target}",
     "fx-in": "Valuutanvaihto £{currency} -> £{target}",
     "fx-out": "Valuutanvaihto £{target} -> £{currency}",
     "interest": "C{service} lainakorko",
-    "move-in": "Siirto C{service}-palveluun +{amount} {target}",
-    "move-out": "Siirto C{service}-palvelusta +{amount} {target}"
+    "move-in": "Siirto C{service}-palveluun +{amount} ={target}",
+    "move-out": "Siirto C{service}-palvelusta +{amount} ={target}"
   },
   "options": {
-    "average": "k.h. ${avg} {$}/{target}",
-    "averageNow": "k.h. nyt ${avg} {$}/{target}",
-    "stock": "yht. #{stock} {target}",
-    "stockNow": "jälj. #{stock} {target}",
-    "rate": "kurssi {rate} £{currency}/{$}",
-    "inRate": "kurssi {rate} £{target}/£{currency}",
-    "outRate": "kurssi {rate} £{currency}/£{target}"
+    "average": "k.h. ${avg} X{$}/={target}",
+    "averageNow": "k.h. nyt ${avg} X{$}/={target}",
+    "stock": "yht. #{stock} ={target}",
+    "stockNow": "jälj. #{stock} ={target}",
+    "rate": "kurssi ={rate} £{currency}/X{$}",
+    "inRate": "kurssi ={rate} £{target}/£{currency}",
+    "outRate": "kurssi ={rate} £{currency}/£{target}"
   }
 }

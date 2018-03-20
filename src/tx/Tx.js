@@ -41,6 +41,7 @@ module.exports = class Tx {
     }
     this.type = type;
     this.id = nextId++;
+    this.chained = [];
 
     // Initialize defaults.
     this.data = Object.assign({
@@ -192,6 +193,14 @@ module.exports = class Tx {
   }
 
   /**
+   * Append another sub-transaction as a combined part of this transaction.
+   * @param {Tx} tx
+   */
+  addSubTx(tx) {
+    this.chained.push(tx);
+  }
+
+  /**
    * Find the configured account number.
    * @param {String} arg1 Main category name in the config for accounts or account name.
    * @return {String} [arg2] Account name in the config.
@@ -224,10 +233,22 @@ module.exports = class Tx {
 
   /**
    * Collect all atomic transaction entries for the transaction including chained sub-transaction.
+   * @param {Boolean} withText If set, add description to each entry.
    * @return {Array<Entry>}
    */
-  getEntries() {
-    return this.getMyEntries();
+  getEntries(withText = false) {
+    if (!withText) {
+      return this.getMyEntries().concat(this.chained.map((tx) => tx.getEntries()));
+    }
+
+    let ret = [];
+    const text = this.getText();
+    this.getMyEntries().forEach((entry) => {
+      entry.description = text;
+      ret.push(entry);
+    });
+
+    return ret.concat(this.chained.map((tx) => tx.getEntries(true)));
   }
 
   /**
@@ -277,5 +298,17 @@ module.exports = class Tx {
     const constructor = require(types[type]);
 
     return new constructor(data);
+  }
+
+  /**
+   * Collect all constructors for all transaction types.
+   * @return {Object<Class>} A mapping from type names to their constructors.
+   */
+  static classes() {
+    let ret = {};
+    Object.keys(types).forEach((type) => {
+      ret[type] = require(types[type]);
+    });
+    return ret;
   }
 };
