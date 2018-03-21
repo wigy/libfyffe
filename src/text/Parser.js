@@ -88,6 +88,8 @@ class Matcher {
           ret.addRegex('-?[0-9.,]+', variable, (num) => parseFloat(num.replace(/,/g, '')));
           break;
         case '=':
+          ret.addRegex('.+?', variable);
+          break;
         case '£':
           ret.addRegex('.+?', variable, (sym) => currency.sym2text(sym));
           break;
@@ -166,7 +168,9 @@ class Parser {
         let opt;
         for (let j = 0; j < notes.length; j++) {
           for (let k = 0; k < this.optionMatch.length; k++) {
+            console.log(this.optionMatch[k]);
             opt = this.optionMatch[k].exec(notes[j]);
+            console.log(opt);
             if (opt) {
               data = Object.assign(data, opt);
               break;
