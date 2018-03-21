@@ -4,7 +4,7 @@
     "withdrawal": "Nosto C{service}-palvelusta",
     "buy": "Osto +{amount} ={target}",
     "sell": "Myynti +{amount} ={target}",
-    "dividend": "Osinko ={amount} x ={target}",
+    "dividend": "Osinko #{amount} x ={target}",
     "fx-in": "Valuutanvaihto £{currency} -> £{target}",
     "fx-out": "Valuutanvaihto £{target} -> £{currency}",
     "interest": "C{service} lainakorko",
@@ -16,8 +16,8 @@
     "averageNow": "k.h. nyt ${avg} X{$}/={target}",
     "stock": "yht. #{stock} ={target}",
     "stockNow": "jälj. #{stock} ={target}",
-    "rate": "kurssi ={rate} £{currency}/X{$}",
-    "inRate": "kurssi ={rate} £{target}/£{currency}",
-    "outRate": "kurssi ={rate} £{currency}/£{target}"
+    "rate": "kurssi #{rate} £{currency}/X{$}",
+    "inRate": "kurssi #{rate} £{target}/£{currency}",
+    "outRate": "kurssi #{rate} £{currency}/£{target}"
   }
 }

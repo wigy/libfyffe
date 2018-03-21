@@ -25,6 +25,8 @@ let nextId = 1;
  */
 module.exports = class Tx {
 
+  // TODO: We need to have also fund, service, owners tag support here.
+
   /**
    * Construct a transaction.
    * @param {String} type Lower-case name of the transaction type.

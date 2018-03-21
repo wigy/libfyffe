@@ -1,4 +1,4 @@
-const getSymbolFromCurrency = require('currency-symbol-map');
+const currency = require('../data/currency');
 const config = require('../config');
 const num = require('../util/num');
 
@@ -28,7 +28,7 @@ function substitute(text, target) {
   // Replace special symbols.
   let regex = /X\{([$])\}/;
   while ((match = regex.exec(ret))) {
-    ret = ret.replace(regex, getSymbolFromCurrency(config.currency) || config.currency);
+    ret = ret.replace(regex, currency.text2sym(config.currency) || config.currency);
   }
 
   // Replace configuration variables.
@@ -78,7 +78,7 @@ function substitute(text, target) {
     if (target[variable] === undefined) {
       throw new Error('Cannot translate text ' + JSON.stringify(text) + ' since variable `' + variable + '` not found from target.');
     }
-    const sym = getSymbolFromCurrency(target[variable]) || target[variable];
+    const sym = currency.text2sym(target[variable]) || target[variable];
     ret = ret.replace(regex, sym);
   }
 
