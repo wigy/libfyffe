@@ -5,7 +5,7 @@
     "buy": "Osto +{amount} ={target}",
     "sell": "Myynti +{amount} ={target}",
     "dividend": "Osinko #{amount} x ={target}",
-    "fx-in": "Valuutanvaihto £{currency} -> £{target}",
+    "fx-in": "Valuutanvaihto £{target} <- £{currency}",
     "fx-out": "Valuutanvaihto £{target} -> £{currency}",
     "interest": "C{service} lainakorko",
     "move-in": "Siirto C{service}-palveluun +{amount} ={target}",
@@ -17,7 +17,7 @@
     "stock": "yht. #{stock} ={target}",
     "stockNow": "jälj. #{stock} ={target}",
     "rate": "kurssi #{rate} £{currency}/X{$}",
-    "inRate": "kurssi #{rate} £{target}/£{currency}",
-    "outRate": "kurssi #{rate} £{currency}/£{target}"
+    "inRate": "ostokurssi #{rate} £{target}/£{currency}",
+    "outRate": "myyntikurssi #{rate} £{currency}/£{target}"
   }
 }

@@ -64,21 +64,25 @@ describe('class Tx', () => {
     assert.equal(tx.target, 'TSLA');
     assert.equal(tx.amount, 5);
     assert.equal(tx.rate, 0.86);
-    // assert.equal(tx.currency, 'USD'); TODO: Fix this.
+    assert.equal(tx.currency, 'USD');
 
-    // TODO: Test fx-out.
+    tx = parser.parse('Valuutanvaihto $ <- € (ostokurssi 0.86 $/€)');
+    assert.equal(tx.type, 'fx-in');
+    assert.equal(tx.target, 'USD');
+    assert.equal(tx.currency, 'EUR');
+    assert.equal(tx.rate, 0.86);
+
+    tx = parser.parse('Valuutanvaihto kr -> $ (myyntikurssi 1.01 $/kr)');
+    assert.equal(tx.type, 'fx-out');
+    assert.equal(tx.target, 'DKK');
+    assert.equal(tx.currency, 'USD');
+    assert.equal(tx.rate, 1.01);
 
     tx = parser.parse('Osinko 10 x NOKIA');
     assert.equal(tx.type, 'dividend');
     assert.equal(tx.target, 'NOKIA');
     assert.equal(tx.amount, 10);
     assert.equal(tx.currency, 'EUR');
-
-    tx = parser.parse('Valuutanvaihto € -> $ (kurssi 0.86 $/€)');
-    assert.equal(tx.type, 'fx-in');
-    assert.equal(tx.target, 'USD');
-    assert.equal(tx.currency, 'EUR');
-    assert.equal(tx.rate, 0.86);
 
     tx = parser.parse('My Test Service lainakorko');
     assert.equal(tx.type, 'interest');

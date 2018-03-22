@@ -95,7 +95,7 @@ class Matcher {
           break;
         case 'X':
           if (variable === '$') {
-            ret.addRegex('.+?', 'currency', () => config.currency);
+            ret.addRegex(regexEscape(currency.text2sym(config.currency)));
           } else {
             throw new Error('No handler for special markup X{' + variable + '}');
           }

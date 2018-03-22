@@ -188,13 +188,13 @@ describe('class Tx', () => {
       total: 5,
       rate: 0.86,
       target: 'USD'
-    }).getText(), 'Valuutanvaihto € -> $ (kurssi 0.86 $/€)');
+    }).getText(), 'Valuutanvaihto $ <- € (ostokurssi 0.86 $/€)');
     assert.equal(Tx.create('fx-out', {
       total: 5,
       rate: 1.01,
       currency: 'USD',
       target: 'DKK'
-    }).getText(), 'Valuutanvaihto kr -> $ (kurssi 1.01 $/kr)');
+    }).getText(), 'Valuutanvaihto kr -> $ (myyntikurssi 1.01 $/kr)');
 
     assert.equal(Tx.create('interest', {total: 9.99}).getText(), 'Service-Z lainakorko');
 
