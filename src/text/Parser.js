@@ -95,7 +95,7 @@ class Matcher {
           break;
         case 'X':
           if (variable === '$') {
-            ret.addRegex('.+?');
+            ret.addRegex('.+?', 'currency', () => config.currency);
           } else {
             throw new Error('No handler for special markup X{' + variable + '}');
           }
@@ -139,7 +139,8 @@ class Parser {
    * @param {String} text
    */
   parse(text) {
-    console.log(text);
+    const orig = text;
+
     // Extract tags.
     let tags = [];
     do {
@@ -161,26 +162,36 @@ class Parser {
       notes = sub[2].split(', ');
     }
 
-    // Find matching transaction and construct it.
+    // Find matching transaction and construct data for it.
+    let type = null;
+    let data = null;
     for (let i = 0; i < this.typeMatch.length; i++) {
-      let data = this.typeMatch[i].exec(text);
+      data = this.typeMatch[i].exec(text);
       if (data) {
+        type = this.typeMatch[i].type;
         let opt;
         for (let j = 0; j < notes.length; j++) {
-          for (let k = 0; k < this.optionMatch.length; k++) {
-            console.log(this.optionMatch[k]);
+          let k = 0;
+          while (k < this.optionMatch.length) {
             opt = this.optionMatch[k].exec(notes[j]);
-            console.log(opt);
             if (opt) {
               data = Object.assign(data, opt);
               break;
             }
+            k++;
+          }
+          if (k === this.optionMatch.length) {
+            throw new Error('Failed to parse option: ' + notes[j] + ' in ' + JSON.stringify(orig));
           }
         }
-        console.log(data);
-        return Tx.create(this.typeMatch[i].type, data);
+        break;
       }
     }
+    // Construct the transaction.
+    if (!type) {
+      throw new Error('Failed to parse ' + JSON.stringify(orig));
+    }
+    return Tx.create(type, data);
   }
 }
 
