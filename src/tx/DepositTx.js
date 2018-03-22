@@ -27,7 +27,7 @@ module.exports = class DepositTx extends Tx {
     ];
   }
 
-  getText() {
+  getMyText() {
     return text.tx(this);
   }
 

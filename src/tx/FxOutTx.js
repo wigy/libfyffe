@@ -25,7 +25,7 @@ module.exports = class FxOutTx extends Tx {
     ];
   }
 
-  getText() {
+  getMyText() {
     let opts = [text.option('outRate', this)];
     return text.withOptions(text.tx(this), opts);
   }

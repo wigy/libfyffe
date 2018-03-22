@@ -26,7 +26,7 @@ module.exports = class WithdrawalTx extends Tx {
     ];
   }
 
-  getText() {
+  getMyText() {
     return text.tx(this);
   }
 

@@ -29,7 +29,7 @@ module.exports = class DividendTx extends Tx {
     return ret;
   }
 
-  getText() {
+  getMyText() {
     let opts = [];
     if (this.currency !== config.currency) {
       opts.push(text.option('rate', this));

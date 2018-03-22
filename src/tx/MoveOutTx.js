@@ -18,7 +18,7 @@ module.exports = class MoveOutTx extends Tx {
     ];
   }
 
-  getText() {
+  getMyText() {
     return text.withOptions(text.tx(this), [text.option('stockNow', this)]);
   }
 

@@ -26,7 +26,7 @@ module.exports = class BuyTx extends Tx {
     ];
   }
 
-  getText() {
+  getMyText() {
     let opts = [text.option('stock', this)];
     if (!config.flags.noProfit) {
       opts.push(text.option('averageNow', this));

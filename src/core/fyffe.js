@@ -1,3 +1,4 @@
+const clone = require('clone');
 const promiseSeq = require('promise-sequential');
 const Stock = require('./Stock');
 const Ledger = require('./Ledger');
@@ -140,11 +141,24 @@ class Fyffe {
     let txs = data.map((group) => importer.createTransaction(group));
     this.ledger.add(txs);
 
-    // TODO: Add tags based on the configuration.
+    // Add tags based on the configuration.
+    const fundTag = config.tags[config.fund];
+    const serviceTag = config.tags[config.service];
+    let tags = [];
+    if (fundTag) {
+      tags.push(fundTag.tag);
+    }
+    if (serviceTag) {
+      tags.push(serviceTag.tag);
+    }
+    if (tags.length) {
+      txs.forEach((tx) => (tx.tags = clone(tags)));
+    }
 
     // Initialize stock for commodities and currencies.
     this.ledger.getTargets().forEach((target) => this.stock.add(0, target, 0.00));
     this.ledger.getCurrencies().forEach((currency) => this.stock.add(0, currency, 0.00));
+
     // TODO: Implement collectHistory() from legacy import.
 
     this.ledger.apply(this.stock);

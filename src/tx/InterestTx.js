@@ -19,7 +19,7 @@ module.exports = class InterestTx extends Tx {
     ];
   }
 
-  getText() {
+  getMyText() {
     return text.tx(this);
   }
 

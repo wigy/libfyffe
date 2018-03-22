@@ -44,7 +44,7 @@ module.exports = class SellTx extends Tx {
     return ret;
   }
 
-  getText() {
+  getMyText() {
     let opts = [];
     if (!config.flags.noProfit) {
       opts.push(text.option('average', this));

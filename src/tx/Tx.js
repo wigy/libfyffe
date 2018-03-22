@@ -261,10 +261,18 @@ module.exports = class Tx {
   }
 
   /**
-   * Describe the transaction.
+   * Describe the transaction and add tags.
    */
   getText() {
-    throw new Error('A transaction class in ' + types[this.type] + ' does not implement `getText()`.');
+    const tags = this.tags.length ? '[' + this.tags.join('][') + '] ' : '';
+    return tags + this.getMyText();
+  }
+
+  /**
+   * Describe the transaction.
+   */
+  getMyText() {
+    throw new Error('A transaction class in ' + types[this.type] + ' does not implement `getMyText()`.');
   }
 
   /**
