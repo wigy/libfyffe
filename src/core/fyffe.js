@@ -70,6 +70,16 @@ class Fyffe {
   }
 
   /**
+   * Find the latest price average for the commodities from the `tilitin`-database.
+   * @param {String} dbName
+   * @param {Array<String>} targets
+   * @param {String} [date]
+   */
+  async loadLastPrice(dbName, targets, date) {
+    tilitintin.history.findPrice(this.dbs[dbName], targets, date);
+  }
+
+  /**
    * Fetch the configured service tag or throw an exception.
    * @return {Tag}
    */
@@ -155,13 +165,16 @@ class Fyffe {
       txs.forEach((tx) => (tx.tags = clone(tags)));
     }
 
-    // Initialize stock for commodities and currencies.
+    // Initialize stock and average for commodities and currencies.
     this.ledger.getTargets().forEach((target) => this.stock.add(0, target, 0.00));
     this.ledger.getCurrencies().forEach((currency) => this.stock.add(0, currency, 0.00));
+    await this.loadLastPrice(dbName, this.ledger.getTargets(), firstDate);
 
-    // TODO: Implement collectHistory() from legacy import.
-
+    // TODO: Apply averages.
     this.ledger.apply(this.stock);
+
+    // TODO: Fix rounding errors.
+    // TODO: Apply loans.
 
     if (config.flags.debug) {
       this.ledger.showTransactions('Transactions:');
