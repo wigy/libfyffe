@@ -25,12 +25,10 @@ let nextId = 1;
  */
 module.exports = class Tx {
 
-  // TODO: We need to have also fund, service, owners tag support here.
-
   /**
    * Construct a transaction.
    * @param {String} type Lower-case name of the transaction type.
-   * @param {Object} add Additional fields activated by their initial values.
+   * @param {Object} add Additional fields to define.
    * @param {Object} data Actual data content to initialize.
    */
   constructor(type, add = {}, data = {}) {
@@ -44,6 +42,7 @@ module.exports = class Tx {
     this.type = type;
     this.id = nextId++;
     this.chained = [];
+    this.tags = [];
 
     // Initialize defaults.
     this.data = Object.assign({

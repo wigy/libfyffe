@@ -10,10 +10,13 @@ describe('class Tx', () => {
     config.set({
       language: 'fi',
       service: 'My Test Service',
+      fund: 'ZOO',
       accounts: {
       },
       tags: {
-        'Tag': 'Testing tag'
+        'Tag': {name: 'Testing tag'},
+        'MyTS': {name: 'My Test Service'},
+        'ZOO': {name: 'ZOO'}
       }
     });
     parser = new Parser();
@@ -22,11 +25,13 @@ describe('class Tx', () => {
   it('can parse transactions from texts', () => {
     let tx;
 
-    tx = parser.parse('[Tag]Talletus My Test Service-palveluun');
+    tx = parser.parse('[Tag][MyTS][ZOO]Talletus My Test Service-palveluun');
     assert.equal(tx.type, 'deposit');
+    assert.deepEqual(tx.tags, ['Tag', 'MyTS', 'ZOO']);
 
-    tx = parser.parse('[Tag]Nosto My Test Service-palvelusta');
+    tx = parser.parse('[Tag][MyTS][ZOO]Nosto My Test Service-palvelusta');
     assert.equal(tx.type, 'withdrawal');
+    assert.deepEqual(tx.tags, ['Tag', 'MyTS', 'ZOO']);
 
     tx = parser.parse('Osto +0.55555556 BTC (yht. 2.1 BTC)');
     assert.equal(tx.type, 'buy');

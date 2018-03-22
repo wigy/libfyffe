@@ -140,6 +140,8 @@ class Fyffe {
     let txs = data.map((group) => importer.createTransaction(group));
     this.ledger.add(txs);
 
+    // TODO: Add tags based on the configuration.
+
     // Initialize stock for commodities and currencies.
     this.ledger.getTargets().forEach((target) => this.stock.add(0, target, 0.00));
     this.ledger.getCurrencies().forEach((currency) => this.stock.add(0, currency, 0.00));

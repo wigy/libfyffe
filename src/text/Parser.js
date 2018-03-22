@@ -151,8 +151,13 @@ class Parser {
       tags.push(match[1]);
       text = match[2];
     } while (true);
-    // TODO: Verify tags.
-    // TODO: Record tags to the transaction.
+
+    // Verify tags.
+    tags.forEach((tag) => {
+      if (!config.tags[tag]) {
+        throw new Error('Ivalid tag ' + JSON.stringify(tag) + ' in ' + JSON.stringify(orig));
+      }
+    });
 
     // Extract notes.
     let notes = [];
@@ -191,7 +196,9 @@ class Parser {
     if (!type) {
       throw new Error('Failed to parse ' + JSON.stringify(orig));
     }
-    return Tx.create(type, data);
+    let ret = Tx.create(type, data);
+    ret.tags = tags;
+    return ret;
   }
 }
 

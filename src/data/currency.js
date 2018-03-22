@@ -182,6 +182,6 @@ function sym2text(sym) {
 }
 
 module.exports = {
-  txt2sym: text2sym,
+  text2sym: text2sym,
   sym2text: sym2text
 };
