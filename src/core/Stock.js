@@ -19,7 +19,7 @@ module.exports = class Stock {
 
     this.average[target] = this.average[target] || 0;
 
-    const oldTotal = this.get(target);
+    const oldTotal = this.getStock(target);
     const oldAverage = this.average[target];
     const oldPrice = oldTotal * oldAverage;
 
@@ -31,11 +31,38 @@ module.exports = class Stock {
     return {amount: this.stock[target], avg: this.average[target]};
   }
 
+  /**
+   * Reduce commodity from the stock.
+   * @param {Number} count
+   * @param {String} target
+   */
   del(count, target) {
     this.stock[target] = this.get(target) - count;
   }
 
-  get(target) {
+  /**
+   * Get the amount of the commodity in the stock.
+   * @param {String} target
+   * @return {Number}
+   */
+  getStock(target) {
     return (this.stock[target] || 0);
+  }
+
+  /**
+   * Get the average price for the commodity in the stock.
+   * @param {String} target
+   * @return {Number}
+   */
+  getAverage(target) {
+    return (this.average[target] || 0);
+  }
+
+  /**
+   * Set the initial average prices for the commodities.
+   * @param {Object} avg
+   */
+  setAverages(avg) {
+    Object.keys(avg).forEach((target) => (this.average[target] = avg[target]));
   }
 };

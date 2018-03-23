@@ -76,7 +76,7 @@ class Fyffe {
    * @param {String} [date]
    */
   async loadLastPrice(dbName, targets, date) {
-    tilitintin.history.findPrice(this.dbs[dbName], targets, date);
+    return tilitintin.history.findPrice(this.dbs[dbName], targets, date);
   }
 
   /**
@@ -168,9 +168,8 @@ class Fyffe {
     // Initialize stock and average for commodities and currencies.
     this.ledger.getTargets().forEach((target) => this.stock.add(0, target, 0.00));
     this.ledger.getCurrencies().forEach((currency) => this.stock.add(0, currency, 0.00));
-    await this.loadLastPrice(dbName, this.ledger.getTargets(), firstDate);
-
-    // TODO: Apply averages.
+    const averages = await this.loadLastPrice(dbName, this.ledger.getTargets(), firstDate);
+    this.stock.setAverages(averages);
     this.ledger.apply(this.stock);
 
     // TODO: Fix rounding errors.

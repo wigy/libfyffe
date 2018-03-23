@@ -296,6 +296,17 @@ module.exports = class Tx {
   }
 
   /**
+   * Retrieve stock and average price from stock for transactions using them.
+   * @param {Stock} stock
+   */
+  updateFromStock(stock) {
+    if ('stock' in this.data && this.has('target')) {
+      this.stock = stock.getStock(this.target);
+      this.avg = stock.getAverage(this.target);
+    }
+  }
+
+  /**
    * Create an instance of transaction.
    * @param {String} type
    * @param {Object} data

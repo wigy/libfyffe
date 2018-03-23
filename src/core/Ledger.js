@@ -52,6 +52,7 @@ module.exports = class Stock {
    */
   apply(stock) {
     this.notApplied.forEach((tx) => {
+      tx.updateFromStock(stock);
       tx.apply(this.accounts, stock);
     });
     this.notApplied.clear();
