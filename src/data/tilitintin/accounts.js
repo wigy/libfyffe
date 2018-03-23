@@ -1,3 +1,14 @@
+/**
+ * Convert account number to ID.
+ * @param {Knex} knex Knex-instance configured for the database.
+ * @param {number} number Account number.
+ * @return An object {id: <id>, number: <number>} or null if not found.
+ */
+function getAccountId(knex, number) {
+  return knex.select('id').from('account')
+    .where({'account.number': number})
+    .then(account => (account.length ? {number: number, id: account[0].id} : null));
+}
 
 /**
  * Get account IDs matching the given numbers.
@@ -53,5 +64,6 @@ function getBalances(knex, numbers, date = null) {
 
 module.exports = {
   getAll: getAll,
+  getAccountId: getAccountId,
   getBalances: getBalances
 };

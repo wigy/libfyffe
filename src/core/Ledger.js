@@ -7,7 +7,7 @@ const d = require('neat-dump');
 /**
  * A container for storing transactions.
  */
-module.exports = class Stock {
+module.exports = class Ledger {
 
   constructor() {
     this.txs = [];
@@ -44,6 +44,13 @@ module.exports = class Stock {
   getCurrencies() {
     let targets = this.txs.filter(tx => tx.has('currency')).map(tx => tx.currency);
     return [...new Set(targets)];
+  }
+
+  /**
+   * Get all transactions in this ledger.
+   */
+  getTransactions() {
+    return this.txs;
   }
 
   /**

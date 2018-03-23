@@ -29,7 +29,7 @@ function findPrice(knex, targets, date = null) {
         if (tx.has('target') && tx.has('avg')) {
           if (missing.has(tx.target)) {
             if (data[i].date > stamp) {
-              d.red('Found future average on', new Date(data[i].date), 'for ' + tx.target + ' that is newer than', date);
+              d.error('Found future average on', new Date(data[i].date), 'for ' + tx.target + ' that is newer than', date);
             }
             missing.delete(tx.target);
             ret[tx.target] = tx.avg;

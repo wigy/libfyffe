@@ -8,6 +8,10 @@ const Tx = require('../../tx/Tx');
  */
 class Import {
 
+  constructor(name) {
+    this.name = name;
+  }
+
   /**
    * Read in the data from the file and store it internally.
    * @param {String} file A path to the file.

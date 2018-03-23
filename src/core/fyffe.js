@@ -95,11 +95,12 @@ class Fyffe {
 
   /**
    * Import data from files into the system.
-   * @param {String} dbName
    * @param {String} format
    * @param {Array<String>} files
+   * @param {Object} options
    */
-  async import(dbName, format, files) {
+  async import(format, files, options) {
+    const {dbName} = options;
     const knex = this.dbs[dbName];
     const importer = require('../data/import/' + format);
 
@@ -181,8 +182,24 @@ class Fyffe {
     }
   }
 
-  async export() {
-    // TODO: Mechanism to transfer data to external sink.
+  /**
+   * Export data from the system to the external storage.
+   * @param {String} format
+   * @param {Object} options
+   */
+  async export(format, options) {
+    if (config.flags.dryRun) {
+      return;
+    }
+    const {dbName} = options;
+    const knex = this.dbs[dbName];
+    const exporter = require('../data/export/' + format);
+    const exportOptions = {
+      ledger: this.ledger,
+      accounts: this.accounts,
+      stock: this.stock
+    };
+    await exporter.export(knex, exportOptions);
   }
 }
 
