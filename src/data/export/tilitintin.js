@@ -11,6 +11,7 @@ class TilitintinExport extends Export {
 
   async save(knex, tx) {
     return tilitintinTx.add(knex, tx.date, tx.getText(), tx.getEntries(), {force: true})
+    // TODO: Add meta data.
 //      .then((docId) => meta.imports.add(this.db, this.config.service, txo.src.id, docId))
       .catch((err) => {
         d.error(err);
