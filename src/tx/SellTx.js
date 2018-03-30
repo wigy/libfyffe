@@ -27,7 +27,7 @@ module.exports = class SellTx extends Tx {
     } else {
       // Otherwise calculate losses or profits from the average price.
       const buyPrice = num.cents(-this.amount * this.avg);
-      const diff = num.cents(buyPrice - total);
+      const diff = num.cents(buyPrice - this.total);
       if (diff > 0) {
         // In losses, add to debit side into losses.
         ret.push({number: this.getAccount('losses'), amount: diff});

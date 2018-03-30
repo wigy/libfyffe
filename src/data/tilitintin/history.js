@@ -30,11 +30,12 @@ function findPrice(knex, targets, date = null) {
           if (missing.has(tx.target)) {
             if (data[i].date > stamp) {
               d.error('Found future average on', new Date(data[i].date), 'for ' + tx.target + ' that is newer than', date);
-            }
-            missing.delete(tx.target);
-            ret[tx.target] = tx.avg;
-            if (missing.values().length === 0) {
-              break;
+            } else {
+              missing.delete(tx.target);
+              ret[tx.target] = tx.avg;
+              if (missing.values().length === 0) {
+                break;
+              }
             }
           }
         }
