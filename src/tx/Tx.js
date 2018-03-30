@@ -221,7 +221,12 @@ module.exports = class Tx {
 
     acc = acc.toLowerCase();
     if (!(acc in conf)) {
-      throw new Error('There is no such configuration for accounts as ' + JSON.stringify(acc));
+      if ('default' in conf) {
+        return conf.default;
+      }
+    }
+    if (!(acc in conf)) {
+      throw new Error('There is no such configuration for an account as ' + JSON.stringify(acc));
     }
 
     const ret = conf[acc];

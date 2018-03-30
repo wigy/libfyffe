@@ -248,14 +248,16 @@ class Import {
       obj.rate = this.rate(group, obj);
     }
     obj.total = this.total(group, obj);
-    obj.fee = this.fee(group, obj);
-    if (obj.type !== 'withdrawal' && obj.type !== 'deposit' && obj.type !== 'buy' && obj.type !== 'sell') {
+    if (obj.type !== 'interest' && obj.type !== 'dividend') {
+      obj.fee = this.fee(group, obj);
+    }
+    if (obj.type === 'dividend') {
       obj.tax = this.tax(group, obj);
     }
-    if (obj.type !== 'withdrawal' && obj.type !== 'deposit') {
+    if (obj.type !== 'withdrawal' && obj.type !== 'deposit' && obj.type !== 'interest') {
       obj.target = this.target(group, obj);
     }
-    if (obj.type !== 'withdrawal' && obj.type !== 'deposit' && obj.type !== 'fx') {
+    if (obj.type === 'buy' || obj.type === 'sell' || obj.type === 'move-in' || obj.type === 'move-out' || obj.type === 'dividend') {
       obj.amount = this.amount(group, obj);
     }
     const type = obj.type;

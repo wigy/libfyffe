@@ -49,7 +49,7 @@ class Config {
         },
         // Accounts for holding tradeable targets.
         targets: {
-          shares: null,
+          default: null,
           eth: null,
           btc: null
         },
