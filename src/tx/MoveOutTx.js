@@ -8,7 +8,7 @@ const text = require('../text/make');
 module.exports = class MoveOutTx extends Tx {
 
   constructor(data = {}) {
-    super('move-out', { target: undefined, amount: undefined, stock: undefined, avg: undefined }, data);
+    super('move-out', { target: undefined, amount: undefined, stock: undefined, avg: undefined, fee: 0.0 }, data);
   }
 
   getMyEntries() {
