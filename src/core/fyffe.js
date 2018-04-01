@@ -175,9 +175,7 @@ class Fyffe {
       this.stock.showAverages('Averages:');
     }
 
-    // TODO: Fix rounding errors.
-
-    // Post-process some transactions.
+    // Post-process transactions.
     txs.forEach((tx, i) => {
       switch (tx.type) {
         case 'move-in':

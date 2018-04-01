@@ -14,7 +14,8 @@ module.exports = class MoveOutTx extends Tx {
   getMyEntries() {
     // Note: this is only partial entry.
     return [
-      {number: this.getAccount('targets', this.target), amount: num.cents(-this.total)}
+      {number: this.getAccount('targets', this.target), amount: num.cents(-this.total)},
+      {number: this.getAccount('imbalance'), amount: num.cents(this.total)}
     ];
   }
 
