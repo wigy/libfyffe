@@ -176,8 +176,18 @@ class Fyffe {
     }
 
     // TODO: Fix rounding errors.
+
+    // Post-process some transactions.
+    txs.forEach((tx, i) => {
+      switch (tx.type) {
+        case 'move-in':
+        case 'move-out':
+          tx.total = importer.total(data[i], tx, this);
+      }
+    });
+
+    // Finally apply all transactions.
     // TODO: Apply loans.
-    // TODO: Post-processing for move-in/move-out.
     this.ledger.apply(this.stock);
 
     if (config.flags.debug) {
