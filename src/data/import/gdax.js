@@ -80,6 +80,7 @@ class GDAXImport extends Import {
     switch (obj.type) {
       case 'move-in':
       case 'move-out':
+        // TODO: Calculate from average.
         return 0;
       case 'buy':
         eur = this._srcType(group, 'match', 'EUR');

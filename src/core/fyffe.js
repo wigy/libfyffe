@@ -175,6 +175,7 @@ class Fyffe {
 
     // TODO: Fix rounding errors.
     // TODO: Apply loans.
+    // TODO: Post-processing for move-in/move-out.
 
     if (config.flags.debug) {
       this.ledger.showTransactions('Transactions:');

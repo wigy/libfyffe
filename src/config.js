@@ -66,8 +66,8 @@ class Config {
         fees: null,
         // Interests paid.
         interest: null,
-        // Rounding errors.
-        rounding: null,
+        // Account to collect invalid balances.
+        imbalance: null,
         // Trade losses.
         losses: null,
         // Profits from the trades.
