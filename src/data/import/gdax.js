@@ -93,10 +93,9 @@ class GDAXImport extends Import {
     let total = 0;
     switch (obj.type) {
       case 'move-in':
+        return Math.round(100 * fyffe.stock.getAverage(obj.target) * group[0].amount) / 100;
       case 'move-out':
-      //console.log(fyffe.stock.getAverage());
-        // TODO: Calculate from average.
-        return 0;
+        return Math.round(-100 * fyffe.stock.getAverage(obj.target) * group[0].amount) / 100;
       case 'buy':
         eur = this._srcType(group, 'match', 'EUR');
         total += -parseFloat(eur[0].amount);
