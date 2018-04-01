@@ -59,6 +59,19 @@ class KrakenImport extends Import {
     return 1.0;
   }
 
+  target(group) {
+    const crypto = group.filter((entry) => entry.asset !== 'ZEUR');
+    if (crypto.length) {
+      switch (crypto[0].asset) {
+        case 'XETH':
+          return 'ETH';
+        case 'XXBT':
+          return 'BTC';
+      }
+    }
+    throw new Error('Cannot recognize trade target for ' + JSON.stringify(group));
+  }
+
   total(group, obj) {
     let total = 0;
     if (obj.type === 'sell') {
@@ -90,19 +103,6 @@ class KrakenImport extends Import {
 
   tax(group) {
     return null;
-  }
-
-  target(group) {
-    const crypto = group.filter((entry) => entry.asset !== 'ZEUR');
-    if (crypto.length) {
-      switch (crypto[0].asset) {
-        case 'XETH':
-          return 'ETH';
-        case 'XXBT':
-          return 'BTC';
-      }
-    }
-    throw new Error('Cannot recognize trade target for ' + JSON.stringify(group));
   }
 
   amount(group, obj) {

@@ -115,6 +115,18 @@ class NordnetImport extends Import {
     return ret;
   }
 
+  target(group) {
+    const ticker = group[0].Arvopaperi;
+    if (!ticker) {
+      const given = this._given(group);
+      if (given && given.Valuutta) {
+        return given.Valuutta;
+      }
+      throw new Error('Cannot recognize target from ' + JSON.stringify(group));
+    }
+    return ticker;
+  }
+
   total(group, obj) {
     let sum = 0;
     if (obj.type === 'fx') {
@@ -155,18 +167,6 @@ class NordnetImport extends Import {
       }
     }
     return null;
-  }
-
-  target(group) {
-    const ticker = group[0].Arvopaperi;
-    if (!ticker) {
-      const given = this._given(group);
-      if (given && given.Valuutta) {
-        return given.Valuutta;
-      }
-      throw new Error('Cannot recognize target from ' + JSON.stringify(group));
-    }
-    return ticker;
   }
 
   amount(group, obj) {

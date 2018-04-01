@@ -74,12 +74,27 @@ class GDAXImport extends Import {
     return 1.0;
   }
 
-  total(group, obj) {
+  target(group) {
+    if (group.length === 1) {
+      return group[0].amount_balance_unit;
+    }
+    const fee = this._srcType(group, 'fee');
+    if ((fee && group.length === 3) || (!fee && group.length === 2)) {
+      const other = group.filter((tx) => tx.amount_balance_unit !== 'EUR');
+      if (other) {
+        return other[0].amount_balance_unit;
+      }
+    }
+    throw new Error('Cannot find target from ' + JSON.stringify(group));
+  }
+
+  total(group, obj, fyffe) {
     let eur, fee;
     let total = 0;
     switch (obj.type) {
       case 'move-in':
       case 'move-out':
+      //console.log(fyffe.stock.getAverage());
         // TODO: Calculate from average.
         return 0;
       case 'buy':
@@ -125,20 +140,6 @@ class GDAXImport extends Import {
 
   tax(group) {
     return null;
-  }
-
-  target(group) {
-    if (group.length === 1) {
-      return group[0].amount_balance_unit;
-    }
-    const fee = this._srcType(group, 'fee');
-    if ((fee && group.length === 3) || (!fee && group.length === 2)) {
-      const other = group.filter((tx) => tx.amount_balance_unit !== 'EUR');
-      if (other) {
-        return other[0].amount_balance_unit;
-      }
-    }
-    throw new Error('Cannot find target from ' + JSON.stringify(group));
   }
 
   amount(group, obj) {

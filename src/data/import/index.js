@@ -124,6 +124,17 @@ class Import {
   }
 
   /**
+   * Look up for the trade target
+   *
+   * @param {Array<Object>} group A source data group.
+   * @param {Object} obj Data known so far.
+   * @return {string}
+   */
+  target(group, obj) {
+    throw new Error('Importer does not implement target().');
+  }
+
+  /**
    * Calculate transaction total as positive number.
    *
    * @param {Array<Object>} group A source data group.
@@ -154,17 +165,6 @@ class Import {
    */
   rate(group, obj) {
     throw new Error('Importer does not implement rate().');
-  }
-
-  /**
-   * Look up for the trade target
-   *
-   * @param {Array<Object>} group A source data group.
-   * @param {Object} obj Data known so far.
-   * @return {string}
-   */
-  target(group, obj) {
-    throw new Error('Importer does not implement target().');
   }
 
   /**
@@ -238,8 +238,9 @@ class Import {
   /**
    * Convert a source data group to transaction.
    * @param {Array<Object>} group
+   * @param {Fyffe} fyffe
    */
-  createTransaction(group) {
+  createTransaction(group, fyffe) {
     let obj = {};
     obj.date = this.date(group[0]);
     obj.type = this.recognize(group);
@@ -247,15 +248,15 @@ class Import {
       obj.currency = this.currency(group, obj);
       obj.rate = this.rate(group, obj);
     }
-    obj.total = this.total(group, obj);
+    if (obj.type !== 'withdrawal' && obj.type !== 'deposit' && obj.type !== 'interest') {
+      obj.target = this.target(group, obj);
+    }
+    obj.total = this.total(group, obj, fyffe);
     if (obj.type !== 'interest' && obj.type !== 'dividend') {
       obj.fee = this.fee(group, obj);
     }
     if (obj.type === 'dividend') {
       obj.tax = this.tax(group, obj);
-    }
-    if (obj.type !== 'withdrawal' && obj.type !== 'deposit' && obj.type !== 'interest') {
-      obj.target = this.target(group, obj);
     }
     if (obj.type === 'buy' || obj.type === 'sell' || obj.type === 'move-in' || obj.type === 'move-out' || obj.type === 'dividend') {
       obj.amount = this.amount(group, obj);
