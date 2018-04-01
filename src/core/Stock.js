@@ -1,3 +1,6 @@
+const d = require('neat-dump');
+const num = require('../util/num');
+
 /**
  * A container class for storing commodities and currencies.
  */
@@ -64,5 +67,16 @@ module.exports = class Stock {
    */
   setAverages(avg) {
     Object.keys(avg).forEach((target) => (this.average[target] = avg[target]));
+  }
+
+  /**
+   * Dump averages loaded to the screen.
+   * @param {String} title
+   */
+  showAverages(title) {
+    d.purple(title);
+    Object.keys(this.average).forEach((target) => {
+      d.green('  ', target, num.currency(this.average[target], '€'));
+    });
   }
 };
