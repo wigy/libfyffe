@@ -15,7 +15,8 @@ const types = {
   'fx-out': './FxOutTx',
   interest: './InterestTx',
   'move-in': './MoveInTx',
-  'move-out': './MoveOutTx'
+  'move-out': './MoveOutTx',
+  trade: './TradeTx'
 };
 
 let nextId = 1;
@@ -221,7 +222,7 @@ module.exports = class Tx {
 
     acc = acc.toLowerCase();
     if (!(acc in conf)) {
-      if ('default' in conf) {
+      if (conf.default !== null) {
         return conf.default;
       }
     }
@@ -287,6 +288,9 @@ module.exports = class Tx {
    */
   apply(accounts, stock) {
     this.getEntries().forEach((entry) => {
+      if (!entry.number) {
+        throw new Error('Invalid account number found in entries ' + JSON.stringify(this.getEntries()));
+      }
       accounts.transfer(entry.number, entry.amount);
     });
     this.updateStock(stock);

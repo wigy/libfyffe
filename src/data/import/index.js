@@ -244,7 +244,7 @@ class Import {
     let obj = {};
     obj.date = this.date(group[0]);
     obj.type = this.recognize(group);
-    if (obj.type !== 'withdrawal' && obj.type !== 'deposit' && obj.type !== 'move-in' && obj.type !== 'move-out') {
+    if (obj.type !== 'withdrawal' && obj.type !== 'deposit' && obj.type !== 'move-in' && obj.type !== 'move-out' && obj.type !== 'trade') {
       obj.currency = this.currency(group, obj);
       obj.rate = this.rate(group, obj);
     }

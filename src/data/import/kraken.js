@@ -39,12 +39,18 @@ class KrakenImport extends Import {
       if (what === 'deposit-ZEUR' || what === 'withdrawal-ZEUR') {
         return group[0].type;
       }
+      if (/^withdrawal-[A-Z]+$/.test(what)) {
+        return 'move-out';
+      }
     }
 
     if (group.length === 2) {
       const euro = group.filter((entry) => entry.asset === 'ZEUR');
       if (euro.length) {
         return parseFloat(euro[0].amount) < 0 ? 'buy' : 'sell';
+      }
+      if (group[0].type === 'trade' && group[1].type === 'trade') {
+        return 'trade';
       }
     }
 
@@ -67,6 +73,8 @@ class KrakenImport extends Import {
           return 'ETH';
         case 'XXBT':
           return 'BTC';
+        case 'BCH':
+          return 'BCH';
       }
     }
     throw new Error('Cannot recognize trade target for ' + JSON.stringify(group));
