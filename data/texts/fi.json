@@ -9,7 +9,8 @@
     "fx-out": "Valuutanvaihto £{target} -> £{currency}",
     "interest": "C{service} lainakorko",
     "move-in": "Siirto C{service}-palveluun +{amount} ={target}",
-    "move-out": "Siirto C{service}-palvelusta +{amount} ={target}"
+    "move-out": "Siirto C{service}-palvelusta +{amount} ={target}",
+    "trade": "Vaihto +{given} ={source} +{amount} ={target}"
   },
   "options": {
     "average": "k.h. ${avg} X{$}/={target}",

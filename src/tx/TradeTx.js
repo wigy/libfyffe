@@ -12,20 +12,18 @@ module.exports = class TradeTx extends Tx {
   }
 
   getMyEntries() {
-    throw new Error('TODO');
+    // TODO: Fee handling (when fee in commodity).
     return [
       {number: this.getAccount('targets', this.target), amount: num.cents(this.total)},
-      {number: this.getAccount('imbalance'), amount: num.cents(-this.total)}
+      {number: this.getAccount('targets', this.source), amount: num.cents(-this.total)}
     ];
   }
 
   getMyText() {
-    throw new Error('TODO');
-    return text.withOptions(text.tx(this), [text.option('stock', this)]);
+    return text.withOptions(text.tx(this), []);
   }
 
   updateStock(stock) {
-    throw new Error('TODO');
     const {amount, avg} = stock.add(this.amount, this.target, this.total);
     this.stock = amount;
     this.avg = avg;

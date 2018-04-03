@@ -135,6 +135,17 @@ class Import {
   }
 
   /**
+   * Look up for the trade source
+   *
+   * @param {Array<Object>} group A source data group.
+   * @param {Object} obj Data known so far.
+   * @return {string}
+   */
+  source(group, obj) {
+    throw new Error('Importer does not implement source().');
+  }
+
+  /**
    * Calculate transaction total as positive number.
    *
    * @param {Array<Object>} group A source data group.
@@ -176,6 +187,17 @@ class Import {
    */
   amount(group, obj) {
     throw new Error('Importer does not implement amount().');
+  }
+
+  /**
+   * Look up for the amount of the target to give away in trade.
+   *
+   * @param {Array<Object>} group A source data group.
+   * @param {Object} obj Data known so far.
+   * @return {Number} Amount given.
+   */
+  given(group, obj) {
+    throw new Error('Importer does not implement given().');
   }
 
   /**
@@ -251,6 +273,9 @@ class Import {
     if (obj.type !== 'withdrawal' && obj.type !== 'deposit' && obj.type !== 'interest') {
       obj.target = this.target(group, obj);
     }
+    if (obj.type === 'trade') {
+      obj.source = this.source(group, obj);
+    }
     obj.total = this.total(group, obj, fyffe);
     if (obj.type !== 'interest' && obj.type !== 'dividend') {
       obj.fee = this.fee(group, obj);
@@ -258,8 +283,12 @@ class Import {
     if (obj.type === 'dividend') {
       obj.tax = this.tax(group, obj);
     }
-    if (obj.type === 'buy' || obj.type === 'sell' || obj.type === 'move-in' || obj.type === 'move-out' || obj.type === 'dividend') {
+    if (obj.type === 'buy' || obj.type === 'sell' || obj.type === 'move-in' || obj.type === 'move-out'
+      || obj.type === 'dividend' || obj.type === 'trade') {
       obj.amount = this.amount(group, obj);
+    }
+    if (obj.type === 'trade') {
+      obj.given = this.given(group, obj);
     }
     const type = obj.type;
     delete obj.type;

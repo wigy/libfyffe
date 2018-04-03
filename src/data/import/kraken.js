@@ -1,9 +1,23 @@
+const d = require('neat-dump');
 const Import = require('../import');
 
 class KrakenImport extends Import {
 
   constructor() {
     super('Kraken');
+  }
+
+  // Helper to convert asset code to target.
+  asset2target(asset) {
+    switch (asset) {
+      case 'XETH':
+        return 'ETH';
+      case 'XXBT':
+        return 'BTC';
+      case 'BCH':
+        return 'BCH';
+    }
+    throw new Error('Cannot recognize asset ' + asset);
   }
 
   load(file) {
@@ -67,17 +81,19 @@ class KrakenImport extends Import {
 
   target(group) {
     const crypto = group.filter((entry) => entry.asset !== 'ZEUR');
-    if (crypto.length) {
-      switch (crypto[0].asset) {
-        case 'XETH':
-          return 'ETH';
-        case 'XXBT':
-          return 'BTC';
-        case 'BCH':
-          return 'BCH';
-      }
+    if (crypto.length === 1) {
+      return this.asset2target(crypto[0].asset);
+    }
+    if (crypto.length === 2) {
+      const dst = group.filter((entry) => parseFloat(entry.amount) > 0);
+      return this.asset2target(dst[0].asset);
     }
     throw new Error('Cannot recognize trade target for ' + JSON.stringify(group));
+  }
+
+  source(group) {
+    const src = group.filter((entry) => parseFloat(entry.amount) < 0);
+    return this.asset2target(src[0].asset);
   }
 
   total(group, obj) {
@@ -102,8 +118,12 @@ class KrakenImport extends Import {
   fee(group) {
     let total = 0;
     group.forEach((entry) => {
-      if (entry.asset === 'ZEUR') {
-        total += Math.abs(parseFloat(entry.fee));
+      if (parseFloat(entry.fee)) {
+        if (entry.asset === 'ZEUR') {
+          total += Math.abs(parseFloat(entry.fee));
+        } else {
+          d.red('No handler for fee in entry ' + JSON.stringify(entry));
+        }
       }
     });
     return Math.round(total * 100) / 100;
@@ -115,10 +135,22 @@ class KrakenImport extends Import {
 
   amount(group, obj) {
     const crypto = group.filter((entry) => entry.asset !== 'ZEUR');
-    if (crypto.length) {
+    if (crypto.length === 1) {
       return parseFloat(crypto[0].amount);
     }
+    if (crypto.length === 2) {
+      const dst = group.filter((entry) => parseFloat(entry.amount) > 0);
+      return parseFloat(dst[0].amount);
+    }
     throw new Error('Cannot recognize amount of trade for ' + JSON.stringify(group));
+  }
+
+  given(group, obj) {
+    if (group.length === 2) {
+      const dst = group.filter((entry) => parseFloat(entry.amount) < 0);
+      return parseFloat(dst[0].amount);
+    }
+    throw new Error('Cannot recognize amount given for ' + JSON.stringify(group));
   }
 }
 
