@@ -60,7 +60,7 @@ module.exports = class Stock {
    */
   showBalances(title) {
     d.purple(title);
-    Object.values(this.accounts).forEach((account) => {
+    Object.values(this.accounts).sort((a, b) => a.number < b.number ? -1 : (a.number > b.number ? 1 : 0)).forEach((account) => {
       if (account.balance !== null) {
         d.yellow('  ', account.number, account.name);
         d.green('       ', num.currency(account.balance, config.currency));

@@ -2,52 +2,82 @@ const d = require('neat-dump');
 
 const Parser = require('../../text/Parser');
 /**
- * Scan for the latest average price for the given targets.
+ * Scan for the latest average price and stock for the given targets.
  * @param {*} knex
  * @param {*} targets
  * @param {*} date
  * @return {Promise<Object>}
+ *
+ * The format of the returned object is
+ * ```
+ * {
+ *   "stock": {
+ *     "TG1": 12.0005,
+ *     "TG2": 0.005
+ *   },
+ *   "avg": {
+ *     "TG1": 0.11,
+ *     "TG2": 511212.11
+ *   },
+ * }
+ * ```
  */
-function findPrice(knex, targets, date = null) {
+function findPriceAndStock(knex, targets, date = null) {
   const parser = new Parser();
   const stamp = date === null ? new Date().getTime() : new Date(date + ' 00:00:00').getTime();
-  let missing = new Set(targets);
+  let missingAvg = new Set(targets);
+  let missingStock = new Set(targets);
   return knex.distinct('description', 'date')
     .select()
     .from('entry')
     .where('description', 'LIKE', '%k.h.%')
     .leftJoin('document', 'entry.document_id', 'document.id').orderBy('date', 'desc')
     .then((data) => {
-      let ret = {};
+      let ret = {stock: {}, avg: {}};
       let tx;
       for (let i = 0; i < data.length; i++) {
+        // Parse it.
         try {
           tx = parser.parse(data[i].description);
         } catch (err) {
           continue;
         }
+        // Look for average.
         if (tx.has('target') && tx.has('avg')) {
-          if (missing.has(tx.target)) {
+          if (missingAvg.has(tx.target)) {
             if (data[i].date > stamp) {
               d.error('Found future average on', new Date(data[i].date), 'for ' + tx.target + ' that is newer than', date);
             } else {
-              missing.delete(tx.target);
-              ret[tx.target] = tx.avg;
-              if (missing.values().length === 0) {
-                break;
-              }
+              missingAvg.delete(tx.target);
+              ret.avg[tx.target] = tx.avg;
             }
           }
         }
+        // Look for stock.
+        if (tx.has('target') && tx.has('stock')) {
+          if (missingStock.has(tx.target)) {
+            if (data[i].date > stamp) {
+              d.error('Found future stock on', new Date(data[i].date), 'for ' + tx.target + ' that is newer than', date);
+            } else {
+              missingStock.delete(tx.target);
+              ret.stock[tx.target] = tx.stock;
+            }
+          }
+        }
+        // Are we done?
+        if (missingAvg.values().length === 0 && missingStock.values().length === 0) {
+          break;
+        }
       }
+
       return ret;
     })
     .then((known) => {
-      missing.forEach((target) => (known[target] = 0.0));
+      missingAvg.forEach((target) => (known[target] = 0.0));
       return known;
     });
 }
 
 module.exports = {
-  findPrice: findPrice
+  findPriceAndStock: findPriceAndStock
 };

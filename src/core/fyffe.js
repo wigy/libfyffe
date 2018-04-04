@@ -70,13 +70,13 @@ class Fyffe {
   }
 
   /**
-   * Find the latest price average for the commodities from the `tilitin`-database.
+   * Find the latest price average and stock for the commodities from the `tilitin`-database.
    * @param {String} dbName
    * @param {Array<String>} targets
    * @param {String} [date]
    */
-  async loadLastPrice(dbName, targets, date) {
-    return tilitintin.history.findPrice(this.dbs[dbName], targets, date);
+  async loadPriceAndStock(dbName, targets, date) {
+    return tilitintin.history.findPriceAndStock(this.dbs[dbName], targets, date);
   }
 
   /**
@@ -169,10 +169,11 @@ class Fyffe {
     // Initialize stock and average for commodities and currencies.
     this.ledger.getTargets().forEach((target) => this.stock.add(0, target, 0.00));
     this.ledger.getCurrencies().forEach((currency) => this.stock.add(0, currency, 0.00));
-    const averages = await this.loadLastPrice(dbName, this.ledger.getTargets(), firstDate);
-    this.stock.setAverages(averages);
+    const {avg, stock} = await this.loadPriceAndStock(dbName, this.ledger.getTargets(), firstDate);
+    this.stock.setStock(stock);
+    this.stock.setAverages(avg);
     if (config.flags.debug) {
-      this.stock.showAverages('Averages:');
+      this.stock.showStock('Initial stock:');
     }
 
     // Post-process transactions.
@@ -190,6 +191,7 @@ class Fyffe {
 
     if (config.flags.debug) {
       this.ledger.showTransactions('Transactions:');
+      this.stock.showStock('Final stock:');
       this.ledger.accounts.showBalances('Final balances:');
     }
   }

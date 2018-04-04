@@ -70,13 +70,22 @@ module.exports = class Stock {
   }
 
   /**
+   * Set the initial stock counts for the commodities.
+   * @param {Object} stock
+   */
+  setStock(stock) {
+    Object.keys(stock).forEach((target) => (this.stock[target] = stock[target]));
+  }
+
+  /**
    * Dump averages loaded to the screen.
    * @param {String} title
    */
-  showAverages(title) {
+  showStock(title) {
     d.purple(title);
     Object.keys(this.average).forEach((target) => {
-      d.green('  ', target, num.currency(this.average[target], '€'));
+      d.green('  ', target, this.stock[target]);
+      d.yellow('       ', num.currency(this.average[target], '€ / ' + target));
     });
   }
 };

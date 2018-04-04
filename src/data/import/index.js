@@ -263,6 +263,7 @@ class Import {
    * @param {Fyffe} fyffe
    */
   createTransaction(group, fyffe) {
+    // TODO: Cleanup. These can be figured from constructor data for each type.
     let obj = {};
     obj.date = this.date(group[0]);
     obj.type = this.recognize(group);
