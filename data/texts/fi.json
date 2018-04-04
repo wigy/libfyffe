@@ -20,6 +20,7 @@
     "stockLeft": "jäi #{stock2} ={source}",
     "rate": "kurssi #{rate} £{currency}/X{$}",
     "inRate": "ostokurssi #{rate} £{target}/£{currency}",
-    "outRate": "myyntikurssi #{rate} £{currency}/£{target}"
+    "outRate": "myyntikurssi #{rate} £{currency}/£{target}",
+    "burn": "kulu +{burnAmount} ={burnTarget}"
   }
 }

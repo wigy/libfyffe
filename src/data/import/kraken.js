@@ -121,8 +121,6 @@ class KrakenImport extends Import {
       if (parseFloat(entry.fee)) {
         if (entry.asset === 'ZEUR') {
           total += Math.abs(parseFloat(entry.fee));
-        } else {
-          d.red('No handler for fee in entry ' + JSON.stringify(entry));
         }
       }
     });
@@ -151,6 +149,26 @@ class KrakenImport extends Import {
       return parseFloat(dst[0].amount);
     }
     throw new Error('Cannot recognize amount given for ' + JSON.stringify(group));
+  }
+
+  burnTarget(group, obj) {
+    let ret = null;
+    group.forEach((entry) => {
+      if (parseFloat(entry.fee) && entry.asset !== 'ZEUR') {
+        ret = this.asset2target(entry.asset);
+      }
+    });
+    return ret;
+  }
+
+  burnAmount(group, obj) {
+    let ret = null;
+    group.forEach((entry) => {
+      if (parseFloat(entry.fee) && entry.asset !== 'ZEUR') {
+        ret = -parseFloat(entry.fee);
+      }
+    });
+    return ret;
   }
 }
 

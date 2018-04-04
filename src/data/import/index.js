@@ -223,6 +223,28 @@ class Import {
   }
 
   /**
+   * Look up for the trade target to be consumed in the transaction.
+   *
+   * @param {Array<Object>} group A source data group.
+   * @param {Object} obj Data known so far.
+   * @return {string}
+   */
+  burnTarget(group, obj) {
+    throw new Error('Importer does not implement burnTarget().');
+  }
+
+  /**
+   * Look up for the amount of the target to consume in the transaction.
+   *
+   * @param {Array<Object>} group A source data group.
+   * @param {Object} obj Data known so far.
+   * @return {Number} Amount traded.
+   */
+  burnAmount(group, obj) {
+    throw new Error('Importer does not implement burnAmount().');
+  }
+
+  /**
    * Fallback ID if nothing better available for identifying transactions.
    */
   fileAndLineId(group) {
@@ -290,6 +312,10 @@ class Import {
     }
     if (obj.type === 'trade') {
       obj.given = this.given(group, obj);
+    }
+    if (obj.type === 'trade' || obj.type === 'move-in' || obj.type === 'move-out') {
+      obj.burnAmount = this.burnAmount(group, obj);
+      obj.burnTarget = this.burnTarget(group, obj);
     }
     const type = obj.type;
     delete obj.type;

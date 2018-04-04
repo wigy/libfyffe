@@ -8,7 +8,7 @@ const text = require('../text/make');
 module.exports = class MoveInTx extends Tx {
 
   constructor(data = {}) {
-    super('move-in', { target: undefined, amount: undefined, stock: undefined, avg: undefined, fee: 0.0 }, data);
+    super('move-in', { target: undefined, amount: undefined, stock: undefined, avg: undefined, fee: 0.0, burnAmount: null, burnTarget: null }, data);
   }
 
   getMyEntries() {
@@ -19,10 +19,18 @@ module.exports = class MoveInTx extends Tx {
   }
 
   getMyText() {
-    return text.withOptions(text.tx(this), [text.option('stock', this)]);
+    let opts = [];
+    if (this.burnAmount) {
+      opts.push(text.option('burn', this));
+    }
+    opts.push(text.option('stock', this));
+    return text.withOptions(text.tx(this), opts);
   }
 
   updateStock(stock) {
+    if (this.burnAmount) {
+      stock.add(this.burnAmount, this.burnTarget, this.total);
+    }
     const {amount, avg} = stock.add(this.amount, this.target, this.total);
     this.stock = amount;
     this.avg = avg;

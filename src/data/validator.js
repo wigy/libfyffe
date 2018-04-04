@@ -49,6 +49,18 @@ module.exports = {
   },
 
   /**
+   * Check that value is a finite number greater than or equal to zero or null.
+   * @param {String} name
+   * @param {any} val
+   */
+  isGeZeroOrNull: (name, val) => {
+    if (val === null) {
+      return;
+    }
+    module.exports.isGeZero(name, val);
+  },
+
+  /**
    * Check that value is a finite number greater than zero.
    * @param {String} name
    * @param {any} val
@@ -59,6 +71,18 @@ module.exports = {
       return;
     }
     throw new Error('Invalid value ' + JSON.stringify(val) + ' for ' + JSON.stringify(name));
+  },
+
+  /**
+   * Check that value is a finite number greater than zero or null.
+   * @param {String} name
+   * @param {any} val
+   */
+  isGtZeroOrNull: (name, val) => {
+    if (val === null) {
+      return;
+    }
+    module.exports.isGtZero(name, val);
   },
 
   /**
@@ -75,6 +99,18 @@ module.exports = {
   },
 
   /**
+   * Check that value is a finite number less than zero or null.
+   * @param {String} name
+   * @param {any} val
+   */
+  isLtZeroOrNull: (name, val) => {
+    if (val === null) {
+      return;
+    }
+    module.exports.isLtZero(name, val);
+  },
+
+  /**
    * Check that the value matches the regex.
    * @param {*} name
    * @param {*} val
@@ -86,5 +122,18 @@ module.exports = {
       return;
     }
     throw new Error('Value ' + JSON.stringify(val) + ' for ' + JSON.stringify(name) + ' does not match ' + regex);
+  },
+
+  /**
+   * Check that the value matches the regex or is Null.
+   * @param {*} name
+   * @param {*} val
+   * @param {*} regex
+   */
+  isRegexMatchOrNull: (name, val, regex) => {
+    if (val === null) {
+      return;
+    }
+    module.exports.isRegexMatch(name, val, regex);
   }
 };

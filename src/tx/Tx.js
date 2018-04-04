@@ -174,6 +174,74 @@ module.exports = class Tx {
   }
 
   /**
+   * A tradeable commodity source used in the transaction.
+   */
+  set source(val) {
+    validator.isRegexMatch('source', val, /^[-A-Z0-9]+\**?$/);
+    this.data.source = val;
+  }
+  get source() {
+    return this.get('source');
+  }
+
+  /**
+   * The total amount of commodity given out in this transaction (if not currency).
+   *
+   * Negative for giving out and positive when receiving.
+   */
+  set given(val) {
+    validator.isLtZero('given', val);
+    this.data.given = val;
+  }
+  get given() {
+    return this.get('given');
+  }
+
+  /**
+   * The average price of the second commodity after this transaction.
+   */
+  set avg2(val) {
+    validator.isGeZero('avg2', val);
+    this.data.avg2 = val;
+  }
+  get avg2() {
+    return this.get('avg2');
+  }
+
+  /**
+   * The total amount of the second commodity owned after this transaction.
+   */
+  set stock2(val) {
+    validator.isNum('stock2', val);
+    this.data.stock2 = val;
+  }
+  get stock2() {
+    return this.get('stock2');
+  }
+
+  /**
+   * A tradeable commodity used to pay the transaction.
+   */
+  set burnTarget(val) {
+    validator.isRegexMatchOrNull('burnTarget', val, /^[-A-Z0-9]+\**?$/);
+    this.data.burnTarget = val;
+  }
+  get burnTarget() {
+    return this.get('burnTarget');
+  }
+
+  /**
+   * The total amount of commodity needed to pay this transaction.
+   */
+  set burnAmount(val) {
+    validator.isLtZeroOrNull('burnAmount', val);
+    this.data.burnAmount = val;
+  }
+  get burnAmount() {
+    return this.get('burnAmount');
+  }
+
+  /**
    * Verify that the given field is set and get its value.
    * @param {String} name
    * @return {any} Value of the field if set.
