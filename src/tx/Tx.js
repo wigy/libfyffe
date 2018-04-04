@@ -355,13 +355,13 @@ module.exports = class Tx {
    * @param {Stock} stock
    */
   apply(accounts, stock) {
+    this.updateStock(stock);
     this.getEntries().forEach((entry) => {
       if (!entry.number) {
         throw new Error('Invalid account number found in entries ' + JSON.stringify(this.getEntries()));
       }
       accounts.transfer(entry.number, entry.amount);
     });
-    this.updateStock(stock);
   }
 
   /**
