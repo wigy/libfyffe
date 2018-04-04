@@ -15,13 +15,15 @@ module.exports = class Stock {
    * Add commodity to the stock.
    * @param {Number} count
    * @param {String} target
-   * @param {Number} price
+   * @param {Number} [price]
    * @return {Object} An object containing `amount` and `avg`.
    */
-  add(count, target, price) {
+  add(count, target, price = null) {
 
     this.average[target] = this.average[target] || 0;
-
+    if (price === null) {
+      price = this.average[target];
+    }
     const oldTotal = this.getStock(target);
     const oldAverage = this.average[target];
     const oldPrice = oldTotal * oldAverage;
@@ -30,6 +32,9 @@ module.exports = class Stock {
     const newTotal = this.stock[target];
     if (count > 0) {
       this.average[target] = (oldPrice + price) / newTotal;
+    }
+    if (this.stock[target] <= 0) {
+      this.average[target] = 0;
     }
     return {amount: this.stock[target], avg: this.average[target]};
   }

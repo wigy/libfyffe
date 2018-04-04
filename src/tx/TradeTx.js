@@ -24,11 +24,14 @@ module.exports = class TradeTx extends Tx {
   }
 
   getMyEntries() {
-    // TODO: Fee handling (when fee in commodity).
-    return [
-      {number: this.getAccount('targets', this.target), amount: num.cents(this.total)},
+    let ret = [
+      {number: this.getAccount('targets', this.target), amount: num.cents(this.total - this.fee)},
       {number: this.getAccount('targets', this.source), amount: num.cents(-this.total)}
     ];
+    if (this.fee) {
+      ret.push({number: this.getAccount('fees'), amount: this.fee});
+    }
+    return ret;
   }
 
   getMyText() {
@@ -41,15 +44,19 @@ module.exports = class TradeTx extends Tx {
   }
 
   updateStock(stock) {
-    // TODO: Calculate price. Make it optional in general?
-    if (this.burnAmount) {
-      stock.add(this.burnAmount, this.burnTarget, this.total);
+    if (!this.total) {
+      this.total = num.cents(-stock.getAverage(this.source) * this.given);
     }
-    let dst = stock.add(this.amount, this.target, this.total);
-    this.stock = dst.amount;
-    this.avg = dst.avg;
+    if (this.burnAmount) {
+      const burned = -this.burnAmount * stock.getAverage(this.burnTarget);
+      stock.add(this.burnAmount, this.burnTarget, burned);
+      this.fee = num.cents(this.fee + burned);
+    }
     let src = stock.add(this.given, this.source, this.total);
     this.stock2 = src.amount;
     this.avg2 = src.avg;
+    let dst = stock.add(this.amount, this.target, this.total);
+    this.stock = dst.amount;
+    this.avg = dst.avg;
   }
 };

@@ -12,11 +12,14 @@ module.exports = class MoveOutTx extends Tx {
   }
 
   getMyEntries() {
-    // Note: this is only partial entry.
-    return [
+    let ret = [
       {number: this.getAccount('targets', this.target), amount: num.cents(-this.total)},
-      {number: this.getAccount('imbalance'), amount: num.cents(this.total)}
+      {number: this.getAccount('imbalance'), amount: num.cents(this.total - this.fee)}
     ];
+    if (this.fee) {
+      ret.push({number: this.getAccount('fees'), amount: this.fee});
+    }
+    return ret;
   }
 
   getMyText() {
@@ -29,8 +32,13 @@ module.exports = class MoveOutTx extends Tx {
   }
 
   updateStock(stock) {
+    if (!this.total) {
+      this.total = num.cents(-stock.getAverage(this.target) * this.amount);
+    }
     if (this.burnAmount) {
-      stock.add(this.burnAmount, this.burnTarget, this.total);
+      const burned = -this.burnAmount * stock.getAverage(this.burnTarget);
+      stock.add(this.burnAmount, this.burnTarget, burned);
+      this.fee = num.cents(this.fee + burned);
     }
     const {amount, avg} = stock.add(this.amount, this.target, this.total);
     this.stock = amount;
