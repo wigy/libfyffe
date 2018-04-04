@@ -117,17 +117,6 @@ module.exports = class Tx {
   }
 
   /**
-   * A tradeable commodity source used in the transaction.
-   */
-  set source(val) {
-    validator.isRegexMatch('source', val, /^[-A-Z0-9]+\**?$/);
-    this.data.source = val;
-  }
-  get source() {
-    return this.get('source');
-  }
-
-  /**
    * The total amount of commodity changed owner in this transaction.
    *
    * Negative for giving out and positive when receiving.
@@ -138,19 +127,6 @@ module.exports = class Tx {
   }
   get amount() {
     return this.get('amount');
-  }
-
-  /**
-   * The total amount of commodity given out in this transaction (if not currency).
-   *
-   * Negative for giving out and positive when receiving.
-   */
-  set given(val) {
-    validator.isLtZero('given', val);
-    this.data.given = val;
-  }
-  get given() {
-    return this.get('given');
   }
 
   /**

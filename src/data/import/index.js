@@ -284,8 +284,8 @@ class Import {
     if (obj.type === 'dividend') {
       obj.tax = this.tax(group, obj);
     }
-    if (obj.type === 'buy' || obj.type === 'sell' || obj.type === 'move-in' || obj.type === 'move-out'
-      || obj.type === 'dividend' || obj.type === 'trade') {
+    if (obj.type === 'buy' || obj.type === 'sell' || obj.type === 'move-in' || obj.type === 'move-out' ||
+      obj.type === 'dividend' || obj.type === 'trade') {
       obj.amount = this.amount(group, obj);
     }
     if (obj.type === 'trade') {

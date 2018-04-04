@@ -17,6 +17,7 @@
     "averageNow": "k.h. nyt ${avg} X{$}/={target}",
     "stock": "yht. #{stock} ={target}",
     "stockNow": "jälj. #{stock} ={target}",
+    "stockLeft": "jäi #{stock2} ={source}",
     "rate": "kurssi #{rate} £{currency}/X{$}",
     "inRate": "ostokurssi #{rate} £{target}/£{currency}",
     "outRate": "myyntikurssi #{rate} £{currency}/£{target}"
