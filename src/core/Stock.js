@@ -36,6 +36,7 @@ module.exports = class Stock {
     if (this.stock[target] <= 0) {
       this.average[target] = 0;
     }
+    // console.log('=>', count, target, this.stock[target]);
     return {amount: this.stock[target], avg: this.average[target]};
   }
 
