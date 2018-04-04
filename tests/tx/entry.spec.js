@@ -28,7 +28,8 @@ describe('entries', () => {
         profits: 'PROF',
         losses: 'LOSS',
         dividends: 'DIV',
-        interest: 'INT'
+        interest: 'INT',
+        imbalance: 'IMB'
       }
     });
   });
@@ -98,21 +99,21 @@ describe('entries', () => {
     assert.deepEqual(tx.getEntries(), [
       { number: 'EUR', amount: 1190 },
       { number: 'FEES', amount: 10 },
-      { number: 'PROF', amount: -190 },
+      { number: 'PROF', amount: -200 },
       { number: 'ETH', amount: -1000 }
     ]);
     tx = Tx.create('sell', {total: 900.00, target: 'ETH', amount: -2.0, fee: 10.0, avg: 500.00});
     assert.deepEqual(tx.getEntries(), [
       { number: 'EUR', amount: 890 },
       { number: 'FEES', amount: 10 },
-      { number: 'LOSS', amount: 110 },
+      { number: 'LOSS', amount: 100 },
       { number: 'ETH', amount: -1000 }
     ]);
-    tx = Tx.create('sell', {total: 1010.00, target: 'ETH', amount: -2.0, fee: 10.0, avg: 500.00});
+    tx = Tx.create('sell', {total: 1000.00, target: 'ETH', amount: -2.0, fee: 10.0, avg: 500.00});
     assert.deepEqual(tx.getEntries(), [
-      { number: 'EUR', amount: 1000 },
+      { number: 'EUR', amount: 990 },
       { number: 'FEES', amount: 10 },
-      { number: 'ETH', amount: -1010 }
+      { number: 'ETH', amount: -1000 }
     ]);
   });
 
@@ -175,11 +176,13 @@ describe('entries', () => {
   it('are correct for moving', () => {
     tx = Tx.create('move-in', {total: 1900.00, target: 'BTC', amount: 0.05});
     assert.deepEqual(tx.getEntries(), [
-      { number: 'BTC', amount: 1900 }
+      { number: 'BTC', amount: 1900 },
+      { number: 'IMB', amount: -1900 }
     ]);
     tx = Tx.create('move-out', {total: 1900.00, target: 'BTC', amount: -0.05});
     assert.deepEqual(tx.getEntries(), [
-      { number: 'BTC', amount: -1900 }
+      { number: 'BTC', amount: -1900 },
+      { number: 'IMB', amount: 1900 }
     ]);
   });
 });

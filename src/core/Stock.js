@@ -40,7 +40,7 @@ module.exports = class Stock {
    * @param {String} target
    */
   del(count, target) {
-    this.stock[target] = this.get(target) - count;
+    this.stock[target] = this.getStock(target) - count;
   }
 
   /**
