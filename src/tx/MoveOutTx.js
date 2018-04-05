@@ -23,7 +23,7 @@ module.exports = class MoveOutTx extends Tx {
   }
 
   getMyText() {
-    let opts = [];
+    let opts = [text.option('average', this)];
     if (this.burnAmount) {
       opts.push(text.option('burn', this));
     }
