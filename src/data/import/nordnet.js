@@ -165,6 +165,7 @@ class NordnetImport extends Import {
         }
         return ret;
       }
+      return 0;
     }
     return null;
   }
@@ -176,6 +177,10 @@ class NordnetImport extends Import {
     }
     let sum = parseInt(tx[0].M__r_);
     return obj.type === 'sell' ? -sum : sum;
+  }
+
+  burnAmount(group, obj) {
+    return null;
   }
 }
 
