@@ -313,9 +313,11 @@ class Import {
     if (obj.type === 'trade') {
       obj.given = this.given(group, obj);
     }
-    if (obj.type === 'trade' || obj.type === 'move-in' || obj.type === 'move-out') {
+    if (obj.type === 'trade' || obj.type === 'move-in' || obj.type === 'move-out' || obj.type === 'buy') {
       obj.burnAmount = this.burnAmount(group, obj);
-      obj.burnTarget = this.burnTarget(group, obj);
+      if (obj.burnAmount) {
+        obj.burnTarget = this.burnTarget(group, obj);
+      }
     }
     const type = obj.type;
     delete obj.type;

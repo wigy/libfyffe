@@ -44,7 +44,7 @@ module.exports = class TradeTx extends Tx {
   }
 
   updateStock(stock) {
-    // TODO: Remove code duplication with MoveOutTx and MoveInTx.
+    // TODO: Remove code duplication with BuyTx, MoveOutTx and MoveInTx.
     const addTotal = !this.total;
     if (addTotal) {
       this.total = num.cents(-stock.getAverage(this.source) * this.given);

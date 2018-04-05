@@ -115,6 +115,10 @@ class CoinmotionImport extends Import {
     });
     return obj.type === 'sell' ? -total : total;
   }
+
+  burnAmount(group, obj) {
+    return null;
+  }
 }
 
 module.exports = new CoinmotionImport();

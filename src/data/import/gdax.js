@@ -160,6 +160,10 @@ class GDAXImport extends Import {
         throw new Error('No amount() implemented for ' + obj.type + '-type ' + JSON.stringify(group));
     }
   }
+
+  burnAmount(group, obj) {
+    return null;
+  }
 }
 
 module.exports = new GDAXImport();
