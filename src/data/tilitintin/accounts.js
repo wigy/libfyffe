@@ -4,7 +4,7 @@
  * @param {number} number Account number.
  * @return An object {id: <id>, number: <number>} or null if not found.
  */
-function getAccountId(knex, number) {
+async function getAccountId(knex, number) {
   return knex.select('id').from('account')
     .where({'account.number': number})
     .then(account => (account.length ? {number: number, id: account[0].id} : null));
@@ -15,7 +15,7 @@ function getAccountId(knex, number) {
  * @param {Knex} knex Knex-instance configured for the database.
  * @param {Array<String>} numbers
  */
-function getIdsByNumber(knex, numbers) {
+async function getIdsByNumber(knex, numbers) {
   return knex.select('id', 'number')
     .from('account')
     .whereIn('number', numbers)
@@ -30,8 +30,21 @@ function getIdsByNumber(knex, numbers) {
  * Get all accounts.
  * @param {Knex} knex Knex-instance configured for the database.
  */
-function getAll(knex) {
+async function getAll(knex) {
   return knex.select('*').from('account').orderBy('number');
+}
+
+/**
+ * Get the period ID for the given timestamp.
+ * @param {Knex} knex Knex-instance configured for the database.
+ * @param {Number} stamp
+ * @return {Promise<Number|null>}
+ */
+async function getPeriod(knex, stamp) {
+  return knex.select('id').from('period')
+    .where('start_date', '<=', stamp)
+    .andWhere('end_date', '>', stamp)
+    .then((res) => res && res.length ? res[0].id : null);
 }
 
 /**
@@ -40,9 +53,17 @@ function getAll(knex) {
  * @param {Array<String>} numbers
  * @param {String} date If given as `YYYY-MM-DD`, calculate balance before the given date.
  */
-function getBalances(knex, numbers, date = null) {
-  const stamp = date === null ? new Date().getTime() : new Date(date + ' 00:00:00').getTime();
-  return getIdsByNumber(knex, numbers)
+async function getBalances(knex, numbers, date = null) {
+  const stamp = date === null ? new Date().getTime() + 1000 : new Date(date + ' 00:00:00').getTime();
+  let periodId;
+  return getPeriod(knex, stamp)
+    .then((id) => {
+      periodId = id;
+      if (!periodId) {
+        return {};
+      }
+      return getIdsByNumber(knex, numbers);
+    })
     .then((idByNumber) => {
       return Promise.all(numbers.map((number) => {
         number = parseInt(number);
@@ -50,7 +71,7 @@ function getBalances(knex, numbers, date = null) {
           .from('entry')
           .join('document', 'document.id', '=', 'entry.document_id')
           .where({account_id: idByNumber[number]})
-          .andWhere('description', '<>', 'Alkusaldo')
+          .andWhere('document.period_id', '=', periodId)
           .andWhere('document.date', '<', stamp)
           .then((data) => data[0]);
       }))
