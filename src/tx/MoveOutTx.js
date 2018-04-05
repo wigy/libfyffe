@@ -32,11 +32,15 @@ module.exports = class MoveOutTx extends Tx {
   }
 
   updateStock(stock) {
-    if (!this.total) {
+    const addTotal = !this.total;
+    if (addTotal) {
       this.total = num.cents(-stock.getAverage(this.target) * this.amount);
     }
     if (this.burnAmount) {
       const burned = -this.burnAmount * stock.getAverage(this.burnTarget);
+      if (addTotal) {
+        this.total += burned;
+      }
       stock.add(this.burnAmount, this.burnTarget, burned);
       this.fee = num.cents(this.fee + burned);
     }
