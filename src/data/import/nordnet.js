@@ -171,11 +171,11 @@ class NordnetImport extends Import {
   }
 
   amount(group, obj) {
-    let tx = group.filter((tx) => parseInt(tx.M__r_));
+    let tx = group.filter((tx) => parseInt(this.num(tx.M__r_)));
     if (!tx.length) {
       return null;
     }
-    let sum = parseInt(tx[0].M__r_);
+    let sum = parseInt(this.num(tx[0].M__r_));
     return obj.type === 'sell' ? -sum : sum;
   }
 
