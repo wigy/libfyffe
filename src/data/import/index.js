@@ -44,7 +44,7 @@ class Import {
   }
 
   /**
-   * Load a list of files.
+   * Load a list of file contents.
    * @param {Array<String>} files
    */
   async loadFiles(files) {
@@ -55,7 +55,7 @@ class Import {
   /**
    * A loader for CSV file.
    *
-   * @param {String} file A path to the file.
+   * @param {String} file A file content.
    * @param {Object} opts Options for CSV-reader.
    * @return {Promise<Array<Object>>}
    *
@@ -64,39 +64,30 @@ class Import {
    * Special option `headers` can be given as an explicit list of headers.
    */
   async loadCSV(file, opts = {}) {
-    this.file = file;
     return new Promise((resolve, reject) => {
 
       let headers = null;
       opts.noheader = true;
 
-      fs.readFile(file, (err, data) => {
-        if (err) {
-          reject(err);
-          return;
-        }
+      let lines = [];
 
-        data = data.toString();
-        let lines = [];
-
-        csv(opts)
-          .fromString(data)
-          .on('csv', (row) => {
-            if (headers === null) {
-              headers = opts.headers || row.map(r => r.replace(/\W/g, '_'));
-            } else {
-              let line = {};
-              for (let i = 0; i < row.length; i++) {
-                line[headers[i]] = row[i];
-              }
-              line.__lineNumber = lines.length + 1;
-              lines.push(line);
+      csv(opts)
+        .fromString(file)
+        .on('csv', (row) => {
+          if (headers === null) {
+            headers = opts.headers || row.map(r => r.replace(/\W/g, '_'));
+          } else {
+            let line = {};
+            for (let i = 0; i < row.length; i++) {
+              line[headers[i]] = row[i];
             }
-          })
-          .on('done', () => {
-            resolve(lines);
-          });
-      });
+            line.__lineNumber = lines.length + 1;
+            lines.push(line);
+          }
+        })
+        .on('done', () => {
+          resolve(lines);
+        });
     });
   }
 
@@ -269,8 +260,8 @@ class Import {
   /**
    * Fallback ID if nothing better available for identifying transactions.
    */
-  fileAndLineId(group) {
-    let id = path.basename(this.file);
+  dateAndLineId(group) {
+    let id = this.date(group[0]);
     id += ':';
     id += group.map((group) => group.__lineNumber).sort((a, b) => a - b).join(',');
     return id;

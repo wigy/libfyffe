@@ -142,7 +142,7 @@ class Fyffe {
    */
   async import(files, options) {
 
-    let dataToImport = this.recognize(this.readFiles(files));
+    let dataPerImporter = this.recognize(this.readFiles(files));
 
     const {dbName} = options;
     const knex = this.dbs[dbName];
@@ -150,22 +150,41 @@ class Fyffe {
     await this.loadTags(dbName);
     await this.loadAccounts(dbName);
 
-    await this.loadFileData(dataToImport);
+    await this.loadFileData(dataPerImporter);
   }
 
   /**
    * First step in importing: read in files for every importer and convert them to groups.
-   * @param {Object} dataToImport
+   *
+   * @param {Object} dataPerImporter
    */
-  async loadFileData(dataToImport) {
+  async loadFileData(dataPerImporter) {
+    // Read in each data cluster.
+    let ret = [];
+    Object.keys(dataPerImporter).forEach((name) => {
+      ret.push(this.modules[name].loadFiles(dataPerImporter[name]));
+    });
 
+    return Promise.all(ret)
+      .then((data) => {
+        // Replace old file content with parsed data entries.
+        Object.keys(dataPerImporter).forEach((name, index) => {
+          dataPerImporter[name] = data[index];
+        });
+        return dataPerImporter;
+      })
+      .then((dataPerImporter) => {
+        // Form groups, i.e. array of related entries for each transaction in the data.
+        Object.keys(dataPerImporter).forEach((name) => {
+          dataPerImporter[name] = this.modules[name].makeGrouping(dataPerImporter[name]);
+        });
+        return dataPerImporter;
+      });
   }
 
   async oldImport() {
     // Collect raw data.
     let data = null;
-    await importer.loadFiles(files)
-      .then((content) => (data = content));
 
     // Form groups and remove those already imported.
     data = importer.makeGrouping(data);
