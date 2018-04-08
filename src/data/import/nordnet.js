@@ -6,6 +6,10 @@ class NordnetImport extends Import {
     super('Nordnet');
   }
 
+  isMine(content) {
+    return /^Id;Kirjausp.iv.;Kauppap.iv.;Maksup.iv.;/.test(content);
+  }
+
   // Helper to convert string amount to parseable string.
   num(str) {
     return parseFloat(str.replace(',', '.').replace(/ /g, ''));

@@ -7,6 +7,10 @@ class KrakenImport extends Import {
     super('Kraken');
   }
 
+  isMine(content) {
+    return /^"txid","refid","time","type","aclass","asset","amount","fee","balance"/.test(content);
+  }
+
   // Helper to convert asset code to target.
   asset2target(asset) {
     switch (asset) {

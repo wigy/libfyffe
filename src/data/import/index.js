@@ -13,6 +13,28 @@ class Import {
   }
 
   /**
+   * A mapping of module names to module instances.
+   * @return {Map}
+   */
+  static modules() {
+    let ret = new Map();
+    fs.readdirSync(__dirname).filter((file) => file !== 'index.js').map((file) => file.replace(/\.js$/, ''))
+      .forEach((name) => {
+        ret[name] = require('./' + name);
+      });
+
+    return ret;
+  }
+
+  /**
+   * Check if the file content given as a string belongs to this importer.
+   * @param {String} content
+   */
+  isMine(content) {
+    throw new Error('Importer does not implement isMine().');
+  }
+
+  /**
    * Read in the data from the file and store it internally.
    * @param {String} file A path to the file.
    * @return {Promise<any>} Promise resolving to the parsed data.

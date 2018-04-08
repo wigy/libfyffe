@@ -7,6 +7,10 @@ class CoinmotionImport extends Import {
     super('Coinmotion');
   }
 
+  isMine(content) {
+    return /^Date,Account,Type,Status,Amount,Fee,Rate,Message,Reserved,Balance/.test(content);
+  }
+
   load(file) {
     return this.loadCSV(file);
   }

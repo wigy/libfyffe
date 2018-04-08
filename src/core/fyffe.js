@@ -1,9 +1,11 @@
 const clone = require('clone');
+const fs = require('fs');
 const promiseSeq = require('promise-sequential');
 const Stock = require('./Stock');
 const Ledger = require('./Ledger');
 const config = require('../config');
 const tilitintin = require('../data/tilitintin');
+const Import = require('../data/import');
 
 /**
  * A system instance for transforming and inspecting financial data.
@@ -13,6 +15,8 @@ class Fyffe {
   constructor() {
     this.stock = new Stock();
     this.ledger = new Ledger();
+    this.modules = Import.modules();
+
     // Configured and named knex-instances.
     this.dbs = {};
   }
@@ -94,19 +98,60 @@ class Fyffe {
   }
 
   /**
+   * Check out each file and find out matching importer for them.
+   * @param {Map<String>} contents
+   * @return {Map} A mapping from importer names to content recognized to belong to them.
+   */
+  recognize(contents) {
+    let ret = {};
+    Object.keys(contents).forEach((path) => {
+      let found = false;
+      let content = contents[path];
+      for (let name in this.modules) {
+        if (this.modules[name].isMine(content)) {
+          ret[name] = ret[name] || [];
+          ret[name].push(content);
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        throw Error('Cannot figure out the importer for ' + path);
+      }
+    });
+    return ret;
+  }
+
+  /**
+   * Read in the content of files.
+   * @param {Array<String>} files
+   * @return {Map} An array of file contents.
+   */
+  readFiles(files) {
+    let ret = {};
+    files.forEach((path) => {
+      ret[path] = fs.readFileSync(path, {encoding: 'utf-8'});
+    });
+    return ret;
+  }
+
+  /**
    * Import data from files into the system.
-   * @param {String} format
    * @param {Array<String>} files
    * @param {Object} options
    */
-  async import(format, files, options) {
+  async import(files, options) {
+
+    let dataToImport = this.recognize(this.readFiles(files));
+
     const {dbName} = options;
     const knex = this.dbs[dbName];
-    const importer = require('../data/import/' + format);
 
     await this.loadTags(dbName);
     await this.loadAccounts(dbName);
+  }
 
+  async oldImport() {
     // Collect raw data.
     let data = null;
     await importer.loadFiles(files)

@@ -6,6 +6,10 @@ class GDAXImport extends Import {
     super('GDAX');
   }
 
+  isMine(content) {
+    return /^type,time,amount,balance,amount.balance unit,transfer id,trade id,order id/.test(content);
+  }
+
   // Helper to find src entries of given type (and optionally given unit).
   _srcType(group, type, unit = null) {
     const matches = group.filter((tx) => tx.type === type && (unit === null || tx.amount_balance_unit === unit));
