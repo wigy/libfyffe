@@ -149,6 +149,16 @@ class Fyffe {
 
     await this.loadTags(dbName);
     await this.loadAccounts(dbName);
+
+    await this.loadFileData(dataToImport);
+  }
+
+  /**
+   * First step in importing: read in files for every importer and convert them to groups.
+   * @param {Object} dataToImport
+   */
+  async loadFileData(dataToImport) {
+
   }
 
   async oldImport() {
