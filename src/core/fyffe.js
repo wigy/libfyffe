@@ -150,11 +150,12 @@ class Fyffe {
     await this.loadTags(dbName);
     await this.loadAccounts(dbName);
 
-    await this.loadFileData(dataPerImporter);
+    dataPerImporter = await this.loadFileData(dataPerImporter);
+    console.log(dataPerImporter);
   }
 
   /**
-   * First step in importing: read in files for every importer and convert them to groups.
+   * First step in importing: read in files for every importer and convert them to groups, filter imported ones and pre-process.
    *
    * @param {Object} dataPerImporter
    */
@@ -179,15 +180,23 @@ class Fyffe {
           dataPerImporter[name] = this.modules[name].makeGrouping(dataPerImporter[name]);
         });
         return dataPerImporter;
+      })
+      .then((dataPerImporter) => {
+        // Preprocess each item in every group.
+        Object.keys(dataPerImporter).forEach((name) => {
+          for (let i = 0; i < dataPerImporter[name].length; i++) {
+            for (let j = 0; j < dataPerImporter[name][i].length; j++) {
+              dataPerImporter[name][i][j] = this.modules[name].trimItem(dataPerImporter[name][i][j]);
+            }
+          }
+        });
+        return dataPerImporter;
       });
   }
 
   async oldImport() {
-    // Collect raw data.
-    let data = null;
 
     // Form groups and remove those already imported.
-    data = importer.makeGrouping(data);
     data = await (async () => {
       if (config.flags.force) {
         return data;
@@ -213,13 +222,6 @@ class Fyffe {
     await this.loadBalances(dbName, firstDate);
     if (config.flags.debug) {
       this.ledger.accounts.showBalances('Initial balances:');
-    }
-
-    // Preprocess each item in every group.
-    for (let i = 0; i < data.length; i++) {
-      for (let j = 0; j < data[i].length; j++) {
-        data[i][j] = importer.trimItem(data[i][j]);
-      }
     }
 
     // Convert raw group data to transactions.
