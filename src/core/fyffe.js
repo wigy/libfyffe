@@ -151,11 +151,11 @@ class Fyffe {
     await this.loadAccounts(dbName);
 
     dataPerImporter = await this.loadFileData(dataPerImporter);
-    console.log(dataPerImporter);
+    dataPerImporter = await this.removeImported(dataPerImporter);
   }
 
   /**
-   * First step in importing: read in files for every importer and convert them to groups, filter imported ones and pre-process.
+   * Parse file data for every importer and convert them to groups and pre-process.
    *
    * @param {Object} dataPerImporter
    */
@@ -194,6 +194,17 @@ class Fyffe {
       });
   }
 
+  /**
+   * Remove all data that has been already imported.
+   * @param {Object} dataPerImporter
+   */
+  async removeImported(dataPerImporter) {
+    Object.keys(dataPerImporter).forEach((name) => {
+      config.use(name);
+      console.log(this.getServiceTag());
+    });
+  }
+
   async oldImport() {
 
     // Form groups and remove those already imported.
@@ -207,6 +218,7 @@ class Fyffe {
           return data.filter((group, i) => !results[i]);
         });
     })();
+
     if (data.length === 0) {
       return;
     }

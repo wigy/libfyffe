@@ -16,7 +16,7 @@ class Config {
   }
 
   clear() {
-    this.set({
+    Object.assign(this, {
       // Abbreviation of the primary currency.
       currency: 'EUR',
       // Language used in entry descriptions.
@@ -87,30 +87,6 @@ class Config {
   }
 
   /**
-   * Collect non-null values and set them as the current.
-   * @param {Object} config
-   */
-  setNonNull(config) {
-    const strip = (obj) => {
-      let ret = {};
-      Object.keys(obj).forEach((key) => {
-        if (obj[key] !== null) {
-          if (obj[key] instanceof Object) {
-            ret[key] = strip(obj[key]);
-            if (Object.keys(ret[key]).length === 0) {
-              delete ret[key];
-            }
-          } else {
-            ret[key] = obj[key];
-          }
-        }
-      });
-      return ret;
-    };
-    this.set(strip(config));
-  }
-
-  /**
    * Collect defined account numbers.
    * @return {Object} A mapping from account numbers to configuration variable names.
    */
@@ -171,9 +147,12 @@ class Config {
     if (!ini[section]) {
       throw new Error('No such section in ' + this.iniPath() + ' than ' + JSON.stringify(section));
     }
+    // Save tags.
+    const tags = clone(this.tags);
     this.clear();
-    this.set(ini.default);
-    this.set(ini[section]);
+    this.set(clone(ini.default));
+    this.set(clone(ini[section]));
+    this.tags = tags;
   }
 }
 
