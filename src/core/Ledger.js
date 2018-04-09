@@ -54,15 +54,18 @@ module.exports = class Ledger {
   }
 
   /**
-   * Apply all transactions not yet applied to the stock.
+   * Apply all transactions in timestamp order not yet applied to the stock.
    * @param {Stock} stock
    */
   apply(stock) {
-    this.notApplied.forEach((tx) => {
-      tx.updateFromStock(stock);
-      tx.apply(this.accounts, stock);
+    this.txs = this.txs.sort((a, b) => a.time - b.time);
+    this.txs.forEach((tx) => {
+      if (this.notApplied.has(tx)) {
+        tx.updateFromStock(stock);
+        tx.apply(this.accounts, stock);
+        this.notApplied.delete(tx);
+      }
     });
-    this.notApplied.clear();
   }
 
   /**

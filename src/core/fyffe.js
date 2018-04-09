@@ -177,7 +177,29 @@ class Fyffe {
     // Convert raw group data to transactions and add them to ledger.
     const txsPerImporter = this.createTransactions(dataPerImporter);
 
-    this.initializeStock(dbName, firstDate);
+    await this.initializeStock(dbName, firstDate);
+
+    // Post-process transactions.
+    // TODO: This is not right. Need to do in correct order and after preceding txs have been resolved.
+    Object.keys(txsPerImporter).forEach((name) => {
+      txsPerImporter[name].forEach((tx, i) => {
+        switch (tx.type) {
+          case 'move-in':
+          case 'move-out':
+            tx.total = this.modules[name].total(dataPerImporter[name][i], tx, this);
+        }
+      });
+    });
+
+    // Finally apply all transactions.
+    // TODO: Apply loans.
+    this.ledger.apply(this.stock);
+
+    if (config.flags.debug) {
+      this.ledger.showTransactions('Transactions:');
+      this.stock.showStock('Final stock:');
+      this.ledger.accounts.showBalances('Final balances:');
+    }
   }
 
   /**
@@ -252,6 +274,7 @@ class Fyffe {
    * @param {Object} dataPerImporter
    */
   createTransactions(dataPerImporter) {
+    let ret = {};
     Object.keys(dataPerImporter).forEach((name) => {
 
       // Create txs.
@@ -274,10 +297,10 @@ class Fyffe {
 
       // Store the result.
       this.ledger.add(txs);
-      dataPerImporter[name] = txs;
+      ret[name] = txs;
     });
 
-    return dataPerImporter;
+    return ret;
   }
 
   /**
@@ -295,38 +318,6 @@ class Fyffe {
     this.stock.setAverages(avg);
     if (config.flags.debug) {
       this.stock.showStock('Initial stock:');
-    }
-  }
-
-  async oldImport() {
-    // Initialize stock and average for commodities and currencies.
-    this.ledger.getTargets().forEach((target) => this.stock.add(0, target, 0.00));
-    this.ledger.getCurrencies().forEach((currency) => this.stock.add(0, currency, 0.00));
-    const {avg, stock} = await this.loadPriceAndStock(dbName, this.ledger.getTargets(), firstDate);
-    this.stock.setStock(stock);
-    this.stock.setAverages(avg);
-    if (config.flags.debug) {
-      this.stock.showStock('Initial stock:');
-    }
-
-    // Post-process transactions.
-    txs.forEach((tx, i) => {
-      switch (tx.type) {
-        case 'move-in':
-        case 'move-out':
-          tx.total = importer.total(data[i], tx, this);
-      }
-    });
-
-    // Finally apply all transactions.
-    // TODO: Apply loans.
-    // TODO: Sort before applying (in ledger class).
-    this.ledger.apply(this.stock);
-
-    if (config.flags.debug) {
-      this.ledger.showTransactions('Transactions:');
-      this.stock.showStock('Final stock:');
-      this.ledger.accounts.showBalances('Final balances:');
     }
   }
 
