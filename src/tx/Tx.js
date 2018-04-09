@@ -1,5 +1,6 @@
 const cc = require('currency-codes');
 const moment = require('moment');
+const clone = require('clone');
 const config = require('../config');
 const validator = require('../data/validator');
 
@@ -60,6 +61,10 @@ module.exports = class Tx {
     });
     // Implicitly validate each field.
     Object.assign(this, data);
+  }
+
+  toJSON() {
+    return this.data;
   }
 
   /**

@@ -13,7 +13,7 @@ const texts = {
  * @param {any} target
  *
  * Special notations in the text are handled according to the following:
- * * C{var} - Variable value is taken from the library configuration.
+ * * C{var} - Variable value is taken from the library configuration for the tx-service.
  * * ={var} - Variable value is taken from the target object as is.
  * * +{var} - Variable value is taken from the target and transformed to signed decimal.
  * * #{var} - Variable value is taken from the target and transformed to decimal.
@@ -34,11 +34,15 @@ function substitute(text, target) {
   // Replace configuration variables.
   regex = /C\{(\w+)\}/;
   while ((match = regex.exec(ret))) {
-    const variable = match[1];
-    if (config[variable] === undefined) {
-      throw new Error('Cannot translate text ' + JSON.stringify(text) + ' since `' + variable + '` not configured.');
+    if (!target.service) {
+      throw new Error('Cannot translate transaction ' + JSON.stringify(target.toJSON()) + ' without service.');
     }
-    ret = ret.replace(regex, config[variable]);
+    const variable = match[1];
+    let conf = config.services[target.service];
+    if (conf[variable] === undefined) {
+      throw new Error('Cannot translate text ' + JSON.stringify(text) + ' since `' + variable + '` not configured for `' + target.service + '`.');
+    }
+    ret = ret.replace(regex, conf[variable]);
   }
 
   // Replace variables with signed number.
