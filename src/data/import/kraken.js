@@ -32,10 +32,6 @@ class KrakenImport extends Import {
     return group[0].refid;
   }
 
-  date(entry) {
-    return entry.time.substr(0, 10);
-  }
-
   time(entry) {
     return new Date(entry.time).getTime();
   }

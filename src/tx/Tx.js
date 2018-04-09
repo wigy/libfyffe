@@ -1,6 +1,7 @@
+const cc = require('currency-codes');
+const moment = require('moment');
 const config = require('../config');
 const validator = require('../data/validator');
-var cc = require('currency-codes');
 
 /**
  * A map from valid type names to the module paths implementing them.
@@ -47,7 +48,7 @@ module.exports = class Tx {
 
     // Initialize defaults.
     this.data = Object.assign({
-      date: undefined,
+      time: undefined,
       total: undefined
     }, add);
     // Verify keys in data.
@@ -61,14 +62,24 @@ module.exports = class Tx {
   }
 
   /**
+   * Transaction time
+   */
+  set time(val) {
+    validator.isGe('time', val, 946684800000); // Jan 1st 2000
+    this.data.time = val;
+  }
+  get time() {
+    return this.get('time');
+  }
+
+  /**
    * Transaction date
    */
   set date(val) {
-    validator.isRegexMatch('date', val, /^\d\d\d\d-\d\d-\d\d$/);
-    this.data.date = val;
+    throw new Error('Do not set date, but time instead for transaction.');
   }
   get date() {
-    return this.get('date');
+    return moment(this.get('time')).format('YYYY-MM-DD');
   }
 
   /**

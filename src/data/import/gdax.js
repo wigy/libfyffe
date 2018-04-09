@@ -24,10 +24,6 @@ class GDAXImport extends Import {
     return group[0].trade_id || group[0].transfer_id;
   }
 
-  date(entry) {
-    return entry.time.substr(0, 10);
-  }
-
   time(entry) {
     return new Date(entry.time).getTime();
   }

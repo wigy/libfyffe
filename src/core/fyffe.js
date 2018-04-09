@@ -147,6 +147,7 @@ class Fyffe {
     const {dbName} = options;
     const knex = this.dbs[dbName];
 
+    // Get initial data.
     await this.loadTags(dbName);
     await this.loadAccounts(dbName);
 
@@ -154,26 +155,29 @@ class Fyffe {
     dataPerImporter = await this.removeImported(knex, dataPerImporter);
 
     // Sort them according to the timestamps and find the earliest timestamp.
-    let min = null;
+    let minDate = null;
     Object.keys(dataPerImporter).forEach((name) => {
       const sorter = (a, b) => {
         return this.modules[name].time(a[0]) - this.modules[name].time(b[0]);
       };
       dataPerImporter[name] = dataPerImporter[name].sort(sorter);
       let first = this.modules[name].time(dataPerImporter[name][0][0]);
-      if (min === null || first < min) {
-        min = first;
+      if (minDate === null || first < minDate) {
+        minDate = first;
       }
     });
 
-    // Get balances for it.
-    await this.loadBalances(dbName, moment(min).format('YYYY-MM-DD'));
+    // Get starting balances for accounts.
+    let firstDate = moment(minDate).format('YYYY-MM-DD');
+    await this.loadBalances(dbName, firstDate);
     if (config.flags.debug) {
       this.ledger.accounts.showBalances('Initial balances:');
     }
 
     // Convert raw group data to transactions and add them to ledger.
-    dataPerImporter = this.createTransactions(dataPerImporter);
+    const txsPerImporter = this.createTransactions(dataPerImporter);
+
+    this.initializeStock(dbName, firstDate);
   }
 
   /**
@@ -249,9 +253,9 @@ class Fyffe {
    */
   createTransactions(dataPerImporter) {
     Object.keys(dataPerImporter).forEach((name) => {
-      config.use(name);
 
       // Create txs.
+      config.use(name);
       let txs = dataPerImporter[name].map((group) => this.modules[name].createTransaction(group, this));
 
       // Add tags based on the configuration.
@@ -272,7 +276,26 @@ class Fyffe {
       this.ledger.add(txs);
       dataPerImporter[name] = txs;
     });
+
     return dataPerImporter;
+  }
+
+  /**
+   * Initialize stock and average price information for the current ledger.
+   * @param {String} dbName
+   * @param {String} firstDate
+   */
+  async initializeStock(dbName, firstDate) {
+    const targets = this.ledger.getTargets();
+    const currencies = this.ledger.getCurrencies();
+    targets.forEach((target) => this.stock.add(0, target, 0.00));
+    currencies.forEach((currency) => this.stock.add(0, currency, 0.00));
+    const {avg, stock} = await this.loadPriceAndStock(dbName, targets, firstDate);
+    this.stock.setStock(stock);
+    this.stock.setAverages(avg);
+    if (config.flags.debug) {
+      this.stock.showStock('Initial stock:');
+    }
   }
 
   async oldImport() {

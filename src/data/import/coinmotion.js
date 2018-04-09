@@ -19,11 +19,6 @@ class CoinmotionImport extends Import {
     return this.dateAndLineId(group);
   }
 
-  date(entry) {
-    const [, d, m, y] = /^(\d+)\.(\d+)\.(\d+)/.exec(entry.Date);
-    return sprintf('%04d-%02d-%02d', parseInt(y), parseInt(m), parseInt(d));
-  }
-
   time(entry) {
     const [, d, m, y, min, sec] = /^(\d+)\.(\d+)\.(\d+) (\d+):(\d+)/.exec(entry.Date);
     const stamp = sprintf('%04d-%02d-%02d %02d:%02d:00', parseInt(y), parseInt(m), parseInt(d), parseInt(min), parseInt(sec));

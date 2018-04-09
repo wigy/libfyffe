@@ -33,17 +33,13 @@ class NordnetImport extends Import {
     return group[0].Vahvistusnumero_Laskelma;
   }
 
-  date(entry) {
-    return entry.Kirjausp_iv_;
-  }
-
   trimItem(obj) {
     obj.Tapahtumatyyppi = obj.Tapahtumatyyppi.replace(/\W/g, '_');
     return obj;
   }
 
   time(entry) {
-    return new Date(this.date(entry)).getTime();
+    return new Date(entry.Kirjausp_iv_).getTime();
   }
 
   grouping(entries) {

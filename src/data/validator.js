@@ -36,6 +36,20 @@ module.exports = {
   },
 
   /**
+   * Check that value is a finite number greater than or equal the given limit.
+   * @param {String} name
+   * @param {any} val
+   * @param {Number} limit
+   */
+  isGe: (name, val, limit) => {
+    module.exports.isNum(name, val);
+    if (val >= limit) {
+      return;
+    }
+    throw new Error('Invalid value ' + JSON.stringify(val) + ' for ' + JSON.stringify(name));
+  },
+
+  /**
    * Check that value is a finite number greater than or equal to zero.
    * @param {String} name
    * @param {any} val
