@@ -87,6 +87,15 @@ class Config {
   }
 
   /**
+   * Override defaults and set them as current as well.
+   * @param {Object} config
+   */
+  setDefaults(config) {
+    this.set(config);
+    Object.assign(ini.default, objectMerge(ini.default, clone(config)));
+  }
+
+  /**
    * Collect defined account numbers.
    * @return {Object} A mapping from account numbers to configuration variable names.
    */

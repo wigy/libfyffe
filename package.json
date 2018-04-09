@@ -25,7 +25,7 @@
     "csvtojson": "^1.1.9",
     "currency-codes": "^1.1.2",
     "escape-string-regexp": "^1.0.5",
-    "moment": "^2.21.0",
+    "moment": "^2.22.0",
     "neat-dump": "^1.0.15",
     "object-merge": "^2.5.1",
     "promise-sequential": "^1.1.1",

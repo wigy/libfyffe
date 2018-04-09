@@ -43,7 +43,7 @@ class NordnetImport extends Import {
   }
 
   time(entry) {
-    return parseInt(entry.Id);
+    return new Date(this.date(entry)).getTime();
   }
 
   grouping(entries) {
@@ -55,7 +55,6 @@ class NordnetImport extends Import {
       ret[entry.Vahvistusnumero_Laskelma] = ret[entry.Vahvistusnumero_Laskelma] || [];
       ret[entry.Vahvistusnumero_Laskelma].push(entry);
     });
-
     return Object.values(ret);
   }
 

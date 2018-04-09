@@ -1,6 +1,6 @@
 const clone = require('clone');
 const fs = require('fs');
-const promiseSeq = require('promise-sequential');
+const moment = require('moment');
 const Stock = require('./Stock');
 const Ledger = require('./Ledger');
 const config = require('../config');
@@ -152,7 +152,25 @@ class Fyffe {
 
     dataPerImporter = await this.loadFileData(dataPerImporter);
     dataPerImporter = await this.removeImported(knex, dataPerImporter);
-    console.log(dataPerImporter);
+
+    // Sort them according to the timestamps and find the earliest timestamp.
+    let min = null;
+    Object.keys(dataPerImporter).forEach((name) => {
+      const sorter = (a, b) => {
+        return this.modules[name].time(a[0]) - this.modules[name].time(b[0]);
+      };
+      dataPerImporter[name] = dataPerImporter[name].sort(sorter);
+      let first = this.modules[name].time(dataPerImporter[name][0][0]);
+      if (min === null || first < min) {
+        min = first;
+      }
+    });
+
+    // Get balances for it.
+    await this.loadBalances(dbName, moment(min).format('YYYY-MM-DD'));
+    if (config.flags.debug) {
+      this.ledger.accounts.showBalances('Initial balances:');
+    }
   }
 
   /**
@@ -223,19 +241,6 @@ class Fyffe {
   }
 
   async oldImport() {
-
-    // Sort it according to the timestamps.
-    const sorter = (a, b) => {
-      return importer.time(a[0]) - importer.time(b[0]);
-    };
-    data = data.sort(sorter);
-
-    // Find the first date and get balances for it.
-    const firstDate = importer.date(data[0][0]);
-    await this.loadBalances(dbName, firstDate);
-    if (config.flags.debug) {
-      this.ledger.accounts.showBalances('Initial balances:');
-    }
 
     // Convert raw group data to transactions.
     let txs = data.map((group) => importer.createTransaction(group, this));
