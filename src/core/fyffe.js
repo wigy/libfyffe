@@ -171,6 +171,9 @@ class Fyffe {
     if (config.flags.debug) {
       this.ledger.accounts.showBalances('Initial balances:');
     }
+
+    // Convert raw group data to transactions and add them to ledger.
+    dataPerImporter = this.createTransactions(dataPerImporter);
   }
 
   /**
@@ -240,26 +243,39 @@ class Fyffe {
       });
   }
 
+  /**
+   * Convert raw group data to transactions and add them to the ledger.
+   * @param {Object} dataPerImporter
+   */
+  createTransactions(dataPerImporter) {
+    Object.keys(dataPerImporter).forEach((name) => {
+      config.use(name);
+
+      // Create txs.
+      let txs = dataPerImporter[name].map((group) => this.modules[name].createTransaction(group, this));
+
+      // Add tags based on the configuration.
+      const fundTag = config.tags[config.fund];
+      const serviceTag = config.tags[config.service];
+      let tags = [];
+      if (fundTag) {
+        tags.push(fundTag.tag);
+      }
+      if (serviceTag) {
+        tags.push(serviceTag.tag);
+      }
+      if (tags.length) {
+        txs.forEach((tx) => (tx.tags = clone(tags)));
+      }
+
+      // Store the result.
+      this.ledger.add(txs);
+      dataPerImporter[name] = txs;
+    });
+    return dataPerImporter;
+  }
+
   async oldImport() {
-
-    // Convert raw group data to transactions.
-    let txs = data.map((group) => importer.createTransaction(group, this));
-    this.ledger.add(txs);
-
-    // Add tags based on the configuration.
-    const fundTag = config.tags[config.fund];
-    const serviceTag = config.tags[config.service];
-    let tags = [];
-    if (fundTag) {
-      tags.push(fundTag.tag);
-    }
-    if (serviceTag) {
-      tags.push(serviceTag.tag);
-    }
-    if (tags.length) {
-      txs.forEach((tx) => (tx.tags = clone(tags)));
-    }
-
     // Initialize stock and average for commodities and currencies.
     this.ledger.getTargets().forEach((target) => this.stock.add(0, target, 0.00));
     this.ledger.getCurrencies().forEach((currency) => this.stock.add(0, currency, 0.00));
@@ -281,6 +297,7 @@ class Fyffe {
 
     // Finally apply all transactions.
     // TODO: Apply loans.
+    // TODO: Sort before applying (in ledger class).
     this.ledger.apply(this.stock);
 
     if (config.flags.debug) {
