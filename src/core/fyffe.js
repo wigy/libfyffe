@@ -151,7 +151,8 @@ class Fyffe {
     await this.loadAccounts(dbName);
 
     dataPerImporter = await this.loadFileData(dataPerImporter);
-    dataPerImporter = await this.removeImported(dataPerImporter);
+    dataPerImporter = await this.removeImported(knex, dataPerImporter);
+    console.log(dataPerImporter);
   }
 
   /**
@@ -198,30 +199,30 @@ class Fyffe {
    * Remove all data that has been already imported.
    * @param {Object} dataPerImporter
    */
-  async removeImported(dataPerImporter) {
-    Object.keys(dataPerImporter).forEach((name) => {
+  async removeImported(knex, dataPerImporter) {
+    if (config.flags.force) {
+      return dataPerImporter;
+    }
+
+    return Promise.all(Object.keys(dataPerImporter).map((name) => {
       config.use(name);
-      console.log(this.getServiceTag());
-    });
+      const tag = this.getServiceTag().tag;
+      return tilitintin.imports.doneFor(knex, tag)
+        .then((ids) => ({name, ids}));
+    }))
+      .then((imported) => {
+        Object.values(imported).forEach((set) => {
+          const ids = new Set(set.ids);
+          dataPerImporter[set.name] = dataPerImporter[set.name].filter((group) => !ids.has(group.id));
+          if (dataPerImporter[set.name].length === 0) {
+            delete dataPerImporter[set.name];
+          }
+        });
+        return dataPerImporter;
+      });
   }
 
   async oldImport() {
-
-    // Form groups and remove those already imported.
-    data = await (async () => {
-      if (config.flags.force) {
-        return data;
-      }
-      const promises = data.map((group) => () => tilitintin.imports.has(knex, this.getServiceTag().tag, group.id));
-      return promiseSeq(promises)
-        .then((results) => {
-          return data.filter((group, i) => !results[i]);
-        });
-    })();
-
-    if (data.length === 0) {
-      return;
-    }
 
     // Sort it according to the timestamps.
     const sorter = (a, b) => {

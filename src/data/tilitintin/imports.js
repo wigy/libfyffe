@@ -74,9 +74,23 @@ function hasImport(knex, serviceTag, txId) {
     .then((matches) => matches && matches.length > 0);
 }
 
+/**
+ * Collect list of IDs already imported for the given service.
+ * @param {Knex} knex Knex-instance configured for the database.
+ * @param {String} serviceTag
+ */
+function doneFor(knex, serviceTag) {
+  return ensureImport(knex)
+    .then(() => {
+      return knex('imports').select('tx_id').where('service_tag', '=', serviceTag);
+    })
+    .then((res) => res.map((entry) => entry.tx_id));
+}
+
 module.exports = {
   isReady: isImportReady,
   ensure: ensureImport,
   add: addImport,
-  has: hasImport
+  has: hasImport,
+  doneFor: doneFor
 };
