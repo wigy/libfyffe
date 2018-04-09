@@ -45,6 +45,7 @@ module.exports = class Tx {
     this.id = nextId++;
     this.chained = [];
     this.tags = [];
+    this.service = null;
 
     // Initialize defaults.
     this.data = Object.assign({
@@ -287,34 +288,21 @@ module.exports = class Tx {
    * @return {String} [arg2] Account name in the config.
    */
   getAccount(arg1, arg2 = null) {
-    let acc;
-    let conf = config.accounts;
-    if (arg2 !== null) {
-      conf = conf[arg1];
-      if (!conf) {
-        throw new Error('There is no such configured account category as ' + JSON.stringify(arg1));
-      }
-      acc = arg2;
-    } else {
-      acc = arg1;
+    let name = 'accounts.' + arg1.toLowerCase();
+    if (arg2) {
+      name += '.' + arg2.toLowerCase();
     }
 
-    acc = acc.toLowerCase();
-    if (!(acc in conf)) {
-      if (conf.default !== null) {
-        return conf.default;
-      }
-    }
-    if (!(acc in conf)) {
-      throw new Error('There is no such configuration for an account as ' + JSON.stringify(acc));
+    let acc = config.get(name, this.service);
+    if (!acc && arg1 === 'targets') {
+      acc = config.get('accounts.targets.default', this.service);
     }
 
-    const ret = conf[acc];
-    if (!ret) {
-      throw new Error('Account ' + JSON.stringify(acc) + ' is not configured.');
+    if (!acc) {
+      throw new Error('Account ' + JSON.stringify(name) + ' is not configured.');
     }
 
-    return ret;
+    return acc;
   }
 
   /**
@@ -398,14 +386,18 @@ module.exports = class Tx {
    * Create an instance of transaction.
    * @param {String} type
    * @param {Object} data
+   * @param {String} service
    */
-  static create(type, data = {}) {
+  static create(type, data = {}, service = null) {
     if (!types[type]) {
       throw new Error('Invalid TX type in create(): ' + JSON.stringify(type));
     }
     const constructor = require(types[type]);
 
-    return new constructor(data);
+    let ret = new constructor(data);
+    ret.service = service;
+
+    return ret;
   }
 
   /**

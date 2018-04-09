@@ -85,16 +85,19 @@ class Fyffe {
 
   /**
    * Fetch the configured service tag or throw an exception.
+   * @param {String} service
    * @return {Tag}
    */
-  getServiceTag() {
-    if (!config.service) {
-      throw new Error('Service not configured.');
+  getServiceTag(service) {
+    if (!config.get('services.' + service)) {
+      throw new Error('Service ' + JSON.stringify(service) + ' not configured.');
     }
-    if (!config.tags[config.service]) {
-      throw new Error('No tag configured for service ' + JSON.stringify(config.service));
+    const serviceName = config.get('service', service);
+    const tags = config.get('tags', service);
+    if (!tags[serviceName]) {
+      throw new Error('No tag configured for service ' + JSON.stringify(serviceName));
     }
-    return config.tags[config.service];
+    return tags[serviceName];
   }
 
   /**
@@ -252,8 +255,7 @@ class Fyffe {
     }
 
     return Promise.all(Object.keys(dataPerImporter).map((name) => {
-      config.use(name);
-      const tag = this.getServiceTag().tag;
+      const tag = this.getServiceTag(name).tag;
       return tilitintin.imports.doneFor(knex, tag)
         .then((ids) => ({name, ids}));
     }))
@@ -278,8 +280,7 @@ class Fyffe {
     Object.keys(dataPerImporter).forEach((name) => {
 
       // Create txs.
-      config.use(name);
-      let txs = dataPerImporter[name].map((group) => this.modules[name].createTransaction(group, this));
+      let txs = dataPerImporter[name].map((group) => this.modules[name].createTransaction(group, this, name));
 
       // Add tags based on the configuration.
       const fundTag = config.tags[config.fund];

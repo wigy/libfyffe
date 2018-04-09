@@ -286,8 +286,9 @@ class Import {
    * Convert a source data group to transaction.
    * @param {Array<Object>} group
    * @param {Fyffe} fyffe
+   * @param {String} service
    */
-  createTransaction(group, fyffe) {
+  createTransaction(group, fyffe, service) {
     // TODO: Cleanup. These can be figured from constructor data for each type.
     let obj = {};
     obj.time = this.time(group[0]);
@@ -324,7 +325,7 @@ class Import {
     }
     const type = obj.type;
     delete obj.type;
-    return Tx.create(type, obj);
+    return Tx.create(type, obj, service);
   }
 }
 

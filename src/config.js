@@ -73,10 +73,10 @@ class Config {
         // Profits from the trades.
         profits: null,
         // Dividends paid.
-        dividends: null,
-        // Service specific accounts as per service overriding defaults.
-        service: {
-        }
+        dividends: null
+      },
+      // Service specific overrides.
+      services: {
       }
     });
   }
@@ -117,6 +117,35 @@ class Config {
       });
     };
     collect(this.accounts, '');
+    return ret;
+  }
+
+  /**
+   * Find the configuration variable value from service or from defaults.
+   * @param {String} name
+   * @param {String} service
+   * @return {null|String}
+   */
+  get(name, service = null) {
+    let vars;
+    if (service === null) {
+      vars = this;
+    } else {
+      vars = this.services[service] || {};
+    }
+
+    let ret = null;
+    name.split('.').forEach((part) => {
+      if (vars) {
+        ret = vars[part] || null;
+        vars = vars[part];
+      }
+    });
+
+    if (ret === null && service !== null) {
+      return this.get(name);
+    }
+
     return ret;
   }
 
@@ -173,6 +202,5 @@ class Config {
 }
 
 let config = new Config();
-config.loadIni();
 
 module.exports = config;
