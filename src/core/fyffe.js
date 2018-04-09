@@ -209,7 +209,6 @@ class Fyffe {
    * @param {Object} dataPerImporter
    */
   createTransactions(dataPerImporter) {
-    let ret = {};
     Object.keys(dataPerImporter).forEach((name) => {
 
       // Create txs.
@@ -231,10 +230,7 @@ class Fyffe {
 
       // Store the result.
       this.ledger.add(txs);
-      ret[name] = txs;
     });
-
-    return ret;
   }
 
   /**
@@ -295,7 +291,7 @@ class Fyffe {
     }
 
     // Convert raw group data to transactions and add them to ledger.
-    const txsPerImporter = this.createTransactions(dataPerImporter);
+    this.createTransactions(dataPerImporter);
 
     await this.initializeStock(dbName, firstDate);
 

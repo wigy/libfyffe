@@ -40,7 +40,6 @@ module.exports = class SellTx extends Tx {
         ret.push({number: this.getAccount('targets', this.target), amount: -this.total});
       }
     }
-
     return ret;
   }
 
@@ -54,8 +53,8 @@ module.exports = class SellTx extends Tx {
   }
 
   updateStock(stock) {
-    const {amount, avg} = stock.add(this.amount, this.target, this.total - this.fee);
+    this.avg = stock.average[this.target];
+    const {amount} = stock.add(this.amount, this.target, this.total - this.fee);
     this.stock = amount;
-    this.avg = avg;
   }
 };
