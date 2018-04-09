@@ -70,7 +70,7 @@ async function getBalances(knex, numbers, date = null) {
         return knex.select(knex.raw('SUM(debit * amount) + SUM((debit - 1) * amount) AS total, ' + number + ' as number'))
           .from('entry')
           .join('document', 'document.id', '=', 'entry.document_id')
-          .where({account_id: idByNumber[number]})
+          .where({account_id: idByNumber[number] || 0})
           .andWhere('document.period_id', '=', periodId)
           .andWhere('document.date', '<', stamp)
           .then((data) => data[0]);

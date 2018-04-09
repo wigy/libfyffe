@@ -106,6 +106,9 @@ class Config {
   getAllAccounts() {
     let ret = {};
     const collect = (accounts, prefix) => {
+      if (!accounts) {
+        return;
+      }
       Object.keys(accounts).forEach((acc) => {
         const name = (prefix ? prefix + '.' : '') + acc;
         if (accounts[acc] === null) {
@@ -117,6 +120,9 @@ class Config {
       });
     };
     collect(this.accounts, '');
+    Object.keys(this.services).forEach((service) => {
+      collect(this.services[service].accounts, service);
+    });
     return ret;
   }
 

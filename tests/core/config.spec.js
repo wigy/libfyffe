@@ -41,5 +41,11 @@ describe('config', () => {
     assert.equal(config.get('accounts.fees', 'my_service'), '102');
     assert.equal(config.get('accounts.losses', 'my_service'), '201');
     assert.equal(config.get('accounts.targets.eth', 'my_service'), '104');
+    assert.deepEqual(config.getAllAccounts(), { '101': 'fees',
+      '102': 'my_service.fees',
+      '103': 'targets.eth',
+      '104': 'my_service.targets.eth',
+      '201': 'losses'
+    });
   });
 });

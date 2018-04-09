@@ -7,8 +7,12 @@ describe('class Tx', () => {
   before(() => {
     config.set({
       language: 'fi',
-      service: 'Service-Z',
       accounts: {
+      },
+      services: {
+        z: {
+          service: 'Service-Z'
+        }
       }
     });
   });
@@ -129,8 +133,8 @@ describe('class Tx', () => {
 
   it('provides correct texts for transactions', () => {
 
-    assert.equal(Tx.create('deposit', {total: 1}).getText(), 'Talletus Service-Z-palveluun');
-    assert.equal(Tx.create('withdrawal', {total: 1}).getText(), 'Nosto Service-Z-palvelusta');
+    assert.equal(Tx.create('deposit', {total: 1}, 'z').getText(), 'Talletus Service-Z-palveluun');
+    assert.equal(Tx.create('withdrawal', {total: 1}, 'z').getText(), 'Nosto Service-Z-palvelusta');
 
     config.set({
       flags: {
@@ -196,20 +200,20 @@ describe('class Tx', () => {
       target: 'DKK'
     }).getText(), 'Valuutanvaihto kr -> $ (myyntikurssi 1.01 $/kr)');
 
-    assert.equal(Tx.create('interest', {total: 9.99}).getText(), 'Service-Z lainakorko');
+    assert.equal(Tx.create('interest', {total: 9.99}, 'z').getText(), 'Service-Z lainakorko');
 
     assert.equal(Tx.create('move-in', {
       total: 500,
       amount: 123 / 999,
       stock: 222 / 999,
       target: 'LTC'
-    }).getText(), 'Siirto Service-Z-palveluun +0.12312312 LTC (yht. 0.22222222 LTC)');
+    }, 'z').getText(), 'Siirto Service-Z-palveluun +0.12312312 LTC (yht. 0.22222222 LTC)');
     assert.equal(Tx.create('move-out', {
       total: 500,
       amount: -567 / 999,
       stock: 0,
       avg: 120,
       target: 'LTC'
-    }).getText(), 'Siirto Service-Z-palvelusta -0.56756757 LTC (k.h. 120.00 €/LTC, jälj. 0 LTC)');
+    }, 'z').getText(), 'Siirto Service-Z-palvelusta -0.56756757 LTC (k.h. 120.00 €/LTC, jälj. 0 LTC)');
   });
 });
