@@ -74,9 +74,10 @@ class Matcher {
       switch (code) {
         case 'C':
           if (!config[variable]) {
-            throw new Error('Configuration variable ' + variable + ' not set.');
+            ret.addRegex('.+?');
+          } else {
+            ret.addRegex(regexEscape(config[variable]));
           }
-          ret.addRegex(regexEscape(config[variable]));
           break;
         case '+':
           ret.addRegex('[-+][0-9.]+', variable, (num) => parseFloat(num));

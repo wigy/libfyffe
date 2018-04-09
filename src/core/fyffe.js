@@ -139,73 +139,6 @@ class Fyffe {
   }
 
   /**
-   * Import data from files into the system.
-   * @param {Array<String>} files
-   * @param {Object} options
-   */
-  async import(files, options) {
-
-    let dataPerImporter = this.recognize(this.readFiles(files));
-
-    const {dbName} = options;
-    const knex = this.dbs[dbName];
-
-    // Get initial data.
-    await this.loadTags(dbName);
-    await this.loadAccounts(dbName);
-
-    dataPerImporter = await this.loadFileData(dataPerImporter);
-    dataPerImporter = await this.removeImported(knex, dataPerImporter);
-
-    // Sort them according to the timestamps and find the earliest timestamp.
-    let minDate = null;
-    Object.keys(dataPerImporter).forEach((name) => {
-      const sorter = (a, b) => {
-        return this.modules[name].time(a[0]) - this.modules[name].time(b[0]);
-      };
-      dataPerImporter[name] = dataPerImporter[name].sort(sorter);
-      let first = this.modules[name].time(dataPerImporter[name][0][0]);
-      if (minDate === null || first < minDate) {
-        minDate = first;
-      }
-    });
-
-    // Get starting balances for accounts.
-    let firstDate = moment(minDate).format('YYYY-MM-DD');
-    await this.loadBalances(dbName, firstDate);
-    if (config.flags.debug) {
-      this.ledger.accounts.showBalances('Initial balances:');
-    }
-
-    // Convert raw group data to transactions and add them to ledger.
-    const txsPerImporter = this.createTransactions(dataPerImporter);
-
-    await this.initializeStock(dbName, firstDate);
-
-    // Post-process transactions.
-    // TODO: This is not right. Need to do in correct order and after preceding txs have been resolved.
-    Object.keys(txsPerImporter).forEach((name) => {
-      txsPerImporter[name].forEach((tx, i) => {
-        switch (tx.type) {
-          case 'move-in':
-          case 'move-out':
-            tx.total = this.modules[name].total(dataPerImporter[name][i], tx, this);
-        }
-      });
-    });
-
-    // Finally apply all transactions.
-    // TODO: Apply loans.
-    this.ledger.apply(this.stock);
-
-    if (config.flags.debug) {
-      this.ledger.showTransactions('Transactions:');
-      this.stock.showStock('Final stock:');
-      this.ledger.accounts.showBalances('Final balances:');
-    }
-  }
-
-  /**
    * Parse file data for every importer and convert them to groups and pre-process.
    *
    * @param {Object} dataPerImporter
@@ -319,6 +252,61 @@ class Fyffe {
     this.stock.setAverages(avg);
     if (config.flags.debug) {
       this.stock.showStock('Initial stock:');
+    }
+  }
+
+  /**
+   * Import data from files into the system.
+   * @param {Array<String>} files
+   * @param {Object} options
+   */
+  async import(files, options) {
+
+    let dataPerImporter = this.recognize(this.readFiles(files));
+
+    const {dbName} = options;
+    const knex = this.dbs[dbName];
+
+    // Get initial data.
+    await this.loadTags(dbName);
+    await this.loadAccounts(dbName);
+
+    dataPerImporter = await this.loadFileData(dataPerImporter);
+    dataPerImporter = await this.removeImported(knex, dataPerImporter);
+
+    // Sort them according to the timestamps and find the earliest timestamp.
+    let minDate = null;
+    Object.keys(dataPerImporter).forEach((name) => {
+      const sorter = (a, b) => {
+        return this.modules[name].time(a[0]) - this.modules[name].time(b[0]);
+      };
+      dataPerImporter[name] = dataPerImporter[name].sort(sorter);
+      let first = this.modules[name].time(dataPerImporter[name][0][0]);
+      if (minDate === null || first < minDate) {
+        minDate = first;
+      }
+    });
+
+    // Get starting balances for accounts.
+    let firstDate = moment(minDate).format('YYYY-MM-DD');
+    await this.loadBalances(dbName, firstDate);
+    if (config.flags.debug) {
+      this.ledger.accounts.showBalances('Initial balances:');
+    }
+
+    // Convert raw group data to transactions and add them to ledger.
+    const txsPerImporter = this.createTransactions(dataPerImporter);
+
+    await this.initializeStock(dbName, firstDate);
+
+    // Finally apply all transactions.
+    // TODO: Apply loans.
+    this.ledger.apply(this.stock);
+
+    if (config.flags.debug) {
+      this.ledger.showTransactions('Transactions:');
+      this.stock.showStock('Final stock:');
+      this.ledger.accounts.showBalances('Final balances:');
     }
   }
 

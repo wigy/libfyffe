@@ -178,7 +178,7 @@ class Config {
     }
     if (path) {
       ini = JSON.parse(fs.readFileSync(path).toString('utf-8'));
-      this.set(ini.default);
+      this.set(ini);
     }
   }
 
