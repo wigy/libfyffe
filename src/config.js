@@ -73,7 +73,10 @@ class Config {
         // Profits from the trades.
         profits: null,
         // Dividends paid.
-        dividends: null
+        dividends: null,
+        // Service specific accounts as per service overriding defaults.
+        service: {
+        }
       }
     });
   }
@@ -91,6 +94,7 @@ class Config {
    * @param {Object} config
    */
   setDefaults(config) {
+    console.log('Call to obsolete setDefaults().');
     this.set(config);
     Object.assign(ini.default, objectMerge(ini.default, clone(config)));
   }
@@ -103,11 +107,12 @@ class Config {
     let ret = {};
     const collect = (accounts, prefix) => {
       Object.keys(accounts).forEach((acc) => {
+        const name = (prefix ? prefix + '.' : '') + acc;
         if (accounts[acc] === null) {
         } else if (typeof (accounts[acc]) === 'object') {
-          collect(accounts[acc], acc + '.' + prefix);
+          collect(accounts[acc], name);
         } else {
-          ret[accounts[acc]] = prefix + acc;
+          ret[accounts[acc]] = name;
         }
       });
     };
@@ -153,6 +158,8 @@ class Config {
    * @param {String} section
    */
   use(section) {
+    // TODO: This is obsolete. Replaced with service-specific accounts.
+    console.log('Call to obsolete use().');
     if (!ini[section]) {
       throw new Error('No such section in ' + this.iniPath() + ' than ' + JSON.stringify(section));
     }

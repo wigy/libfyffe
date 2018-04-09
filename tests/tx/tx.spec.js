@@ -208,7 +208,8 @@ describe('class Tx', () => {
       total: 500,
       amount: -567 / 999,
       stock: 0,
+      avg: 120,
       target: 'LTC'
-    }).getText(), 'Siirto Service-Z-palvelusta -0.56756757 LTC (jälj. 0 LTC)');
+    }).getText(), 'Siirto Service-Z-palvelusta -0.56756757 LTC (k.h. 120.00 €/LTC, jälj. 0 LTC)');
   });
 });
