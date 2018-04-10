@@ -32,6 +32,8 @@ class Config {
         dryRun: false,
         // If set, show verbose debug information.
         debug: false,
+        // If set, do not add to stock commodities received with `move-in`.
+        zeroMoves: false,
         // If set, force the operation.
         force: false
       },
