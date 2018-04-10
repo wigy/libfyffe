@@ -61,6 +61,7 @@ class GDAXImport extends Import {
           return parseFloat(eur[0].amount) > 0 ? 'sell' : 'buy';
         }
       }
+      return 'trade';
     }
 
     throw new Error('Cannot recognize entry ' + JSON.stringify(group));
@@ -74,18 +75,33 @@ class GDAXImport extends Import {
     return 1.0;
   }
 
-  target(group) {
+  target(group, obj) {
+    if (obj.type === 'trade') {
+      const targets = group.filter((tx) => tx.type !== 'fee' && parseFloat(tx.amount) > 0);
+      if (targets.length) {
+        return targets[0].amount_balance_unit;
+      }
+    }
+
     if (group.length === 1) {
       return group[0].amount_balance_unit;
     }
     const fee = this._srcType(group, 'fee');
     if ((fee && group.length === 3) || (!fee && group.length === 2)) {
       const other = group.filter((tx) => tx.amount_balance_unit !== 'EUR');
-      if (other) {
+      if (other.length) {
         return other[0].amount_balance_unit;
       }
     }
     throw new Error('Cannot find target from ' + JSON.stringify(group));
+  }
+
+  source(group) {
+    const targets = group.filter((tx) => tx.type !== 'fee' && parseFloat(tx.amount) < 0);
+    if (targets.length) {
+      return targets[0].amount_balance_unit;
+    }
+    throw new Error('Cannot find source from ' + JSON.stringify(group));
   }
 
   total(group, obj, fyffe) {
@@ -120,6 +136,9 @@ class GDAXImport extends Import {
         eur = this._srcType(group, 'withdrawal', 'EUR');
         total = -parseFloat(eur[0].amount);
         break;
+      case 'trade':
+        total = 0;
+        break;
       default:
         throw new Error('No total() implemented for ' + JSON.stringify(group));
     }
@@ -130,7 +149,7 @@ class GDAXImport extends Import {
     const fee = this._srcType(group, 'fee');
     if (fee) {
       if (fee[0].amount_balance_unit !== 'EUR') {
-        throw new Error('Cannot handle non-EUR fees ' + JSON.stringify(group));
+        return 0;
       }
       return Math.round(-100 * parseFloat(fee[0].amount)) / 100;
     }
@@ -156,8 +175,27 @@ class GDAXImport extends Import {
           return parseFloat(other[0].amount);
         }
         break;
+      case 'trade':
+        const targets = group.filter((tx) => tx.type !== 'fee' && parseFloat(tx.amount) > 0);
+        if (targets.length) {
+          return parseFloat(targets[0].amount);
+        }
+        break;
       default:
         throw new Error('No amount() implemented for ' + obj.type + '-type ' + JSON.stringify(group));
+    }
+  }
+
+  given(group, obj) {
+    switch (obj.type) {
+      case 'trade':
+        const targets = group.filter((tx) => tx.type !== 'fee' && parseFloat(tx.amount) < 0);
+        if (targets.length) {
+          return parseFloat(targets[0].amount);
+        }
+        break;
+      default:
+        throw new Error('No given() implemented for ' + obj.type + '-type ' + JSON.stringify(group));
     }
   }
 
