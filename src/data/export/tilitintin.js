@@ -2,6 +2,8 @@ const d = require('neat-dump');
 const promiseSeq = require('promise-sequential');
 const Export = require('../export');
 const tilitintinTx = require('../tilitintin/tx');
+const imports = require('../tilitintin/imports');
+const config = require('../../config');
 
 class TilitintinExport extends Export {
 
@@ -10,9 +12,9 @@ class TilitintinExport extends Export {
   }
 
   async save(knex, tx) {
+    const tag = config.getTag(config.getServiceName(tx.service)).tag;
     return tilitintinTx.add(knex, tx.date, tx.getText(), tx.getEntries(), {force: true})
-    // TODO: Add meta data.
-//      .then((docId) => meta.imports.add(this.db, this.config.service, txo.src.id, docId))
+      .then((docId) => imports.add(knex, tag, tx.id, docId))
       .catch((err) => {
         d.error(err);
       });

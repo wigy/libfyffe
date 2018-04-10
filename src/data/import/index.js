@@ -291,6 +291,7 @@ class Import {
   createTransaction(group, fyffe, service) {
     // TODO: Cleanup. These can be figured from constructor data for each type.
     let obj = {};
+    obj.id = this.id(group);
     obj.time = this.time(group[0]);
     obj.type = this.recognize(group);
     if (obj.type !== 'withdrawal' && obj.type !== 'deposit' && obj.type !== 'move-in' && obj.type !== 'move-out' && obj.type !== 'trade') {

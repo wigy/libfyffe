@@ -3,9 +3,6 @@ const path = require('path');
 const clone = require('clone');
 const objectMerge = require('object-merge');
 
-// Storage for loaded ini-file.
-let ini = {};
-
 /**
  * Library configuration.
  */
@@ -90,16 +87,6 @@ class Config {
   }
 
   /**
-   * Override defaults and set them as current as well.
-   * @param {Object} config
-   */
-  setDefaults(config) {
-    console.log('Call to obsolete setDefaults().');
-    this.set(config);
-    Object.assign(ini.default, objectMerge(ini.default, clone(config)));
-  }
-
-  /**
    * Collect defined account numbers.
    * @return {Object} A mapping from account numbers to configuration variable names.
    */
@@ -156,6 +143,26 @@ class Config {
   }
 
   /**
+   * Get the name of the service.
+   * @param {String} service
+   */
+  getServiceName(service) {
+    if (this.services[service]) {
+      return this.services[service].service || null;
+    }
+    return null;
+  }
+
+  /**
+   * Lookup for tag.
+   * @param {String} name
+   */
+  getTag(name) {
+    const tags = this.get('tags');
+    return tags[name] || null;
+  }
+
+  /**
    * Look from ascending from the current directory until file `.fyffe` is found.
    *
    * @return {String|null}
@@ -183,27 +190,9 @@ class Config {
       path = this.iniPath();
     }
     if (path) {
-      ini = JSON.parse(fs.readFileSync(path).toString('utf-8'));
+      const ini = JSON.parse(fs.readFileSync(path).toString('utf-8'));
       this.set(ini);
     }
-  }
-
-  /**
-   * Use the named section of the config.
-   * @param {String} section
-   */
-  use(section) {
-    // TODO: This is obsolete. Replaced with service-specific accounts.
-    console.log('Call to obsolete use().');
-    if (!ini[section]) {
-      throw new Error('No such section in ' + this.iniPath() + ' than ' + JSON.stringify(section));
-    }
-    // Save tags.
-    const tags = clone(this.tags);
-    this.clear();
-    this.set(clone(ini.default));
-    this.set(clone(ini[section]));
-    this.tags = tags;
   }
 }
 

@@ -21,8 +21,6 @@ const types = {
   trade: './TradeTx'
 };
 
-let nextId = 1;
-
 /**
  * Abstract base class for different transactions.
  */
@@ -43,7 +41,7 @@ module.exports = class Tx {
       throw new Error('Invalid initial data in constructor: ' + JSON.stringify(data));
     }
     this.type = type;
-    this.id = nextId++;
+    this.id = null;
     this.chained = [];
     this.tags = [];
     this.service = null;
@@ -398,9 +396,13 @@ module.exports = class Tx {
       throw new Error('Invalid TX type in create(): ' + JSON.stringify(type));
     }
     const constructor = require(types[type]);
-
+    const id = data.id || null;
+    if (id) {
+      delete data.id;
+    }
     let ret = new constructor(data);
     ret.service = service;
+    ret.id = id;
 
     return ret;
   }
