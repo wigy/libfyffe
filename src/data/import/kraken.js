@@ -1,4 +1,3 @@
-const d = require('neat-dump');
 const Import = require('../import');
 
 class KrakenImport extends Import {
