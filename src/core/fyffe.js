@@ -215,18 +215,16 @@ class Fyffe {
       let txs = dataPerImporter[name].map((group) => this.modules[name].createTransaction(group, this, name));
 
       // Add tags based on the configuration.
-      const fundTag = config.tags[config.fund];
-      const serviceTag = config.tags[config.service];
-      let tags = [];
-      if (fundTag) {
-        tags.push(fundTag.tag);
-      }
-      if (serviceTag) {
-        tags.push(serviceTag.tag);
-      }
-      if (tags.length) {
-        txs.forEach((tx) => (tx.tags = clone(tags)));
-      }
+      txs.forEach((tx) => {
+        const fundTag = config.getTag(config.get('fund', tx.service));
+        const serviceTag = config.getTag(config.get('service', tx.service));
+        if (fundTag) {
+          tx.tags.push(fundTag.tag);
+        }
+        if (serviceTag) {
+          tx.tags.push(serviceTag.tag);
+        }
+      });
 
       // Store the result.
       this.ledger.add(txs);

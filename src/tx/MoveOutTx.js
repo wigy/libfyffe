@@ -1,6 +1,7 @@
 const Tx = require('./Tx');
 const num = require('../util/num');
 const text = require('../text/make');
+const config = require('../config');
 
 /**
  * Tradeable commodity is transferred out of the system.
@@ -44,7 +45,7 @@ module.exports = class MoveOutTx extends Tx {
       stock.add(this.burnAmount, this.burnTarget, burned);
       this.fee = num.cents(this.fee + burned);
     }
-    const {amount, avg} = stock.add(this.amount, this.target, this.total);
+    const {amount, avg} = stock.add(config.flags.zeroMoves ? 0 : this.amount, this.target, this.total);
     this.stock = amount;
     this.avg = avg;
   }
