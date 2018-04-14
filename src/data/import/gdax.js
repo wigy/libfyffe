@@ -53,7 +53,7 @@ class GDAXImport extends Import {
         }
         return parseFloat(group[0].amount) > 0 ? 'move-in' : 'move-out';
       }
-    } else {
+    } else if (group.length <= 3) {
       const matches = this._srcType(group, 'match');
       if (matches) {
         const eur = this._srcType(group, 'match', 'EUR');
@@ -123,10 +123,6 @@ class GDAXImport extends Import {
       case 'sell':
         eur = this._srcType(group, 'match', 'EUR');
         total += parseFloat(eur[0].amount);
-        fee = this._srcType(group, 'fee', 'EUR');
-        if (fee) {
-          total += -parseFloat(fee[0].amount);
-        }
         break;
       case 'deposit':
         eur = this._srcType(group, 'deposit', 'EUR');

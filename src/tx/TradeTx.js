@@ -39,7 +39,11 @@ module.exports = class TradeTx extends Tx {
     if (this.burnAmount) {
       opts.push(text.option('burn', this));
     }
-    opts = opts.concat([text.option('stock', this), text.option('stockLeft', this)]);
+    opts = opts.concat([
+      text.option('stock', this),
+      text.option('stockLeft', this),
+      text.option('averageNow', this)
+    ]);
     return text.withOptions(text.tx(this), opts);
   }
 
