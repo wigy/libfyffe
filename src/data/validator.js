@@ -20,7 +20,7 @@ module.exports = {
     if (typeof (val) === 'number' && !isNaN(val) && val < Infinity && val > -Infinity) {
       return;
     }
-    throw new Error('Invalid value ' + JSON.stringify(val) + ' for ' + JSON.stringify(name));
+    throw new Error('Invalid value ' + val + ' for ' + JSON.stringify(name));
   },
 
   /**
@@ -32,7 +32,7 @@ module.exports = {
     if (typeof (val) === 'string') {
       return;
     }
-    throw new Error('Invalid value ' + JSON.stringify(val) + ' for ' + JSON.stringify(name));
+    throw new Error('Invalid value ' + val + ' for ' + JSON.stringify(name));
   },
 
   /**
@@ -46,7 +46,7 @@ module.exports = {
     if (val >= limit) {
       return;
     }
-    throw new Error('Invalid value ' + JSON.stringify(val) + ' for ' + JSON.stringify(name));
+    throw new Error('Invalid value ' + val + ' for ' + JSON.stringify(name));
   },
 
   /**
@@ -59,7 +59,7 @@ module.exports = {
     if (val >= 0) {
       return;
     }
-    throw new Error('Invalid value ' + JSON.stringify(val) + ' for ' + JSON.stringify(name));
+    throw new Error('Invalid value ' + val + ' for ' + JSON.stringify(name));
   },
 
   /**
@@ -84,7 +84,7 @@ module.exports = {
     if (val > 0) {
       return;
     }
-    throw new Error('Invalid value ' + JSON.stringify(val) + ' for ' + JSON.stringify(name));
+    throw new Error('Invalid value ' + val + ' for ' + JSON.stringify(name));
   },
 
   /**
@@ -109,7 +109,7 @@ module.exports = {
     if (val < 0) {
       return;
     }
-    throw new Error('Invalid value ' + JSON.stringify(val) + ' for ' + JSON.stringify(name));
+    throw new Error('Invalid value ' + val + ' for ' + JSON.stringify(name));
   },
 
   /**
