@@ -53,7 +53,7 @@ module.exports = class SellTx extends Tx {
   }
 
   updateStock(stock) {
-    this.avg = stock.getAverage(this.getTarget());
+    this.avg = this.requireAverage(stock, this.getTarget());
     const {amount} = stock.add(this.amount, this.getTarget(), this.total - this.fee);
     this.stock = amount;
   }

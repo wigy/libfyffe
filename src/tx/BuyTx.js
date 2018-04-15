@@ -40,7 +40,7 @@ module.exports = class BuyTx extends Tx {
 
   updateStock(stock) {
     if (this.burnAmount) {
-      const burned = -this.burnAmount * stock.getAverage(this.getBurnTarget());
+      const burned = -this.burnAmount * this.requireAverage(stock, this.getBurnTarget());
       stock.add(this.burnAmount, this.getBurnTarget(), burned);
       this.fee = num.cents(this.fee + burned);
     }

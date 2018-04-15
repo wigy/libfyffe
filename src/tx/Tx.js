@@ -416,6 +416,19 @@ module.exports = class Tx {
   }
 
   /**
+   * Get the average for the target and throw an error if not found.
+   * @param {Stock} stock
+   * @param {String} target
+   */
+  requireAverage(stock, target) {
+    let avg = stock.getAverage(target);
+    if (!avg) {
+      throw new Error('No average available for ' + target);
+    }
+    return avg;
+  }
+
+  /**
    * Create an instance of transaction.
    * @param {String} type
    * @param {Object} data
