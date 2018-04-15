@@ -309,6 +309,36 @@ module.exports = class Tx {
   }
 
   /**
+   * Get full target name including service.
+   */
+  getTarget() {
+    if (!this.service) {
+      throw new Error('Cannot get full target of null service ' + JSON.stringify(this));
+    }
+    return this.service.toUpperCase() + ':' + this.target;
+  }
+
+  /**
+   * Get full burn target name including service.
+   */
+  getBurnTarget() {
+    if (!this.service) {
+      throw new Error('Cannot get full burn target of null service ' + JSON.stringify(this));
+    }
+    return this.service.toUpperCase() + ':' + this.burnTarget;
+  }
+
+  /**
+   * Get full source name including service.
+   */
+  getSource() {
+    if (!this.service) {
+      throw new Error('Cannot get full source of null service ' + JSON.stringify(this));
+    }
+    return this.service.toUpperCase() + ':' + this.source;
+  }
+
+  /**
    * Collect all atomic transaction entries for the transaction including chained sub-transaction.
    * @param {Boolean} withText If set, add description to each entry.
    * @return {Array<Entry>}
@@ -380,8 +410,8 @@ module.exports = class Tx {
    */
   updateFromStock(stock) {
     if ('stock' in this.data && this.has('target')) {
-      this.stock = stock.getStock(this.target);
-      this.avg = stock.getAverage(this.target);
+      this.stock = stock.getStock(this.getTarget());
+      this.avg = stock.getAverage(this.getTarget());
     }
   }
 

@@ -31,6 +31,6 @@ module.exports = class FxInTx extends Tx {
   }
 
   updateStock(stock) {
-    stock.add(this.amount, this.target, this.total);
+    stock.add(this.amount, this.getTarget(), this.total);
   }
 };

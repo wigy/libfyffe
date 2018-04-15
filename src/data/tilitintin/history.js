@@ -44,23 +44,23 @@ function findPriceAndStock(knex, targets, date = null) {
         }
         // Look for average.
         if (tx.has('target') && tx.has('avg')) {
-          if (missingAvg.has(tx.target)) {
+          if (missingAvg.has(tx.getTarget())) {
             if (data[i].date > stamp) {
-              d.error('Found future average on', new Date(data[i].date), 'for ' + tx.target + ' that is newer than', date);
+              d.error('Found future average on', new Date(data[i].date), 'for ' + tx.getTarget() + ' that is newer than', date);
             } else {
-              missingAvg.delete(tx.target);
-              ret.avg[tx.target] = tx.avg;
+              missingAvg.delete(tx.getTarget());
+              ret.avg[tx.getTarget()] = tx.avg;
             }
           }
         }
         // Look for stock.
         if (tx.has('target') && tx.has('stock')) {
-          if (missingStock.has(tx.target)) {
+          if (missingStock.has(tx.getTarget())) {
             if (data[i].date > stamp) {
-              d.error('Found future stock on', new Date(data[i].date), 'for ' + tx.target + ' that is newer than', date);
+              d.error('Found future stock on', new Date(data[i].date), 'for ' + tx.getTarget() + ' that is newer than', date);
             } else {
-              missingStock.delete(tx.target);
-              ret.stock[tx.target] = tx.stock;
+              missingStock.delete(tx.getTarget());
+              ret.stock[tx.getTarget()] = tx.stock;
             }
           }
         }

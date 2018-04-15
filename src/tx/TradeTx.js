@@ -51,20 +51,20 @@ module.exports = class TradeTx extends Tx {
     // TODO: Remove code duplication with BuyTx, MoveOutTx and MoveInTx.
     const addTotal = !this.total;
     if (addTotal) {
-      this.total = num.cents(-stock.getAverage(this.source) * this.given);
+      this.total = num.cents(-stock.getAverage(this.getSource()) * this.given);
     }
     if (this.burnAmount) {
-      const burned = -this.burnAmount * stock.getAverage(this.burnTarget);
+      const burned = -this.burnAmount * stock.getAverage(this.getBurnTarget());
       if (addTotal) {
         this.total += burned;
       }
-      stock.add(this.burnAmount, this.burnTarget, burned);
+      stock.add(this.burnAmount, this.getBurnTarget(), burned);
       this.fee = num.cents(this.fee + burned);
     }
-    let src = stock.add(this.given, this.source, this.total);
+    let src = stock.add(this.given, this.getSource(), this.total);
     this.stock2 = src.amount;
     this.avg2 = src.avg;
-    let dst = stock.add(this.amount, this.target, this.total);
+    let dst = stock.add(this.amount, this.getTarget(), this.total);
     this.stock = dst.amount;
     this.avg = dst.avg;
   }

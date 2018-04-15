@@ -35,17 +35,17 @@ module.exports = class MoveInTx extends Tx {
   updateStock(stock) {
     const addTotal = !this.total;
     if (addTotal) {
-      this.total = num.cents(stock.getAverage(this.target) * this.amount);
+      this.total = num.cents(stock.getAverage(this.getTarget()) * this.amount);
     }
     if (this.burnAmount) {
-      const burned = -this.burnAmount * stock.getAverage(this.burnTarget);
+      const burned = -this.burnAmount * stock.getAverage(this.getBurnTarget());
       if (addTotal) {
         this.total += burned;
       }
-      stock.add(this.burnAmount, this.burnTarget, burned);
+      stock.add(this.burnAmount, this.getBurnTarget(), burned);
       this.fee = num.cents(this.fee + burned);
     }
-    const {amount, avg} = stock.add(config.flags.zeroMoves ? 0 : this.amount, this.target, this.total);
+    const {amount, avg} = stock.add(config.flags.zeroMoves ? 0 : this.amount, this.getTarget(), this.total);
     this.stock = amount;
     this.avg = avg;
   }

@@ -133,6 +133,13 @@ class Parser {
     Object.keys(texts.options).forEach((type) => {
       this.optionMatch.push(Matcher.make(type, texts.options[type]));
     });
+    this.tagOfService = {};
+    Object.keys(config.services).forEach((service) => {
+      const tag = config.getTag(config.getServiceName(service));
+      if (tag) {
+        this.tagOfService[tag.tag] = service;
+      }
+    });
   }
 
   /**
@@ -153,10 +160,14 @@ class Parser {
       text = match[2];
     } while (true);
 
-    // Verify tags.
+    // Verify tags and find the service.
+    let service = null;
     tags.forEach((tag) => {
       if (!config.tags[tag]) {
-        throw new Error('Ivalid tag ' + JSON.stringify(tag) + ' in ' + JSON.stringify(orig));
+        throw new Error('Invalid tag ' + JSON.stringify(tag) + ' in ' + JSON.stringify(orig));
+      }
+      if (this.tagOfService[tag]) {
+        service = this.tagOfService[tag];
       }
     });
 
@@ -199,6 +210,7 @@ class Parser {
     }
     let ret = Tx.create(type, data);
     ret.tags = tags;
+    ret.service = service;
     return ret;
   }
 }

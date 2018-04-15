@@ -34,7 +34,7 @@ module.exports = class Ledger {
    * Collect all different targets from the transactions.
    */
   getTargets() {
-    let targets = new Set(this.txs.filter(tx => tx.has('target')).map(tx => tx.target));
+    let targets = new Set(this.txs.filter(tx => tx.has('target')).map(tx => tx.getTarget()));
     return [...targets];
   }
 
