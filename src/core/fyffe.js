@@ -1,4 +1,3 @@
-const clone = require('clone');
 const fs = require('fs');
 const moment = require('moment');
 const Stock = require('./Stock');
@@ -16,7 +15,8 @@ class Fyffe {
     this.stock = new Stock();
     this.ledger = new Ledger();
     this.modules = Import.modules();
-
+    // Explicitly set averages.
+    this.averages = {};
     // Configured and named knex-instances.
     this.dbs = {};
   }
@@ -28,6 +28,14 @@ class Fyffe {
    */
   setDb(dbName, knex) {
     this.dbs[dbName] = knex;
+  }
+
+  /**
+   * Set the explicit initial averages.
+   * @param {Object} avgs
+   */
+  setAverages(avgs) {
+    this.averages = avgs;
   }
 
   /**
@@ -243,6 +251,7 @@ class Fyffe {
     currencies.forEach((currency) => this.stock.add(0, currency, 0.00));
     const {avg, stock} = await this.loadPriceAndStock(dbName, targets, firstDate);
     this.stock.setStock(stock);
+    Object.assign(avg, this.averages);
     this.stock.setAverages(avg);
     if (config.flags.debug) {
       this.stock.showStock('Initial stock:');
