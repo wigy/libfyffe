@@ -16,7 +16,9 @@ class Fyffe {
     this.ledger = new Ledger();
     this.modules = Import.modules();
     // Explicitly set averages.
-    this.averages = {};
+    this.initialAverages = {};
+    // Explicitly set stock.
+    this.initialStock = {};
     // Configured and named knex-instances.
     this.dbs = {};
   }
@@ -35,7 +37,15 @@ class Fyffe {
    * @param {Object} avgs
    */
   setAverages(avgs) {
-    this.averages = avgs;
+    this.initialAverages = avgs;
+  }
+
+  /**
+   * Set the explicit initial stock.
+   * @param {Object} stock
+   */
+  setStock(stock) {
+    this.initialStock = stock;
   }
 
   /**
@@ -250,8 +260,9 @@ class Fyffe {
     targets.forEach((target) => this.stock.add(0, target, 0.00));
     currencies.forEach((currency) => this.stock.add(0, currency, 0.00));
     const {avg, stock} = await this.loadPriceAndStock(dbName, targets, firstDate);
+    Object.assign(stock, this.initialStock);
     this.stock.setStock(stock);
-    Object.assign(avg, this.averages);
+    Object.assign(avg, this.initialAverages);
     this.stock.setAverages(avg);
     if (config.flags.debug) {
       this.stock.showStock('Initial stock:');
