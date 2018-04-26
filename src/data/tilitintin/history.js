@@ -43,7 +43,7 @@ function findPriceAndStock(knex, targets, date = null) {
           continue;
         }
         // Look for average.
-        if (tx.has('target') && tx.has('avg')) {
+        if (tx.has('target') && tx.has('avg') && tx.service) {
           if (missingAvg.has(tx.getTarget())) {
             if (data[i].date > stamp) {
               d.error('Found future average on', new Date(data[i].date), 'for ' + tx.getTarget() + ' that is newer than', date);
@@ -54,7 +54,7 @@ function findPriceAndStock(knex, targets, date = null) {
           }
         }
         // Look for stock.
-        if (tx.has('target') && tx.has('stock')) {
+        if (tx.has('target') && tx.has('stock') && tx.service) {
           if (missingStock.has(tx.getTarget())) {
             if (data[i].date > stamp) {
               d.error('Found future stock on', new Date(data[i].date), 'for ' + tx.getTarget() + ' that is newer than', date);
