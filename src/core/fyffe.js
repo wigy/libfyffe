@@ -94,10 +94,10 @@ class Fyffe {
   /**
    * Find the latest price average and stock for the commodities from the `tilitin`-database.
    * @param {String} dbName
-   * @param {Array<String>} targets
+   * @param {Array<String>} [targets]
    * @param {String} [date]
    */
-  async loadPriceAndStock(dbName, targets, date) {
+  async loadPriceAndStock(dbName, targets = null, date = null) {
     return tilitintin.history.findPriceAndStock(this.dbs[dbName], targets, date);
   }
 

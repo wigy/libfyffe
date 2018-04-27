@@ -4,8 +4,8 @@ const Parser = require('../../text/Parser');
 /**
  * Scan for the latest average price and stock for the given targets.
  * @param {*} knex
- * @param {*} targets
- * @param {*} date
+ * @param {Array<String>|null} targets
+ * @param {String} date
  * @return {Promise<Object>}
  *
  * The format of the returned object is
@@ -22,7 +22,7 @@ const Parser = require('../../text/Parser');
  * }
  * ```
  */
-function findPriceAndStock(knex, targets, date = null) {
+function findPriceAndStock(knex, targets = null, date = null) {
   const parser = new Parser();
   const stamp = date === null ? new Date().getTime() : new Date(date + ' 00:00:00').getTime();
   let missingAvg = new Set(targets);
@@ -44,28 +44,34 @@ function findPriceAndStock(knex, targets, date = null) {
         }
         // Look for average.
         if (tx.has('target') && tx.has('avg') && tx.service) {
-          if (missingAvg.has(tx.getTarget())) {
+          const target = tx.getTarget();
+          if (targets === null || missingAvg.has(tx.getTarget())) {
             if (data[i].date > stamp) {
               d.error('Found future average on', new Date(data[i].date), 'for ' + tx.getTarget() + ' that is newer than', date);
             } else {
-              missingAvg.delete(tx.getTarget());
-              ret.avg[tx.getTarget()] = tx.avg;
+              missingAvg.delete(target);
+              if (ret.avg[target] === undefined) {
+                ret.avg[target] = tx.avg;
+              }
             }
           }
         }
         // Look for stock.
         if (tx.has('target') && tx.has('stock') && tx.service) {
-          if (missingStock.has(tx.getTarget())) {
+          const target = tx.getTarget();
+          if (targets === null || missingStock.has(tx.getTarget())) {
             if (data[i].date > stamp) {
               d.error('Found future stock on', new Date(data[i].date), 'for ' + tx.getTarget() + ' that is newer than', date);
             } else {
-              missingStock.delete(tx.getTarget());
-              ret.stock[tx.getTarget()] = tx.stock;
+              missingStock.delete(target);
+              if (ret.stock[target] === undefined) {
+                ret.stock[target] = tx.stock;
+              }
             }
           }
         }
         // Are we done?
-        if (missingAvg.values().length === 0 && missingStock.values().length === 0) {
+        if (targets !== null && missingAvg.values().length === 0 && missingStock.values().length === 0) {
           break;
         }
       }
