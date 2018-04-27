@@ -77,7 +77,7 @@ module.exports = class Ledger {
     this.txs.forEach((tx) => {
       d.green('  ', tx.date, num.currency(tx.total, config.currency), tx.getText());
       tx.getEntries().forEach((entry) => {
-        d.yellow('       ', entry.number, this.accounts.get(entry.number).name, num.currency(entry.amount, config.currency));
+        d.yellow('       ', entry.number, this.accounts.get(entry.number).name, num.currency(entry.amount, config.currency), entry.description ? '  - ' + entry.description : '');
       });
     });
   }

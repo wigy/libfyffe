@@ -1,24 +1,26 @@
 const cc = require('currency-codes');
 const moment = require('moment');
-const clone = require('clone');
 const config = require('../config');
 const validator = require('../data/validator');
+const num = require('../util/num');
 
 /**
  * A map from valid type names to the module paths implementing them.
  */
 const types = {
-  deposit: './DepositTx',
-  withdrawal: './WithdrawalTx',
-  sell: './SellTx',
-  buy: './BuyTx',
-  dividend: './DividendTx',
   'fx-in': './FxInTx',
   'fx-out': './FxOutTx',
-  interest: './InterestTx',
   'move-in': './MoveInTx',
   'move-out': './MoveOutTx',
-  trade: './TradeTx'
+  buy: './BuyTx',
+  deposit: './DepositTx',
+  dividend: './DividendTx',
+  interest: './InterestTx',
+  'loan-take': './LoanTakeTx',
+  'loan-pay': './LoanPayTx',
+  sell: './SellTx',
+  trade: './TradeTx',
+  withdrawal: './WithdrawalTx'
 };
 
 /**
@@ -42,10 +44,10 @@ module.exports = class Tx {
     }
     this.type = type;
     this.id = null;
+    this.parent = null;
     this.chained = [];
     this.tags = [];
     this.service = null;
-
     // Initialize defaults.
     this.data = Object.assign({
       time: undefined,
@@ -283,6 +285,7 @@ module.exports = class Tx {
    */
   addSubTx(tx) {
     this.chained.push(tx);
+    tx.parent = this;
   }
 
   /**
@@ -340,22 +343,23 @@ module.exports = class Tx {
 
   /**
    * Collect all atomic transaction entries for the transaction including chained sub-transaction.
-   * @param {Boolean} withText If set, add description to each entry.
    * @return {Array<Entry>}
    */
-  getEntries(withText = false) {
-    if (!withText) {
-      return this.getMyEntries().concat(this.chained.map((tx) => tx.getEntries()));
+  getEntries() {
+    let ret = this.getMyEntries();
+    // Add own description for child txs.
+    if (this.parent) {
+      ret.forEach((entry, i) => {
+        ret[i].description = this.getText();
+      });
     }
-
-    let ret = [];
-    const text = this.getText();
-    this.getMyEntries().forEach((entry) => {
-      entry.description = text;
-      ret.push(entry);
-    });
-
-    return ret.concat(this.chained.map((tx) => tx.getEntries(true)));
+    if (this.chained.length) {
+      this.chained.forEach((sub) => {
+        let subEntries = sub.getEntries();
+        ret = ret.concat(subEntries);
+      });
+    }
+    return ret;
   }
 
   /**
@@ -385,6 +389,9 @@ module.exports = class Tx {
    * Apply the transaction to the stock and accounts.
    * @param {Accounts} accounts
    * @param {Stock} stock
+   *
+   * After updating the balance, the account number is checked and if it has a matching loan account,
+   * automatic loan payment or loan take is attached to the transaction.
    */
   apply(accounts, stock) {
     this.updateStock(stock);
@@ -392,7 +399,24 @@ module.exports = class Tx {
       if (!entry.number) {
         throw new Error('Invalid account number found in entries ' + JSON.stringify(this.getEntries()));
       }
-      accounts.transfer(entry.number, entry.amount);
+      const balance = accounts.transfer(entry.number, entry.amount);
+      if (this.currency) {
+        const loanAcc = config.get('accounts.loans', this.service)[this.currency.toLowerCase()];
+        if (loanAcc && entry.number === this.getAccount('currencies', this.currency)) {
+          let loan;
+          if (balance < 0) {
+            loan = Tx.create('loan-take', {total: num.cents(-balance)}, this.service);
+          } else if (balance > 0) {
+            const loanTotal = -accounts.getBalance(loanAcc);
+            const payBack = Math.min(loanTotal, this.total);
+            loan = Tx.create('loan-pay', {total: num.cents(payBack)}, this.service);
+          }
+          if (loan) {
+            this.addSubTx(loan);
+            loan.apply(accounts, stock);
+          }
+        }
+      }
     });
   }
 

@@ -1,26 +1,28 @@
 {
   "tx": {
-    "deposit": "Talletus C{service}-palveluun",
-    "withdrawal": "Nosto C{service}-palvelusta",
     "buy": "Osto +{amount} ={target}",
-    "sell": "Myynti +{amount} ={target}",
+    "deposit": "Talletus C{service}-palveluun",
     "dividend": "Osinko #{amount} x ={target}",
     "fx-in": "Valuutanvaihto £{target} <- £{currency}",
     "fx-out": "Valuutanvaihto £{target} -> £{currency}",
     "interest": "C{service} lainakorko",
+    "loan-take": "Lainanotto: C{loanName}",
+    "loan-pay": "Lainan lyhennys: C{loanName}",
     "move-in": "Siirto C{service}-palveluun +{amount} ={target}",
     "move-out": "Siirto C{service}-palvelusta +{amount} ={target}",
-    "trade": "Vaihto +{given} ={source} +{amount} ={target}"
+    "sell": "Myynti +{amount} ={target}",
+    "trade": "Vaihto +{given} ={source} +{amount} ={target}",
+    "withdrawal": "Nosto C{service}-palvelusta"
   },
   "options": {
     "average": "k.h. ${avg} X{$}/={target}",
     "averageNow": "k.h. nyt ${avg} X{$}/={target}",
-    "stock": "yht. #{stock} ={target}",
-    "stockNow": "jälj. #{stock} ={target}",
-    "stockLeft": "jäi #{stock2} ={source}",
-    "rate": "kurssi #{rate} £{currency}/X{$}",
+    "burn": "kulu +{burnAmount} ={burnTarget}",
     "inRate": "ostokurssi #{rate} £{target}/£{currency}",
     "outRate": "myyntikurssi #{rate} £{currency}/£{target}",
-    "burn": "kulu +{burnAmount} ={burnTarget}"
+    "rate": "kurssi #{rate} £{currency}/X{$}",
+    "stock": "yht. #{stock} ={target}",
+    "stockLeft": "jäi #{stock2} ={source}",
+    "stockNow": "jälj. #{stock} ={target}"
   }
 }

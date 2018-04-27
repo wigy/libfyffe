@@ -38,6 +38,14 @@ module.exports = class Stock {
   }
 
   /**
+   * Get the balance of the account by its number.
+   * @return {Number|null}
+   */
+  getBalance(number) {
+    return this.accounts[number] ? this.accounts[number].balance : null;
+  }
+
+  /**
    * Set the balance for account.
    * @param {String} number
    * @param {Number} balance
@@ -50,9 +58,11 @@ module.exports = class Stock {
    * Transfer the given amount to/from account.
    * @param {String} number
    * @param {Number} amount
+   * @return {Number}
    */
   transfer(number, amount) {
     this.accounts[number].balance = (this.accounts[number].balance || 0) + amount;
+    return this.accounts[number].balance;
   }
 
   /**

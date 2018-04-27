@@ -22,6 +22,8 @@ class Config {
       service: null,
       // Current fund name.
       fund: null,
+      // Name of the loan provided in this service.
+      loanName: null,
       // Mapping from tags and their full names to tag objects.
       tags: {},
       // Various flags affecting library behavior.
