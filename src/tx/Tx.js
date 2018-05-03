@@ -401,14 +401,14 @@ module.exports = class Tx {
    * After updating the balance, the account number is checked and if it has a matching loan account,
    * automatic loan payment or loan take is attached to the transaction.
    */
-  apply(accounts, stock) {
+  apply(accounts, stock, loanCheck = true) {
     this.updateStock(stock);
     this.getEntries().forEach((entry) => {
       if (!entry.number) {
         throw new Error('Invalid account number found in entries ' + JSON.stringify(this.getEntries()));
       }
       const balance = accounts.transfer(entry.number, entry.amount);
-      if (this.currency) {
+      if (loanCheck && this.currency) {
         const loanAcc = config.get('accounts.loans', this.service)[this.currency.toLowerCase()];
         if (loanAcc && entry.number === this.getAccount('currencies', this.currency)) {
           let loan;
@@ -421,7 +421,7 @@ module.exports = class Tx {
           }
           if (loan) {
             this.addSubTx(loan);
-            loan.apply(accounts, stock);
+            loan.apply(accounts, stock, false);
           }
         }
       }

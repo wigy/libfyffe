@@ -60,7 +60,7 @@ class NordnetImport extends Import {
       return 'dividend';
     }
     if (types.includes('VALUUTAN_OSTO')) {
-      return 'fx-in';
+      return 'fx-out';
     }
     if (types.includes('MYYNTI')) {
       return 'sell';
@@ -93,7 +93,7 @@ class NordnetImport extends Import {
 
   rate(group, obj) {
     let ret = 1.0;
-    if (obj.type === 'fx') {
+    if (obj.type === 'fx-out') {
       let a, b;
       group.forEach((tx) => {
         if (tx.Valuutta === 'EUR') {
@@ -128,7 +128,7 @@ class NordnetImport extends Import {
 
   total(group, obj) {
     let sum = 0;
-    if (obj.type === 'fx-in' || obj.type === 'fx-out') {
+    if (obj.type === 'fx-out') {
       group.forEach((tx) => {
         if (tx.Valuutta === 'EUR') {
           sum += Math.abs(this.num(tx.Summa));
