@@ -371,11 +371,20 @@ module.exports = class Tx {
   }
 
   /**
+   * Get the tags of this transaction (or its parents if none).
+   */
+  getTags() {
+    return this.tags.length ? this.tags : (
+      this.parent ? this.parent.getTags() : []
+    );
+  }
+
+  /**
    * Describe the transaction and add tags.
    */
   getText() {
-    const tags = this.tags.length ? '[' + this.tags.join('][') + '] ' : '';
-    return tags + this.getMyText();
+    let tags = this.getTags();
+    return (tags.length ? '[' + tags.join('][') + '] ' : '') + this.getMyText();
   }
 
   /**
