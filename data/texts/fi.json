@@ -18,6 +18,7 @@
     "average": "k.h. ${avg} X{$}/={target}",
     "averageNow": "k.h. nyt ${avg} X{$}/={target}",
     "burn": "kulu +{burnAmount} ={burnTarget}",
+    "dividend": "osinko #{amount} £{currency}",
     "inRate": "ostokurssi #{rate} £{target}/£{currency}",
     "outRate": "myyntikurssi #{rate} £{currency}/£{target}",
     "rate": "kurssi #{rate} £{currency}/X{$}",
