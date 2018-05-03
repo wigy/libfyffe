@@ -9,7 +9,7 @@ const text = require('../text/make');
 module.exports = class DividendTx extends Tx {
 
   constructor(data = {}) {
-    super('dividend', { currency: config.currency, rate: undefined, tax: 0.0, target: undefined, amount: undefined }, data);
+    super('dividend', { currency: config.currency, rate: undefined, tax: 0.0, target: undefined, amount: undefined, given: undefined }, data);
   }
 
   getMyEntries() {

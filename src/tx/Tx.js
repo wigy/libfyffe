@@ -134,7 +134,7 @@ module.exports = class Tx {
   }
 
   /**
-   * The total amount of commodity changed owner in this transaction.
+   * The total amount of commodity involved in this transaction.
    *
    * Negative for giving out and positive when receiving.
    */
@@ -203,11 +203,10 @@ module.exports = class Tx {
 
   /**
    * The total amount of commodity given out in this transaction (if not currency).
-   *
-   * Negative for giving out and positive when receiving.
+   * Also used as dividend per commodity.
    */
   set given(val) {
-    validator.isLtZero('given', val);
+    validator.isNum('given', val);
     this.data.given = val;
   }
   get given() {

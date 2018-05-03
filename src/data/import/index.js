@@ -315,7 +315,7 @@ class Import {
       obj.type === 'dividend' || obj.type === 'trade') {
       obj.amount = this.amount(group, obj);
     }
-    if (obj.type === 'trade') {
+    if (obj.type === 'trade' || obj.type === 'dividend') {
       obj.given = this.given(group, obj);
     }
     if (obj.type === 'trade' || obj.type === 'move-in' || obj.type === 'move-out' || obj.type === 'buy') {

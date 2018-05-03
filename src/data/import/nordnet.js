@@ -169,18 +169,19 @@ class NordnetImport extends Import {
     return null;
   }
 
-  amount(group, obj) {
-    if (obj.type === 'dividend') {
-      const dividend = group.filter((tx) => tx.Tapahtumatyyppi === 'OSINKO');
-      const text = dividend[0].Tapahtumateksti;
-      if (text) {
-        const match = /^OSINKO .*? ([0-9,.]+) /.exec(text);
-        if (match) {
-          return parseFloat(match[1].replace(/,/, '.'));
-        }
+  given(group, obj) {
+    const dividend = group.filter((tx) => tx.Tapahtumatyyppi === 'OSINKO');
+    const text = dividend[0].Tapahtumateksti;
+    if (text) {
+      const match = /^OSINKO .*? ([0-9,.]+) /.exec(text);
+      if (match) {
+        return parseFloat(match[1].replace(/,/, '.'));
       }
-      return null;
     }
+    return null;
+  }
+
+  amount(group, obj) {
     let tx = group.filter((tx) => parseInt(this.num(tx.M__r_)));
     if (!tx.length) {
       return null;
