@@ -416,7 +416,7 @@ module.exports = class Tx {
             loan = Tx.create('loan-take', {total: num.cents(-balance)}, this.service);
           } else if (balance > 0) {
             const loanTotal = -accounts.getBalance(loanAcc);
-            const payBack = Math.min(loanTotal, this.total);
+            const payBack = Math.min(loanTotal, entry.amount);
             loan = Tx.create('loan-pay', {total: num.cents(payBack)}, this.service);
           }
           if (loan) {
