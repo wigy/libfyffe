@@ -128,7 +128,7 @@ class NordnetImport extends Import {
 
   total(group, obj) {
     let sum = 0;
-    if (obj.type === 'fx') {
+    if (obj.type === 'fx-in' || obj.type === 'fx-out') {
       group.forEach((tx) => {
         if (tx.Valuutta === 'EUR') {
           sum += Math.abs(this.num(tx.Summa));
