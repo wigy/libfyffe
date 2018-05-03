@@ -139,6 +139,10 @@ class NordnetImport extends Import {
         const value = Math.abs(this.num(tx.Summa));
         const rate = Math.abs(this.num(tx.Valuuttakurssi));
         sum += value * rate;
+        if (obj.type === 'sell') {
+          const fees = Math.abs(this.num(tx.Maksut));
+          sum += fees * rate;
+        }
       });
     }
     return Math.round(100 * sum) / 100;
