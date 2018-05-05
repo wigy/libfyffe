@@ -290,7 +290,7 @@ module.exports = class Tx {
   /**
    * Find the configured account number.
    * @param {String} arg1 Main category name in the config for accounts or account name.
-   * @return {String} [arg2] Account name in the config.
+   * @param {String} [arg2] Account name in the config.
    */
   getAccount(arg1, arg2 = null) {
     let name = 'accounts.' + arg1.toLowerCase();
