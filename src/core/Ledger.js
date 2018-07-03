@@ -59,6 +59,7 @@ module.exports = class Ledger {
    */
   apply(stock) {
     this.txs = this.txs.sort((a, b) => a.time - b.time);
+
     this.txs.forEach((tx) => {
       if (this.notApplied.has(tx)) {
         tx.updateFromStock(stock);

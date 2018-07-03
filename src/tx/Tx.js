@@ -408,7 +408,7 @@ module.exports = class Tx {
         throw new Error('Invalid account number found in entries ' + JSON.stringify(this.getEntries()));
       }
       const balance = accounts.transfer(entry.number, entry.amount);
-      if (loanCheck && this.currency) {
+      if (loanCheck && this.has('currency')) {
         const loanAcc = config.get('accounts.loans', this.service)[this.currency.toLowerCase()];
         if (loanAcc && entry.number === this.getAccount('currencies', this.currency)) {
           let loan;
