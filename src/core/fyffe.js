@@ -317,9 +317,13 @@ class Fyffe {
     // TODO: Apply loans.
     this.ledger.apply(this.stock);
 
-    if (config.flags.debug) {
+    if (config.flags.dryRun) {
       this.ledger.showTransactions('Transactions:');
+    }
+    if (config.flags.debug) {
       this.stock.showStock('Final stock:');
+    }
+    if (config.flags.debug) {
       this.ledger.accounts.showBalances('Final balances:');
     }
   }

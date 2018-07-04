@@ -193,7 +193,7 @@ class Import {
   }
 
   /**
-   * Look up for the amount of the target to give away in trade.
+   * Look up for the amount of the target to give away in trade (also dividend amount per stock).
    *
    * @param {Array<Object>} group A source data group.
    * @param {Object} obj Data known so far.

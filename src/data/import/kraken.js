@@ -19,6 +19,8 @@ class KrakenImport extends Import {
         return 'BTC';
       case 'BCH':
         return 'BCH';
+      case 'EOS':
+        return 'EOS';
     }
     throw new Error('Cannot recognize asset ' + asset);
   }
@@ -38,6 +40,10 @@ class KrakenImport extends Import {
   grouping(entries) {
     let ret = {};
     entries.forEach((entry) => {
+      // Drop entries without transaction ID.
+      if (!entry.txid) {
+        return;
+      }
       ret[entry.refid] = ret[entry.refid] || [];
       ret[entry.refid].push(entry);
     });
@@ -66,6 +72,8 @@ class KrakenImport extends Import {
         return 'trade';
       }
     }
+
+    console.log('group', group);
 
     throw new Error('Cannot recognize entry ' + JSON.stringify(group));
   }

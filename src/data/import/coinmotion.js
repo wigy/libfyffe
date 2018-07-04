@@ -41,6 +41,12 @@ class CoinmotionImport extends Import {
       switch (group[0].Type) {
         case 'Deposit':
           return 'deposit';
+        case 'Sent payment':
+          return 'move-out';
+        case 'Account transfer':
+          if (group[0].Message === 'BTG Proceeds') {
+            return 'dividend';
+          }
       }
     }
 
@@ -79,6 +85,10 @@ class CoinmotionImport extends Import {
   }
 
   total(group, obj) {
+    if (obj.type === 'dividend') {
+      // No good way to calculate it here.
+      return 0;
+    }
     let total = 0;
     group.forEach((entry) => {
       if (entry.Account === 'EUR') {
@@ -101,8 +111,8 @@ class CoinmotionImport extends Import {
     return noRounding ? total : Math.round(total * 100) / 100;
   }
 
-  tax(group) {
-    return null;
+  tax(group, obj) {
+    return obj.type === 'dividend' ? 0 : null;
   }
 
   amount(group, obj) {
@@ -112,7 +122,11 @@ class CoinmotionImport extends Import {
         total += Math.abs(parseFloat(entry.Amount.replace(/ [A-Z]+/, '')));
       }
     });
-    return obj.type === 'sell' ? -total : total;
+    return obj.type === 'sell' || obj.type === 'move-out' ? -total : total;
+  }
+
+  given(group, obj) {
+    return 0;
   }
 
   burnAmount(group, obj) {
