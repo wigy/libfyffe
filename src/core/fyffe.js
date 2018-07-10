@@ -225,12 +225,13 @@ class Fyffe {
   /**
    * Convert raw group data to transactions and add them to the ledger.
    * @param {Object} dataPerImporter
+   * @param {String} [service] If not given, importer name is used as a service key in config.
    */
-  createTransactions(dataPerImporter) {
+  createTransactions(dataPerImporter, service = null) {
     Object.keys(dataPerImporter).forEach((name) => {
 
       // Create txs.
-      let txs = dataPerImporter[name].map((group) => this.modules[name].createTransaction(group, this, name));
+      let txs = dataPerImporter[name].map((group) => this.modules[name].createTransaction(group, this, service || name));
 
       // Add tags based on the configuration.
       txs.forEach((tx) => {
