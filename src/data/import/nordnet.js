@@ -74,6 +74,9 @@ class NordnetImport extends Import {
     if (types.includes('TALLETUS')) {
       return 'deposit';
     }
+    if (types.includes('NOSTO')) {
+      return 'withdrawal';
+    }
     throw new Error('Cannot recognize entry with types ' + types.join(', ') + ': ' + JSON.stringify(group));
   }
 
