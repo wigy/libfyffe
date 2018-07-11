@@ -33,6 +33,7 @@ function findPriceAndStock(knex, targets = null, date = null) {
     .where('description', 'LIKE', '%k.h.%')
     .leftJoin('document', 'entry.document_id', 'document.id').orderBy('date', 'desc')
     .then((data) => {
+
       let ret = {stock: {}, avg: {}};
       let tx;
       for (let i = 0; i < data.length; i++) {
@@ -42,6 +43,7 @@ function findPriceAndStock(knex, targets = null, date = null) {
         } catch (err) {
           continue;
         }
+
         // Look for average.
         if (tx.has('target') && tx.has('avg') && tx.service) {
           const target = tx.getTarget();

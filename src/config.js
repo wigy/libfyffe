@@ -147,12 +147,23 @@ class Config {
   }
 
   /**
-   * Get the name of the service.
+   * Get the full name of the service.
    * @param {String} service
    */
   getServiceName(service) {
     if (this.services[service]) {
       return this.services[service].service || null;
+    }
+    return null;
+  }
+
+  /**
+   * Get the name of the fund.
+   * @param {String} service
+   */
+  getFundName(service) {
+    if (this.services[service]) {
+      return this.services[service].fund || null;
     }
     return null;
   }

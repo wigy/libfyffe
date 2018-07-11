@@ -133,13 +133,28 @@ class Parser {
     Object.keys(texts.options).forEach((type) => {
       this.optionMatch.push(Matcher.make(type, texts.options[type]));
     });
-    this.tagOfService = {};
-    Object.keys(config.services).forEach((service) => {
-      const tag = config.getTag(config.getServiceName(service));
-      if (tag) {
-        this.tagOfService[tag.tag] = service;
+    this.tagsOfService = {};
+    let services = Object.keys(config.services);
+    for (let i = 0; i < services.length; i++) {
+      const tag1 = config.getTag(config.getServiceName(services[i])).tag;
+      const tag2 = config.getTag(config.getFundName(services[i])).tag;
+      this.tagsOfService[services[i]] = [tag1, tag2];
+    }
+  }
+
+  /**
+   * Find the service key for the given tags.
+   * @param {String[]} tags
+   */
+  findService(tags) {
+    let services = Object.keys(config.services);
+    for (let i = 0; i < services.length; i++) {
+      const [tag1, tag2] = this.tagsOfService[services[i]];
+      if (tags.includes(tag1) && tags.includes(tag2)) {
+        return services[i];
       }
-    });
+    }
+    return null;
   }
 
   /**
@@ -166,10 +181,8 @@ class Parser {
       if (!config.tags[tag]) {
         throw new Error('Invalid tag ' + JSON.stringify(tag) + ' in ' + JSON.stringify(orig));
       }
-      if (this.tagOfService[tag]) {
-        service = this.tagOfService[tag];
-      }
     });
+    service = this.findService(tags);
 
     // Extract notes.
     let notes = [];
