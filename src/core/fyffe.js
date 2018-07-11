@@ -310,7 +310,7 @@ class Fyffe {
     }
 
     // Convert raw group data to transactions and add them to ledger.
-    this.createTransactions(dataPerImporter);
+    this.createTransactions(dataPerImporter, options.service);
 
     await this.initializeStock(dbName, firstDate);
 
