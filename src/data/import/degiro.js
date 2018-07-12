@@ -180,6 +180,7 @@ class DegiroImport extends Import {
 
   rate(group, obj) {
     // TODO: It is challenging to find the rate for Degiro...
+    // It would need to grouping of those Cash Fund conversion entries to right counterparts.
     return 1.0;
   }
 
