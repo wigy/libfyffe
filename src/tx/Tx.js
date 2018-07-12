@@ -15,6 +15,8 @@ const types = {
   buy: './BuyTx',
   deposit: './DepositTx',
   dividend: './DividendTx',
+  expense: './ExpenseTx',
+  income: './IncomeTx',
   interest: './InterestTx',
   'loan-take': './LoanTakeTx',
   'loan-pay': './LoanPayTx',
@@ -301,6 +303,12 @@ module.exports = class Tx {
     let acc = config.get(name, this.service);
     if (!acc && arg1 === 'targets') {
       acc = config.get('accounts.targets.default', this.service);
+    }
+    if (!acc && arg1 === 'expenses') {
+      acc = config.get('accounts.expenses.default', this.service);
+    }
+    if (!acc && arg1 === 'incomes') {
+      acc = config.get('accounts.incomes.default', this.service);
     }
 
     if (!acc) {

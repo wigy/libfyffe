@@ -108,7 +108,7 @@ module.exports = {
   tx: (tx) => {
     const key = tx.type;
     let text = texts[config.language].tx[key];
-    if (!text) {
+    if (text === undefined) {
       throw new Error('No translation for transaction ' + JSON.stringify(key) + ' in ' + config.language);
     }
     return substitute(text, tx);
@@ -119,7 +119,7 @@ module.exports = {
    */
   option: (name, tx) => {
     let text = texts[config.language].options[name];
-    if (!text) {
+    if (text === undefined) {
       throw new Error('No translation for option ' + JSON.stringify(name) + ' in ' + config.language);
     }
     return substitute(text, tx);
@@ -131,7 +131,11 @@ module.exports = {
   withOptions: (body, opts) => {
     let ret = body;
     if (opts.length) {
-      ret += ' (' + opts.join(', ') + ')';
+      if (ret === '') {
+        ret = opts.join(', ');
+      } else {
+        ret += ' (' + opts.join(', ') + ')';
+      }
     }
     return ret;
   },

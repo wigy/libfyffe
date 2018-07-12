@@ -296,7 +296,8 @@ class Import {
     obj.id = this.id(group);
     obj.time = this.time(group[0]);
     obj.type = this.recognize(group);
-    if (obj.type !== 'withdrawal' && obj.type !== 'deposit' && obj.type !== 'move-in' && obj.type !== 'move-out' && obj.type !== 'trade') {
+    if (obj.type !== 'withdrawal' && obj.type !== 'deposit' && obj.type !== 'move-in' &&
+      obj.type !== 'move-out' && obj.type !== 'trade' && obj.type !== 'expense' && obj.type !== 'income') {
       obj.currency = this.currency(group, obj);
       obj.rate = this.rate(group, obj);
     }
@@ -307,7 +308,7 @@ class Import {
       obj.source = this.source(group, obj);
     }
     obj.total = this.total(group, obj, fyffe);
-    if (obj.type !== 'interest' && obj.type !== 'dividend') {
+    if (obj.type !== 'interest' && obj.type !== 'dividend' && obj.type !== 'expense' && obj.type !== 'income') {
       obj.fee = this.fee(group, obj);
     }
     if (obj.type === 'dividend') {

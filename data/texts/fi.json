@@ -3,8 +3,10 @@
     "buy": "Osto +{amount} ={target}",
     "deposit": "Talletus C{service}-palveluun",
     "dividend": "Osinko #{amount} x ={target}",
+    "expense": "",
     "fx-in": "Valuutanvaihto £{target} <- £{currency}",
     "fx-out": "Valuutanvaihto £{target} -> £{currency}",
+    "income": "",
     "interest": "C{service} lainakorko",
     "loan-take": "Lainanotto: C{loanName}",
     "loan-pay": "Lainan lyhennys: C{loanName}",
@@ -24,6 +26,8 @@
     "rate": "kurssi #{rate} £{currency}/X{$}",
     "stock": "yht. #{stock} ={target}",
     "stockLeft": "jäi #{stock2} ={source}",
-    "stockNow": "jälj. #{stock} ={target}"
+    "stockNow": "jälj. #{stock} ={target}",
+    "expense.fees": "Kaupankäyntikulut",
+    "income.feerefund": "Kaupankäyntikulujen palautus"
   }
 }

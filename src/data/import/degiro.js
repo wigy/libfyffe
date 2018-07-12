@@ -23,6 +23,9 @@ class DegiroImport extends Import {
         entry.type = 'fee';
       } else {
         switch (entry.Kuvaus) {
+          case 'Giro CashFund Compensation':
+            entry.type = 'income';
+            break;
           case 'DEGIRO Transaction Fee':
           case 'Trustly-Sofort payment fee':
             entry.type = 'fee';
@@ -37,6 +40,12 @@ class DegiroImport extends Import {
           case 'FX Credit':
           case 'FX Withdrawal':
             entry.type = 'fx';
+            break;
+          case 'Dividend':
+            entry.type = 'dividend';
+            break;
+          case 'Dividend Tax':
+            entry.type = 'tax';
             break;
           default:
             throw new Error('Cannot recognize type of entry from description ' + JSON.stringify(entry.Kuvaus));
@@ -70,7 +79,8 @@ class DegiroImport extends Import {
       if (!id) {
         return;
       }
-      if (/^Cash Fund conversion:/.test(entry.Kuvaus)) {
+      if (entry.Column9 === '') {
+        // No money value given.
         return;
       }
       // Separate FX operations.
@@ -89,6 +99,12 @@ class DegiroImport extends Import {
 
   recognize(group) {
     const types = this._types(group).map(entry => entry.type);
+    if (types.length === 1 && types[0] === 'fee') {
+      return 'expense';
+    }
+    if (types.includes('income')) {
+      return 'income';
+    }
     if (types.includes('deposit')) {
       return 'deposit';
     }
@@ -100,6 +116,9 @@ class DegiroImport extends Import {
     }
     if (types.includes('withdrawal')) {
       return 'withdrawal';
+    }
+    if (types.includes('dividend')) {
+      return 'dividend';
     }
     if (types.includes('fx')) {
       const eur = group.filter(tx => tx.M__r_ === 'EUR');
@@ -120,10 +139,18 @@ class DegiroImport extends Import {
       group.forEach((tx) => {
         sum += Math.abs(this.num(tx.Column9));
       });
+    } else if (obj.type === 'expense' || obj.type === 'income') {
+      group.forEach((tx) => {
+        sum += Math.abs(this.num(tx.Column9));
+      });
     } else if (obj.type === 'fx-in' || obj.type === 'fx-out') {
       const eur = group.filter(tx => tx.M__r_ === 'EUR');
       sum += Math.abs(this.num(eur[0].Column9));
+    } else if (obj.type === 'dividend') {
+      const pay = group.filter(tx => tx.type === 'dividend');
+      sum += Math.abs(this.num(pay[0].Column9));
     } else {
+      console.log(group);
       throw new Error('Cannot find total from entry: ' + JSON.stringify(group));
     }
     return Math.round(100 * sum) / 100;
@@ -152,20 +179,24 @@ class DegiroImport extends Import {
   }
 
   rate(group, obj) {
-    return 1.0;
     // TODO: It is challenging to find the rate for Degiro...
-    throw new Error('Cannot figure out rate ' + JSON.stringify(group));
+    return 1.0;
   }
 
   target(group, obj) {
     switch (obj.type) {
+      case 'expense':
+        return 'FEES';
+      case 'income':
+        return 'FEEREFUND';
       case 'fx-in':
       case 'fx-out':
         const nonEur = group.filter(tx => tx.M__r_ !== 'EUR');
         return nonEur[0].M__r_;
       case 'sell':
       case 'buy':
-        const targets = group.filter(tx => tx.type === 'buy' || tx.type === 'sell');
+      case 'dividend':
+        const targets = group.filter(tx => tx.type === 'buy' || tx.type === 'sell' || tx.type === 'dividend');
         if (targets.length) {
           return isin2ticker(targets[0].ISIN);
         }
@@ -180,6 +211,9 @@ class DegiroImport extends Import {
       case 'buy':
         const match = /(Buy|Sell) (\d+) (.+?)@([0-9,]+)/.exec(targets[0].Kuvaus);
         return parseInt(match[2]);
+      case 'dividend':
+        // Not found from CSV.
+        return 0;
       default:
         throw new Error('Cannot find amount for ' + JSON.stringify(group));
     }
@@ -187,6 +221,21 @@ class DegiroImport extends Import {
 
   burnAmount(group, obj) {
     return null;
+  }
+
+  given(group, obj) {
+    // Not found from CSV.
+    return 0;
+  }
+
+  tax(group) {
+    let sum = 0;
+    group.forEach((tx) => {
+      if (tx.type === 'tax') {
+        sum += Math.abs(this.num(tx.Column9));
+      }
+    });
+    return Math.round(100 * sum) / 100;
   }
 }
 
