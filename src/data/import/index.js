@@ -75,6 +75,7 @@ class Import {
         .on('csv', (row) => {
           if (headers === null) {
             headers = opts.headers || row.map(r => r.replace(/\W/g, '_'));
+            headers = headers.map((header, i) => header || 'Column' + (i + 1));
           } else {
             let line = {};
             for (let i = 0; i < row.length; i++) {
@@ -116,6 +117,7 @@ class Import {
   grouping(entries) {
     throw new Error('Importer does not implement grouping().');
   }
+
   /**
    * Recognize the type of the transaction.
    *

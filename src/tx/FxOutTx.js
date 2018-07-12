@@ -5,7 +5,8 @@ const text = require('../text/make');
 const validator = require('../data/validator');
 
 /**
- * The `target` currency is traded out and another `currency` is received in.
+ * The `target` currency is traded out and another `currency` is received in,
+ * i.e. selling foreign currency.
  */
 module.exports = class FxOutTx extends Tx {
 
