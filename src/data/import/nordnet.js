@@ -10,7 +10,7 @@ class NordnetImport extends Import {
     return /^Id;Kirjausp.iv.;Kauppap.iv.;Maksup.iv.;/.test(content);
   }
 
-  // Helper to convert string amount to parseable string.
+  // Helper to convert string amount to float value.
   num(str) {
     return parseFloat(str.replace(',', '.').replace(/ /g, ''));
   }

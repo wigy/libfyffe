@@ -136,9 +136,15 @@ class Parser {
     this.tagsOfService = {};
     let services = Object.keys(config.services);
     for (let i = 0; i < services.length; i++) {
-      const tag1 = config.getTag(config.getServiceName(services[i])).tag;
-      const tag2 = config.getTag(config.getFundName(services[i])).tag;
-      this.tagsOfService[services[i]] = [tag1, tag2];
+      const tag1 = config.getTag(config.getServiceName(services[i]));
+      const tag2 = config.getTag(config.getFundName(services[i]));
+      this.tagsOfService[services[i]] = [];
+      if (tag1) {
+        this.tagsOfService[services[i]].push(tag1);
+      }
+      if (tag2) {
+        this.tagsOfService[services[i]].push(tag2);
+      }
     }
   }
 

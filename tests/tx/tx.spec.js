@@ -180,13 +180,15 @@ describe('class Tx', () => {
       target: 'TSLA',
       amount: 5,
       rate: 0.86,
-      currency: 'USD'
-    }).getText(), 'Osinko 5 x TSLA (kurssi 0.86 $/€)');
+      currency: 'USD',
+      given: 0.02
+    }).getText(), 'Osinko 5 x TSLA (osinko 0.02 $, kurssi 0.86 $/€)');
     assert.equal(Tx.create('dividend', {
       total: 10,
       target: 'NOKIA',
-      amount: 10
-    }).getText(), 'Osinko 10 x NOKIA');
+      amount: 10,
+      given: 2
+    }).getText(), 'Osinko 10 x NOKIA (osinko 2 €)');
 
     assert.equal(Tx.create('fx-in', {
       total: 5,

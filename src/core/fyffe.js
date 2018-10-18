@@ -102,7 +102,7 @@ class Fyffe {
   }
 
   /**
-   * Fetch the configured service tag or throw an exception.
+   * Fetch the configured service tag or null.
    * @param {String} service
    * @return {Tag}
    */
@@ -112,10 +112,7 @@ class Fyffe {
     }
     const serviceName = config.get('service', service);
     const tags = config.get('tags', service);
-    if (!tags[serviceName]) {
-      throw new Error('No tag configured for service ' + JSON.stringify(serviceName));
-    }
-    return tags[serviceName];
+    return tags[serviceName] || null;
   }
 
   /**
@@ -206,7 +203,7 @@ class Fyffe {
     }
 
     return Promise.all(Object.keys(dataPerImporter).map((name) => {
-      const tag = this.getServiceTag(name).tag;
+      const tag = this.getServiceTag(name) ? this.getServiceTag(name).tag : '<' + name + '>';
       return tilitintin.imports.doneFor(knex, tag)
         .then((ids) => ({name, ids}));
     }))
@@ -274,6 +271,8 @@ class Fyffe {
    * Import data from files into the system.
    * @param {Array<String>} files
    * @param {Object} options
+   * @param {String} options.dbName Name of the database to use.
+   * @param {String} options.service Name of the configuration section to use.
    */
   async import(files, options) {
 
@@ -292,6 +291,7 @@ class Fyffe {
     // Sort them according to the timestamps and find the earliest timestamp.
     let minDate = null;
     Object.keys(dataPerImporter).forEach((name) => {
+      this.modules[name].setService(options.service || name);
       const sorter = (a, b) => {
         return this.modules[name].time(a[0]) - this.modules[name].time(b[0]);
       };
@@ -333,6 +333,7 @@ class Fyffe {
    * Export data from the system to the external storage.
    * @param {String} format
    * @param {Object} options
+   * @param {String} options.dbName Name of the database to use.
    */
   async export(format, options) {
     if (config.flags.dryRun) {

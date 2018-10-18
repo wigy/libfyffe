@@ -1,6 +1,8 @@
 const fs = require('fs');
 const csv = require('csvtojson');
 const Tx = require('../../tx/Tx');
+const StringMapper = require('../../text/StringMapper');
+const config = require('../../config');
 
 /**
  * Base class for importing data.
@@ -9,6 +11,17 @@ class Import {
 
   constructor(name) {
     this.name = name;
+    this.service = null;
+    this.mapper = null;
+  }
+
+  /**
+   * Select the configuration section to use.
+   * @param {String} service
+   */
+  setService(service) {
+    this.service = service;
+    this.mapper = new StringMapper(config.get('import', service) || {});
   }
 
   /**
@@ -61,6 +74,7 @@ class Import {
    * The first row is assumed to have headers and they are used to construct
    * an array of objects containing each row as members defined by the first header row.
    * Special option `headers` can be given as an explicit list of headers.
+   * If `cutFromBeginning` is set, then remove this many lines from the beginning.
    */
   async loadCSV(file, opts = {}) {
     return new Promise((resolve, reject) => {
@@ -73,7 +87,9 @@ class Import {
       csv(opts)
         .fromString(file)
         .on('csv', (row) => {
-          if (headers === null) {
+          if (opts.cutFromBeginning) {
+            opts.cutFromBeginning--;
+          } else if (headers === null) {
             headers = opts.headers || row.map(r => r.replace(/\W/g, '_'));
             headers = headers.map((header, i) => header || 'Column' + (i + 1));
           } else {
@@ -296,6 +312,9 @@ class Import {
     obj.id = this.id(group);
     obj.time = this.time(group[0]);
     obj.type = this.recognize(group);
+    if (!obj.type) {
+      throw new Error('Module ' + this.name + ' failed to recognize ' + JSON.stringify(group));
+    }
     if (obj.type !== 'withdrawal' && obj.type !== 'deposit' && obj.type !== 'move-in' &&
       obj.type !== 'move-out' && obj.type !== 'trade' && obj.type !== 'expense' && obj.type !== 'income') {
       obj.currency = this.currency(group, obj);

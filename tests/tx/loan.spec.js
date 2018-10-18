@@ -45,9 +45,9 @@ describe('sub-entries', () => {
       { number: 'LOAN', amount: -100, description: 'Lainanotto: Sharks Loan' }
     ]);
 
-    tx = Tx.create('dividend', {total: 50.50, amount: 5, target: 'NEO'});
+    tx = Tx.create('dividend', {total: 50.50, amount: 5, target: 'NEO', given: 0.01});
     sub = Tx.create('loan-pay', {total: 25.25}, 'shark');
     tx.addSubTx(sub);
-    assert.equal(tx.getText(), 'Osinko 5 x NEO');
+    assert.equal(tx.getText(), 'Osinko 5 x NEO (osinko 0.01 €)');
   });
 });

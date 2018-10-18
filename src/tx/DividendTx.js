@@ -4,7 +4,7 @@ const num = require('../util/num');
 const text = require('../text/make');
 
 /**
- * A dividend is distributed to some currency account.
+ * A dividend `amount` x `given` from `target` is distributed to some currency account.
  */
 module.exports = class DividendTx extends Tx {
 
