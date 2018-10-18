@@ -77,6 +77,9 @@ class NordnetImport extends Import {
     if (types.includes('NOSTO')) {
       return 'withdrawal';
     }
+    if (types.includes('VAIHTO_AP_OTTO') && types.includes('VAIHTO_AP_J_TT_')) {
+      return 'trade';
+    }
     throw new Error('Cannot recognize entry with types ' + types.join(', ') + ': ' + JSON.stringify(group));
   }
 
@@ -117,8 +120,10 @@ class NordnetImport extends Import {
     return ret;
   }
 
-  target(group) {
-    const ticker = group[0].Arvopaperi;
+  target(group, obj) {
+    const ticker = obj.type === 'tradenge'
+      ? group.filter(g => g.Tapahtumatyyppi === 'VAIHTO_AP_J_TT_')[0].Arvopaperi
+      : group[0].Arvopaperi;
     if (!ticker) {
       const given = this._given(group);
       if (given && given.Valuutta) {
@@ -177,6 +182,10 @@ class NordnetImport extends Import {
   }
 
   given(group, obj) {
+    if (obj.type === 'trade') {
+      const burn = group.filter(g => g.Tapahtumatyyppi === 'VAIHTO_AP_OTTO')[0];
+      return -parseInt(burn.M__r_);
+    }
     const dividend = group.filter((tx) => tx.Tapahtumatyyppi === 'OSINKO');
     const text = dividend[0].Tapahtumateksti;
     if (text) {
@@ -189,12 +198,24 @@ class NordnetImport extends Import {
   }
 
   amount(group, obj) {
+    if (obj.type === 'trade') {
+      const burn = group.filter(g => g.Tapahtumatyyppi === 'VAIHTO_AP_J_TT_')[0];
+      return parseInt(burn.M__r_);
+    }
     let tx = group.filter((tx) => parseInt(this.num(tx.M__r_)));
     if (!tx.length) {
       return null;
     }
     let sum = parseInt(this.num(tx[0].M__r_));
     return obj.type === 'sell' ? -sum : sum;
+  }
+
+  source(group, obj) {
+    if (obj.type === 'trade') {
+      const burn = group.filter(g => g.Tapahtumatyyppi === 'VAIHTO_AP_OTTO')[0];
+      return burn.Arvopaperi;
+    }
+    return null;
   }
 
   burnAmount(group, obj) {
