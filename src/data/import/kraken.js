@@ -61,6 +61,9 @@ class KrakenImport extends Import {
       if (/^withdrawal-[A-Z]+$/.test(what)) {
         return 'move-out';
       }
+      if (/^deposit-[A-Z]+$/.test(what)) {
+        return 'move-in';
+      }
     }
 
     if (group.length === 2) {

@@ -5,7 +5,6 @@ class StringMapper {
 
   constructor(instructions) {
     this.instructions = instructions;
-    console.log(instructions);
   }
 
   /**

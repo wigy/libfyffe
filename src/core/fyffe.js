@@ -262,7 +262,7 @@ class Fyffe {
     this.stock.setStock(stock);
     Object.assign(avg, this.initialAverages);
     this.stock.setAverages(avg);
-    if (config.flags.debug) {
+    if (config.flags.showStock) {
       this.stock.showStock('Initial stock:');
     }
   }
@@ -305,7 +305,7 @@ class Fyffe {
     // Get starting balances for accounts.
     let firstDate = moment(minDate).format('YYYY-MM-DD');
     await this.loadBalances(dbName, firstDate);
-    if (config.flags.debug) {
+    if (config.flags.showBalances) {
       this.ledger.accounts.showBalances('Initial balances:');
     }
 
@@ -321,10 +321,10 @@ class Fyffe {
     if (config.flags.dryRun) {
       this.ledger.showTransactions('Transactions:');
     }
-    if (config.flags.debug) {
+    if (config.flags.showStock) {
       this.stock.showStock('Final stock:');
     }
-    if (config.flags.debug) {
+    if (config.flags.showBalances) {
       this.ledger.accounts.showBalances('Final balances:');
     }
   }
