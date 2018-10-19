@@ -1,5 +1,6 @@
 const fs = require('fs');
 const moment = require('moment');
+const d = require('neat-dump');
 const Stock = require('./Stock');
 const Ledger = require('./Ledger');
 const config = require('../config');
@@ -228,7 +229,24 @@ class Fyffe {
     Object.keys(dataPerImporter).forEach((name) => {
 
       // Create txs.
-      let txs = dataPerImporter[name].map((group) => this.modules[name].createTransaction(group, this, service || name));
+      let txs = [];
+      dataPerImporter[name].forEach((group) => {
+        try {
+          txs.push(this.modules[name].createTransaction(group, this, service || name));
+        } catch (err) {
+          if (config.flags.skipErrors) {
+            d.error('==================');
+            d.error('  Import failed:');
+            d.error('==================');
+            console.log(group);
+            console.log();
+            console.log(err);
+            d.error('__________________');
+          } else {
+            throw err;
+          }
+        }
+      });
 
       // Add tags based on the configuration.
       txs.forEach((tx) => {

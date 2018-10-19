@@ -375,6 +375,7 @@ class Import {
     const type = obj.type;
     delete obj.type;
     let ret = Tx.create(type, obj, service);
+
     if (desc !== null && desc !== undefined) {
       ret.description = desc;
     }
