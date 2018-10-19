@@ -325,6 +325,7 @@ class Import {
    * @param {Array<Object>} group
    * @param {Fyffe} fyffe
    * @param {String} service
+   * @return {Tx|null} Transaction or null, if type `skipped`.
    */
   createTransaction(group, fyffe, service) {
 
@@ -339,6 +340,11 @@ class Import {
     if (!obj.type) {
       throw new Error('Module ' + this.name + ' failed to recognize ' + JSON.stringify(group));
     }
+
+    if (obj.type === 'skipped') {
+      return null;
+    }
+
     if (obj.type !== 'withdrawal' && obj.type !== 'deposit' && obj.type !== 'move-in' &&
       obj.type !== 'move-out' && obj.type !== 'trade' && obj.type !== 'expense' && obj.type !== 'income') {
       obj.currency = this.currency(group, obj);

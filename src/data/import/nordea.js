@@ -87,6 +87,10 @@ class NordeaImport extends Import {
     return 1.0;
   }
 
+  fee(group) {
+    return 0.0;
+  }
+
   target(group, obj) {
     return this.useMapper(group, obj, 'target', null);
   }

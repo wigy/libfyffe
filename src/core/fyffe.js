@@ -232,7 +232,12 @@ class Fyffe {
       let txs = [];
       dataPerImporter[name].forEach((group) => {
         try {
-          txs.push(this.modules[name].createTransaction(group, this, service || name));
+          let tx = this.modules[name].createTransaction(group, this, service || name);
+          if (tx) {
+            txs.push(tx);
+          } else {
+            d.warning('Skipping', group);
+          }
         } catch (err) {
           if (config.flags.skipErrors) {
             d.error('==================');
