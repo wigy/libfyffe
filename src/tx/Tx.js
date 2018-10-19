@@ -1,5 +1,7 @@
 const cc = require('currency-codes');
 const moment = require('moment');
+const clone = require('clone');
+const d = require('neat-dump');
 const config = require('../config');
 const validator = require('../data/validator');
 const num = require('../util/num');
@@ -24,6 +26,8 @@ const types = {
   trade: './TradeTx',
   withdrawal: './WithdrawalTx'
 };
+
+let stockDebugTitle = false;
 
 /**
  * Abstract base class for different transactions.
@@ -378,6 +382,13 @@ module.exports = class Tx {
   }
 
   /**
+   * Get a summary presentation.
+   */
+  getTitle() {
+    return this.date + ' ' + num.currency(this.total, config.currency) + ' ' + this.getText();
+  }
+
+  /**
    * Get the tags of this transaction (or its parents if none).
    */
   getTags() {
@@ -410,7 +421,34 @@ module.exports = class Tx {
    * automatic loan payment or loan take is attached to the transaction.
    */
   apply(accounts, stock, loanCheck = true) {
+
+    let oldStock = clone(stock);
     this.updateStock(stock);
+    if (config.flags.debugStock) {
+      if (!stockDebugTitle) {
+        d.purple('Stock changes:');
+        stockDebugTitle = true;
+      }
+      let title = false;
+      Object.keys(stock.stock).forEach((target) => {
+        const short = target.split(':')[1];
+        if (oldStock.stock[target] !== stock.stock[target]) {
+          if (!title) {
+            title = true;
+            d.green('  ', this.getTitle());
+          }
+          d.yellow('       ', target, oldStock.stock[target], '=>', stock.stock[target], short);
+        }
+        if (oldStock.average[target] !== stock.average[target]) {
+          if (!title) {
+            title = true;
+            d.green('  ', this.getTitle());
+          }
+          d.yellow('       ', target, oldStock.average[target], '=>', stock.average[target], '€/' + short);
+        }
+      });
+    }
+
     this.getEntries().forEach((entry) => {
       if (!entry.number) {
         throw new Error('Invalid account number found in entries ' + JSON.stringify(this.getEntries()));
