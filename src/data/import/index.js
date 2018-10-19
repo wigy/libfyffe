@@ -13,6 +13,9 @@ class Import {
     this.name = name;
     this.service = null;
     this.mapper = null;
+    // Initialized when creating transactions.
+    this.stock = null;
+    this.ledger = null;
   }
 
   /**
@@ -266,6 +269,23 @@ class Import {
   }
 
   /**
+   * Get the custom description for the transaction, if not using auto-generated.
+   * @param {Array<Object>} group A source data group.
+   * @param {Object} obj Data known so far.
+   */
+  description(group, obj) {
+    return null;
+  }
+
+  /**
+   * Get the custom tags to be added to the transaction.
+   * @return {String[]}
+   */
+  tags(group, obj) {
+    return [];
+  }
+
+  /**
    * Fallback ID if nothing better available for identifying transactions.
    */
   dateAndLineId(group) {
@@ -307,6 +327,10 @@ class Import {
    * @param {String} service
    */
   createTransaction(group, fyffe, service) {
+
+    this.stock = fyffe.stock;
+    this.ledger = fyffe.ledger;
+
     // TODO: Cleanup. These can be figured from constructor data for each type.
     let obj = {};
     obj.id = this.id(group);
@@ -346,9 +370,19 @@ class Import {
         obj.burnTarget = this.burnTarget(group, obj);
       }
     }
+
+    const desc = this.description(group, obj);
     const type = obj.type;
     delete obj.type;
-    return Tx.create(type, obj, service);
+    let ret = Tx.create(type, obj, service);
+    if (desc !== null && desc !== undefined) {
+      ret.description = desc;
+    }
+    this.tags(group, obj).forEach((tag) => {
+      ret.tags.push(tag);
+    });
+
+    return ret;
   }
 }
 

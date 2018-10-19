@@ -54,6 +54,7 @@ module.exports = class Tx {
     this.chained = [];
     this.tags = [];
     this.service = null;
+    this.description = null;
     // Initialize defaults.
     this.data = Object.assign({
       time: undefined,
@@ -401,8 +402,9 @@ module.exports = class Tx {
    * Describe the transaction and add tags.
    */
   getText() {
-    let tags = this.getTags();
-    return (tags.length ? '[' + tags.join('][') + '] ' : '') + this.getMyText();
+    const tags = this.getTags();
+    const text = this.description === null ? this.getMyText() : this.description;
+    return (tags.length ? '[' + tags.join('][') + '] ' : '') + text;
   }
 
   /**

@@ -309,10 +309,10 @@ class Fyffe {
       this.ledger.accounts.showBalances('Initial balances:');
     }
 
+    await this.initializeStock(dbName, firstDate);
+
     // Convert raw group data to transactions and add them to ledger.
     this.createTransactions(dataPerImporter, options.service);
-
-    await this.initializeStock(dbName, firstDate);
 
     // Finally apply all transactions.
     // TODO: Apply loans.

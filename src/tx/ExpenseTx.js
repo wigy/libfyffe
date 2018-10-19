@@ -5,7 +5,7 @@ const text = require('../text/make');
 const validator = require('../data/validator');
 
 /**
- * An arbitraty expense classified by `target` field.
+ * An arbitrary expense classified by `target` field.
  */
 module.exports = class ExpenseTx extends Tx {
 

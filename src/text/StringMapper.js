@@ -5,6 +5,20 @@ class StringMapper {
 
   constructor(instructions) {
     this.instructions = instructions;
+    // TODO: Consider converting instructions to pre-defined functions here.
+  }
+
+  /**
+   * Get data from the instruction collection for the `instructions[key][name]`.
+   * @param {String} key
+   * @param {String} name
+   */
+  get(key, name) {
+    if (this.instructions[key] === undefined || this.instructions[key][name] === undefined) {
+      throw new Error('String mapper does not know `' + key + '` `' + name + '` pair.');
+    }
+    const str = this.instructions[key][name];
+    return str;
   }
 
   /**
@@ -33,6 +47,7 @@ class StringMapper {
       // Fixed key value pairs requiring exact match.
       return Object.keys(rule).reduce((prev, curr) => prev && rule[curr] === obj[curr], true);
     }
+    throw new Error('No handler for rule ' + JSON.stringify(rule));
   }
 }
 
