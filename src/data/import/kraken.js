@@ -141,6 +141,10 @@ class KrakenImport extends Import {
     return null;
   }
 
+  vat(group, obj) {
+    return null;
+  }
+
   amount(group, obj) {
     const crypto = group.filter((entry) => entry.asset !== 'ZEUR');
     if (crypto.length === 1) {

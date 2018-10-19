@@ -70,6 +70,10 @@ class CoinbaseImport extends Import {
     return 1.0;
   }
 
+  vat(group, obj) {
+    return null;
+  }
+
   target(group, obj) {
     switch (obj.type) {
       case 'buy':

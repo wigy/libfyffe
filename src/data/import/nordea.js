@@ -1,5 +1,6 @@
 const safeEval = require('safe-eval');
 const Import = require('../import');
+const num = require('../../util/num');
 
 class NordeaImport extends Import {
 
@@ -89,6 +90,16 @@ class NordeaImport extends Import {
 
   fee(group) {
     return 0.0;
+  }
+
+  vat(group, obj) {
+    const vatPct = this.useMapper(group, obj, 'vat', null);
+    if (vatPct === null) {
+      return null;
+    }
+    const total = this.total(group, obj);
+    const withoutVat = num.cents(total / (1 + vatPct / 100));
+    return num.cents(total - withoutVat);
   }
 
   target(group, obj) {

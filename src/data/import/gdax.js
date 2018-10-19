@@ -75,6 +75,10 @@ class GDAXImport extends Import {
     return 1.0;
   }
 
+  vat(group, obj) {
+    return null;
+  }
+
   target(group, obj) {
     if (obj.type === 'trade') {
       const targets = group.filter((tx) => tx.type !== 'fee' && parseFloat(tx.amount) > 0);

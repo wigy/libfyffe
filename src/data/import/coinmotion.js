@@ -73,6 +73,10 @@ class CoinmotionImport extends Import {
     return 1.0;
   }
 
+  vat(group, obj) {
+    return null;
+  }
+
   target(group) {
     const crypto = group.filter((entry) => entry.Account !== 'EUR');
     if (crypto.length) {

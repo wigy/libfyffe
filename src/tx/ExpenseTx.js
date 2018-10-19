@@ -10,7 +10,7 @@ const validator = require('../data/validator');
 module.exports = class ExpenseTx extends Tx {
 
   constructor(data = {}) {
-    super('expense', { target: undefined, amount: undefined, currency: config.currency }, data);
+    super('expense', { target: undefined, amount: undefined, currency: config.currency, vat: null }, data);
   }
 
   set amount(val) {
@@ -19,6 +19,13 @@ module.exports = class ExpenseTx extends Tx {
   }
 
   getMyEntries() {
+    if (this.vat) {
+      return [
+        {number: this.getAccount('expenses', this.target), amount: num.cents(this.total - this.vat)},
+        {number: this.getAccount('taxes', 'vat'), amount: num.cents(this.vat)},
+        {number: this.getAccount('currencies', this.currency), amount: num.cents(-this.total)}
+      ];
+    }
     return [
       {number: this.getAccount('expenses', this.target), amount: num.cents(this.total)},
       {number: this.getAccount('currencies', this.currency), amount: num.cents(-this.total)}

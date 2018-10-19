@@ -176,6 +176,17 @@ module.exports = class Tx {
   }
 
   /**
+   * VAT amount added to the income or expense.
+   */
+  set vat(val) {
+    validator.isGeZeroOrNull('vat', val);
+    this.data.vat = val;
+  }
+  get vat() {
+    return this.get('vat');
+  }
+
+  /**
    * The average price of the commodity after this transaction.
    */
   set avg(val) {

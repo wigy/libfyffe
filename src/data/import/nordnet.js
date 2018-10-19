@@ -181,6 +181,10 @@ class NordnetImport extends Import {
     return null;
   }
 
+  vat(group, obj) {
+    return null;
+  }
+
   given(group, obj) {
     if (obj.type === 'trade') {
       const burn = group.filter(g => g.Tapahtumatyyppi === 'VAIHTO_AP_OTTO')[0];

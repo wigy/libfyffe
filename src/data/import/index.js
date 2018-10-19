@@ -247,6 +247,17 @@ class Import {
   }
 
   /**
+   * Look up for the VAT.
+   *
+   * @param {Array<Object>} group A source data group.
+   * @param {Object} obj Data known so far.
+   * @return {Number} Amount of VAT to apply.
+   */
+  vat(group, obj) {
+    throw new Error('Importer does not implement vat().');
+  }
+
+  /**
    * Look up for the trade target to be consumed in the transaction.
    *
    * @param {Array<Object>} group A source data group.
@@ -362,6 +373,9 @@ class Import {
     }
     if (obj.type === 'dividend') {
       obj.tax = this.tax(group, obj);
+    }
+    if (obj.type === 'expense') {
+      obj.vat = this.vat(group, obj);
     }
     if (obj.type === 'buy' || obj.type === 'sell' || obj.type === 'move-in' || obj.type === 'move-out' ||
       obj.type === 'dividend' || obj.type === 'trade') {
