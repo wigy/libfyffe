@@ -179,6 +179,11 @@ class Fyffe {
         // Form groups, i.e. array of related entries for each transaction in the data.
         Object.keys(dataPerImporter).forEach((name) => {
           dataPerImporter[name] = this.modules[name].makeGrouping(dataPerImporter[name]);
+          // Drop entries before starting date.
+          if (config.flags.startDate) {
+            const timestamp = new Date(config.flags.startDate).getTime();
+            dataPerImporter[name] = dataPerImporter[name].filter(group => group.timestamp >= timestamp);
+          }
         });
         return dataPerImporter;
       })
