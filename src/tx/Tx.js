@@ -54,7 +54,6 @@ module.exports = class Tx {
     this.chained = [];
     this.tags = [];
     this.service = null;
-    this.description = null;
     // Initialize defaults.
     this.data = Object.assign({
       time: undefined,
@@ -276,6 +275,17 @@ module.exports = class Tx {
   }
 
   /**
+   * Additional description of transaction subject.
+   */
+  set notes(val) {
+    validator.isString('notes', val);
+    this.data.notes = val;
+  }
+  get notes() {
+    return this.get('notes');
+  }
+
+  /**
    * Verify that the given field is set and get its value.
    * @param {String} name
    * @return {any} Value of the field if set.
@@ -414,7 +424,7 @@ module.exports = class Tx {
    */
   getText() {
     const tags = this.getTags();
-    const text = this.description === null ? this.getMyText() : this.description;
+    const text = this.getMyText();
     return (tags.length ? '[' + tags.join('][') + '] ' : '') + text;
   }
 

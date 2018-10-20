@@ -280,12 +280,12 @@ class Import {
   }
 
   /**
-   * Get the custom description for the transaction, if not using auto-generated.
+   * Get the additional description for the transaction.
    * @param {Array<Object>} group A source data group.
    * @param {Object} obj Data known so far.
    */
-  description(group, obj) {
-    return null;
+  notes(group, obj) {
+    throw new Error('Importer does not implement notes().');
   }
 
   /**
@@ -377,6 +377,9 @@ class Import {
     if (obj.type === 'expense') {
       obj.vat = this.vat(group, obj);
     }
+    if (obj.type === 'expense' || obj.type === 'income') {
+      obj.notes = this.notes(group, obj);
+    }
     if (obj.type === 'buy' || obj.type === 'sell' || obj.type === 'move-in' || obj.type === 'move-out' ||
       obj.type === 'dividend' || obj.type === 'trade') {
       obj.amount = this.amount(group, obj);
@@ -391,14 +394,10 @@ class Import {
       }
     }
 
-    const desc = this.description(group, obj);
     const type = obj.type;
     delete obj.type;
     let ret = Tx.create(type, obj, service);
 
-    if (desc !== null && desc !== undefined) {
-      ret.description = desc;
-    }
     this.tags(group, obj).forEach((tag) => {
       ret.tags.push(tag);
     });

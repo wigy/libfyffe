@@ -5,12 +5,12 @@ const text = require('../text/make');
 const validator = require('../data/validator');
 
 /**
- * An arbitraty income classified by `target` field.
+ * An arbitrary income classified by `target` field.
  */
 module.exports = class IncomeTx extends Tx {
 
   constructor(data = {}) {
-    super('income', { target: undefined, amount: undefined, currency: config.currency }, data);
+    super('income', { target: undefined, amount: undefined, currency: config.currency, notes: '' }, data);
   }
 
   set amount(val) {
@@ -26,8 +26,9 @@ module.exports = class IncomeTx extends Tx {
   }
 
   getMyText() {
-    let opts = [text.option('income.' + this.target.toLowerCase(), this)];
-    return text.withOptions(text.tx(this), opts);
+    const key = 'income.' + this.target.toLowerCase();
+    let opts = [text.option(key, this)];
+    return text.withOptions(text.tx(this, key), opts);
   }
 
   updateStock(stock) {

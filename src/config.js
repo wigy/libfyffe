@@ -57,13 +57,42 @@ class Config {
         // Tax accounts.
         taxes: {
           source: null,
-          income: null
+          income: null,
+          vat: null
         },
         // Accounts for loaning currencies.
         loans: {
           eur: null
         },
-        // All fees.
+        // Accounts for target expenses.
+        expenses: {
+          'gov-fees': null,
+          bank: null,
+          computer: null,
+          software: null,
+          transfer: null,
+          transfer2: null,
+          transfer3: null,
+          transfer4: null,
+          transfer5: null,
+          vat: null
+        },
+        // Accounts for target incomes.
+        incomes: {
+          invest: null,
+          invest2: null,
+          sales: null,
+          sales2: null,
+          sales3: null,
+          sales4: null,
+          sales5: null,
+          transfer: null,
+          transfer2: null,
+          transfer3: null,
+          transfer4: null,
+          transfer5: null
+        },
+        // Transaction fees.
         fees: null,
         // Interests paid.
         interest: null,

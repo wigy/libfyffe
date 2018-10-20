@@ -127,14 +127,15 @@ class NordeaImport extends Import {
     return this.useMapper(group, obj, 'given');
   }
 
-  description(group, obj) {
-    const desc = this.useMapper(group, obj, 'description', null);
+  notes(group, obj) {
+    const desc = this.useMapper(group, obj, 'notes', null);
     if (desc !== null) {
       return desc;
     }
     if (obj.type === 'expense' && group[0].Viesti) {
       return group[0].Viesti;
     }
+    return '';
   }
 
   tags(group, obj) {

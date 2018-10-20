@@ -9,8 +9,9 @@ const texts = {
 
 /**
  * Helper to substitute variables in to the translated text.
- * @param {String} text
+ * @param {String|null} text
  * @param {any} target
+ * @return {String|null}
  *
  * Special notations in the text are handled according to the following:
  * * C{var} - Variable value is taken from the library configuration for the tx-service.
@@ -24,6 +25,10 @@ const texts = {
 function substitute(text, target) {
   let match;
   let ret = text;
+
+  if (text === null) {
+    return null;
+  }
 
   // Replace special symbols.
   let regex = /X\{([$])\}/;
@@ -105,8 +110,7 @@ module.exports = {
    * Construct a text describing a transaction.
    * @param {Tx} tx Transaction to describe.
    */
-  tx: (tx) => {
-    const key = tx.type;
+  tx: (tx, key = tx.type) => {
     let text = texts[config.language].tx[key];
     if (text === undefined) {
       throw new Error('No translation for transaction ' + JSON.stringify(key) + ' in ' + config.language);
@@ -130,13 +134,19 @@ module.exports = {
    */
   withOptions: (body, opts) => {
     let ret = body;
-    if (opts.length) {
-      if (ret === '') {
-        ret = opts.join(', ');
-      } else {
-        ret += ' (' + opts.join(', ') + ')';
-      }
+
+    opts = opts.filter(o => o !== null);
+
+    if (!opts.length) {
+      return ret;
     }
+
+    if (ret === '') {
+      ret = opts.join(', ');
+    } else {
+      ret += ' (' + opts.join(', ') + ')';
+    }
+
     return ret;
   },
 

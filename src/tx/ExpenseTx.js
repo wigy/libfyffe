@@ -10,7 +10,7 @@ const validator = require('../data/validator');
 module.exports = class ExpenseTx extends Tx {
 
   constructor(data = {}) {
-    super('expense', { target: undefined, amount: undefined, currency: config.currency, vat: null }, data);
+    super('expense', { target: undefined, amount: undefined, currency: config.currency, vat: null, notes: '' }, data);
   }
 
   set amount(val) {
@@ -33,8 +33,9 @@ module.exports = class ExpenseTx extends Tx {
   }
 
   getMyText() {
-    let opts = [text.option('expense.' + this.target.toLowerCase(), this)];
-    return text.withOptions(text.tx(this), opts);
+    const key = 'expense.' + this.target.toLowerCase();
+    let opts = [text.option(key, this)];
+    return text.withOptions(text.tx(this, key), opts);
   }
 
   updateStock(stock) {
