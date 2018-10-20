@@ -64,7 +64,11 @@ class DegiroImport extends Import {
   }
 
   id(group) {
-    return group[0].P_iv_ys + ' ' + group[0].Aika;
+    let id = group[0].P_iv_ys + ' ' + group[0].Aika + group[0].ISIN;
+    if (/^FX (Credit|Withdrawal)/.test(group[0].Kuvaus)) {
+      id += 'FX';
+    }
+    return id;
   }
 
   time(entry) {
@@ -75,7 +79,7 @@ class DegiroImport extends Import {
   grouping(entries) {
     let ret = {};
     entries.forEach((entry) => {
-      let id = entry.P_iv_ys + ' ' + entry.Aika;
+      let id = entry.P_iv_ys + ' ' + entry.Aika + entry.ISIN;
       if (!id) {
         return;
       }
@@ -89,11 +93,12 @@ class DegiroImport extends Import {
       }
       ret[id] = ret[id] || [];
       ret[id].push(entry);
-      if (ret[id].length > 5) {
+      if (ret[id].length > 6) {
         console.log(ret[id]);
-        throw new Error('Too many entries in one group (maybe same timestamp accidentally?)');
+        throw new Error('Too many entries ' + ret[id].length + ' in one group (maybe same timestamp accidentally?)');
       }
     });
+
     return Object.values(ret);
   }
 
@@ -122,7 +127,7 @@ class DegiroImport extends Import {
     }
     if (types.includes('fx')) {
       const eur = group.filter(tx => tx.M__r_ === 'EUR');
-      return this.num(eur[0].Column9) < 0 ? 'fx-in' : 'fx-out';
+      return this.num(eur[0].Column9) > 0 ? 'fx-in' : 'fx-out';
     }
     throw new Error('Cannot recognize entry: ' + JSON.stringify(group));
   }
@@ -166,7 +171,7 @@ class DegiroImport extends Import {
     return Math.round(100 * sum) / 100;
   }
 
-  currency(group) {
+  currency(group, obj) {
     let currencies = new Set(group.map(tx => tx.M__r_));
     if (currencies.size > 1) {
       const targets = group.filter(tx => tx.M__r_ !== 'EUR');
@@ -179,8 +184,14 @@ class DegiroImport extends Import {
   }
 
   rate(group, obj) {
-    // TODO: It is challenging to find the rate for Degiro...
-    // It would need to grouping of those Cash Fund conversion entries to right counterparts.
+    const fxs = group.filter(g => g.FX);
+    if (fxs.length > 1) {
+      console.log(group);
+      throw new Error('Too many FX entries to figure out rate.');
+    }
+    if (fxs.length) {
+      return 1 / parseFloat(fxs[0].FX.replace(',', '.'));
+    }
     return 1.0;
   }
 
@@ -191,13 +202,12 @@ class DegiroImport extends Import {
   target(group, obj) {
     switch (obj.type) {
       case 'expense':
-        return 'FEES';
+        return 'MISC';
       case 'income':
-        return 'FEEREFUND';
+        return 'MISC';
       case 'fx-in':
       case 'fx-out':
-        const nonEur = group.filter(tx => tx.M__r_ !== 'EUR');
-        return nonEur[0].M__r_;
+        return 'EUR';
       case 'sell':
       case 'buy':
       case 'dividend':
@@ -241,6 +251,17 @@ class DegiroImport extends Import {
       }
     });
     return Math.round(100 * sum) / 100;
+  }
+
+  notes(group, obj) {
+    switch (obj.type + obj.target) {
+      case 'incomeMISC':
+        // TODO: i18n
+        return 'kuluhyvitys';
+      case 'expenseMISC':
+        // TODO: i18n
+        return 'kaupankäyntikulu';
+    }
   }
 }
 
