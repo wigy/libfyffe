@@ -12,7 +12,8 @@ class TilitintinExport extends Export {
   }
 
   async save(knex, tx) {
-    const tag = config.getTag(config.getServiceName(tx.service)).tag;
+    const serviceTag = config.getTag(config.getServiceName(tx.service));
+    const tag = serviceTag ? serviceTag.tag : '<' + tx.service + '>';
     return tilitintinTx.add(knex, tx.date, tx.getText(), tx.getEntries(), {force: true})
       .then((docId) => imports.add(knex, tag, tx.id, docId))
       .catch((err) => {

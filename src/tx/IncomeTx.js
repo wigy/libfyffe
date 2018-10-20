@@ -20,8 +20,8 @@ module.exports = class IncomeTx extends Tx {
 
   getMyEntries() {
     return [
-      {number: this.getAccount('incomes', this.target), amount: num.cents(this.total)},
-      {number: this.getAccount('currencies', this.currency), amount: num.cents(-this.total)}
+      {number: this.getAccount('incomes', this.target), amount: num.cents(-this.total)},
+      {number: this.getAccount('currencies', this.currency), amount: num.cents(this.total)}
     ];
   }
 
