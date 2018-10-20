@@ -26,7 +26,7 @@ class NordeaImport extends Import {
   }
 
   id(group) {
-    return (group[0].Saaja_Maksaja.replace(/\s/g, '_') + '/' + (group[0].Viite || group[0].Maksajan_viite).replace(/\s/g, '')).toUpperCase();
+    return (group[0].Saaja_Maksaja.replace(/\s/g, '_')).replace(/\s/g, '').toUpperCase() + '/' + this.dateAndLineId(group);
   }
 
   time(entry) {

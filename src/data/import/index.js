@@ -16,6 +16,14 @@ class Import {
     // Initialized when creating transactions.
     this.stock = null;
     this.ledger = null;
+    this.idsUsed = new Set();
+  }
+
+  /**
+   * Reset import.
+   */
+  init() {
+    this.idsUsed = new Set();
   }
 
   /**
@@ -307,19 +315,26 @@ class Import {
   }
 
   /**
-   * Split input data to groups and generate IDs.
+   * Split input data to groups and generate IDs and timestamps.
    * @param {Array<any>} entries
    * @return {Promise<Array<Array<any>>>}
    */
   makeGrouping(entries) {
     let groups = this.grouping(entries);
-    // Generate IDs.
+    // Generate IDs and timestamps.
     groups.forEach((group, i) => {
       const id = this.id(group);
+      if (this.idsUsed.has(id)) {
+        console.log(group);
+        throw new Error('ID conflict: duplicate ID found `' + id + '`.');
+      }
+      this.idsUsed.add(id);
+      const timestamp = this.time(group[0]);
       if (id === null || id === undefined || /undefined/.test(id)) {
         throw new Error('Invalid ID ' + JSON.stringify(id) + ' generated for a group ' + JSON.stringify(group));
       }
       group.id = id + '';
+      group.timestamp = timestamp;
     });
     return groups;
   }

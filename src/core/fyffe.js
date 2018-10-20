@@ -163,6 +163,7 @@ class Fyffe {
     // Read in each data cluster.
     let ret = [];
     Object.keys(dataPerImporter).forEach((name) => {
+      this.modules[name].init();
       ret.push(this.modules[name].loadFiles(dataPerImporter[name]));
     });
 
