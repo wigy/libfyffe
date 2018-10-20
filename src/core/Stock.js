@@ -86,9 +86,11 @@ module.exports = class Stock {
    */
   showStock(title) {
     d.purple(title);
-    Object.keys(this.average).sort().forEach((target) => {
+    Object.keys(this.stock).sort().forEach((target) => {
       d.green('  ', target, num.trim(this.stock[target]));
-      d.yellow('       ', num.currency(this.average[target], '€ / ' + target));
+      if (this.average[target]) {
+        d.yellow('       ', num.currency(this.average[target], '€ / ' + target));
+      }
     });
   }
 };
