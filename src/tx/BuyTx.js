@@ -17,12 +17,12 @@ module.exports = class BuyTx extends Tx {
       return [
         {number: this.getAccount('targets', this.target), amount: num.cents(this.total - this.fee)},
         {number: this.getAccount('fees'), amount: num.cents(this.fee)},
-        {number: this.getAccount('currencies', config.currency), amount: num.cents(-this.total)}
+        {number: this.getAccount('currencies', this.currency), amount: num.cents(-this.total)}
       ];
     }
     return [
       {number: this.getAccount('targets', this.target), amount: num.cents(this.total)},
-      {number: this.getAccount('currencies', config.currency), amount: num.cents(-this.total)}
+      {number: this.getAccount('currencies', this.currency), amount: num.cents(-this.total)}
     ];
   }
 

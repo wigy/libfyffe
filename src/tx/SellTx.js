@@ -15,7 +15,7 @@ module.exports = class SellTx extends Tx {
   getMyEntries() {
     const total = num.cents(this.total - this.fee);
     let ret = [
-      {number: this.getAccount('currencies', config.currency), amount: total}
+      {number: this.getAccount('currencies', this.currency), amount: total}
     ];
     if (this.fee) {
       ret.push({number: this.getAccount('fees'), amount: this.fee});

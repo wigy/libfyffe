@@ -7,6 +7,11 @@ class DegiroImport extends Import {
     super('Degiro');
   }
 
+  init() {
+    super.init();
+    this.txRates = {};
+  }
+
   // Helper to convert string amount to parseable string.
   num(str) {
     return parseFloat(str.replace(',', '.'));
@@ -89,6 +94,10 @@ class DegiroImport extends Import {
       }
       // Separate FX operations.
       if (/^FX (Credit|Withdrawal)/.test(entry.Kuvaus)) {
+        // Store corresponding conversion rate for buy/sell transaction.
+        if (entry.FX) {
+          this.txRates[id] = 1 / parseFloat(entry.FX.replace(',', '.'));
+        }
         id += 'FX';
       }
       ret[id] = ret[id] || [];
@@ -144,6 +153,13 @@ class DegiroImport extends Import {
       group.forEach((tx) => {
         sum += Math.abs(this.num(tx.Column9));
       });
+      if (obj.currency !== 'EUR') {
+        if (!this.txRates[group.id]) {
+          console.log(group);
+          throw new Error('No currency rate recorded for ID ' + group.id);
+        }
+        sum *= this.txRates[group.id];
+      }
     } else if (obj.type === 'expense' || obj.type === 'income') {
       group.forEach((tx) => {
         sum += Math.abs(this.num(tx.Column9));
