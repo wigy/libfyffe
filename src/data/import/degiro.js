@@ -243,8 +243,8 @@ class DegiroImport extends Import {
         const match = /(Buy|Sell) (\d+) (.+?)@([0-9,]+)/.exec(targets[0].Kuvaus);
         return parseInt(match[2]);
       case 'dividend':
-        // Not found from CSV.
-        return 0;
+        // Rough estimate - not working if bought in this same import.
+        return this.stock.getStock(this.service.toUpperCase() + ':' + obj.target);
       default:
         throw new Error('Cannot find amount for ' + JSON.stringify(group));
     }
