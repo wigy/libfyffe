@@ -122,9 +122,18 @@ module.exports = {
    * Construct an optional text for the transaction.
    */
   option: (name, tx) => {
-    let text = texts[config.language].options[name];
+    let key = tx.type;
+    let text = texts[config.language].options[key];
+    if (text === undefined && tx.has('target')) {
+      key += '.' + tx.target.toLowerCase();
+      text = texts[config.language].options[key];
+    }
     if (text === undefined) {
-      throw new Error('No translation for option ' + JSON.stringify(name) + ' in ' + config.language);
+      throw new Error('Cannot find any option definitions for tx ' + key + ': ' + JSON.stringify(tx));
+    }
+    text = text[name];
+    if (text === undefined) {
+      throw new Error('No translation for option ' + JSON.stringify(name) + ' in language ' + config.language + ' for type ' + JSON.stringify(key));
     }
     return substitute(text, tx);
   },
@@ -144,7 +153,9 @@ module.exports = {
     if (ret === '') {
       ret = opts.join(', ');
     } else {
-      ret += ' (' + opts.join(', ') + ')';
+      if (opts.join(', ') !== '') {
+        ret += ' (' + opts.join(', ') + ')';
+      }
     }
 
     return ret;

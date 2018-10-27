@@ -9,29 +9,29 @@
     "expense.gov-fees": "Viranomaismaksu",
     "expense.software": "Ohjelmistohankinnat",
     "expense.transfer": "Siirto ={notes}-palveluun",
-    "expense.transfer2": "Siirto ={notes}-palveluun",
-    "expense.transfer3": "Siirto ={notes}-palveluun",
-    "expense.transfer4": "Siirto ={notes}-palveluun",
-    "expense.transfer5": "Siirto ={notes}-palveluun",
+    "expense.transfer2": "Siirto #2 ={notes}-palveluun",
+    "expense.transfer3": "Siirto #3 ={notes}-palveluun",
+    "expense.transfer4": "Siirto #4 ={notes}-palveluun",
+    "expense.transfer5": "Siirto #5 ={notes}-palveluun",
     "expense.misc": "Satunnaiset kulut",
-    "expense.misc2": "Satunnaiset kulut",
-    "expense.misc3": "Satunnaiset kulut",
-    "expense.misc4": "Satunnaiset kulut",
-    "expense.misc5": "Satunnaiset kulut",
+    "expense.misc2": "Satunnaiset kulut #2",
+    "expense.misc3": "Satunnaiset kulut #3",
+    "expense.misc4": "Satunnaiset kulut #4",
+    "expense.misc5": "Satunnaiset kulut #5",
     "fx-in": "Valuutanvaihto £{target} <- £{currency}",
     "fx-out": "Valuutanvaihto £{target} -> £{currency}",
     "interest": "C{service} lainakorko",
     "income.invest": "SVOP-sijoitus",
     "income.misc": "Satunnaiset tulot",
-    "income.misc2": "Satunnaiset tulot",
-    "income.misc3": "Satunnaiset tulot",
-    "income.misc4": "Satunnaiset tulot",
-    "income.misc5": "Satunnaiset tulot",
+    "income.misc2": "Satunnaiset tulot #2",
+    "income.misc3": "Satunnaiset tulot #3",
+    "income.misc4": "Satunnaiset tulot #4",
+    "income.misc5": "Satunnaiset tulot #5",
     "income.sales": "Myynti: ={notes}",
-    "income.sales2": "Myynti: ={notes}",
-    "income.sales3": "Myynti: ={notes}",
-    "income.sales4": "Myynti: ={notes}",
-    "income.sales5": "Myynti: ={notes}",
+    "income.sales2": "Myynti #2: ={notes}",
+    "income.sales3": "Myynti #3: ={notes}",
+    "income.sales4": "Myynti #4: ={notes}",
+    "income.sales5": "Myynti #5: ={notes}",
     "loan-take": "Lainanotto: C{loanName}",
     "loan-pay": "Lainan lyhennys: C{loanName}",
     "move-in": "Siirto C{service}-palveluun +{amount} ={target}",
@@ -41,42 +41,118 @@
     "withdrawal": "Nosto C{service}-palvelusta"
   },
   "options": {
-    "average": "k.h. ${avg} X{$}/={target}",
-    "averageNow": "k.h. nyt ${avg} X{$}/={target}",
-    "burn": "kulu +{burnAmount} ={burnTarget}",
-    "dividend": "osinko #{given} £{currency}",
-    "expense.bank": null,
-    "expense.gov-fees": "={notes}",
-    "expense.misc": "={notes}",
-    "expense.misc2": "={notes}",
-    "expense.misc3": "={notes}",
-    "expense.misc4": "={notes}",
-    "expense.misc5": "={notes}",
-    "expense.vat": null,
-    "expense.computer": "={notes}",
-    "expense.software": "={notes}",
-    "expense.transfer": null,
-    "expense.transfer2": null,
-    "expense.transfer3": null,
-    "expense.transfer4": null,
-    "expense.transfer5": null,
-    "inRate": "ostokurssi #{rate} £{target}/£{currency}",
-    "income.misc": "={notes}",
-    "income.misc2": "={notes}",
-    "income.misc3": "={notes}",
-    "income.misc4": "={notes}",
-    "income.misc5": "={notes}",
-    "income.invest": "={notes}",
-    "income.sales": null,
-    "income.sales2": null,
-    "income.sales3": null,
-    "income.sales4": null,
-    "income.sales5": null,
-    "outRate": "myyntikurssi #{rate} £{currency}/£{target}",
-    "rate": "kurssi #{rate} £{currency}/X{$}",
-    "stock": "yht. #{stock} ={target}",
-    "stockLeft": "jäi #{stock2} ={source}",
-    "stockNow": "jälj. #{stock} ={target}",
-    "expense.fees": "Kaupankäyntikulut"
+    "buy": {
+      "burn": "kulu +{burnAmount} ={burnTarget}",
+      "stock": "yht. #{stock} ={target}",
+      "averageNow": "k.h. nyt ${avg} X{$}/={target}"
+    },
+    "sell": {
+      "stockNow": "jälj. #{stock} ={target}",
+      "average": "k.h. ${avg} X{$}/={target}"
+    },
+    "dividend": {
+      "dividend": "osinko #{given} £{currency}",
+      "rate": "kurssi #{rate} £{currency}/X{$}"
+    },
+    "fx-in": {
+      "inRate": "ostokurssi #{rate} £{target}/£{currency}"
+    },
+    "fx-out": {
+      "outRate": "myyntikurssi #{rate} £{currency}/£{target}"
+    },
+    "move-in": {
+      "burn": "kulu +{burnAmount} ={burnTarget}",
+      "stock": "yht. #{stock} ={target}"
+    },
+    "move-out": {
+      "average": "k.h. ${avg} X{$}/={target}",
+      "burn": "kulu +{burnAmount} ={burnTarget}",
+      "stockNow": "jälj. #{stock} ={target}"
+    },
+    "deposit": {
+    },
+    "withdrawal": {
+    },
+    "loan-pay": {
+    },
+    "loan-take": {
+    },
+    "trade": {
+      "stock": "yht. #{stock} ={target}",
+      "stockLeft": "jäi #{stock2} ={source}",
+      "averageNow": "k.h. nyt ${avg} X{$}/={target}"
+    },
+    "expense.misc": {
+      "notes": "={notes}"
+    },
+    "expense.misc2": {
+      "notes": "={notes}"
+    },
+    "expense.misc3": {
+      "notes": "={notes}"
+    },
+    "expense.misc4": {
+      "notes": "={notes}"
+    },
+    "expense.misc5": {
+      "notes": "={notes}"
+    },
+    "income.misc": {
+      "notes": "={notes}"
+    },
+    "income.misc2": {
+      "notes": "={notes}"
+    },
+    "income.misc3": {
+      "notes": "={notes}"
+    },
+    "income.mis4": {
+      "notes": "={notes}"
+    },
+    "income.misc5": {
+      "notes": "={notes}"
+    },
+    "expense.bank": {
+      "notes": "={notes}"
+    },
+    "expense.gov-fees": {
+      "notes": "={notes}"
+    },
+    "expense.vat": {
+    },
+    "expense.computer": {
+      "notes": "={notes}"
+    },
+    "expense.software": {
+      "notes": "={notes}"
+    },
+    "expense.transfer": {
+      "notes": "={notes}"
+    },
+    "expense.transfer2": {
+      "notes": "={notes}"
+    },
+    "expense.transfer3": {
+      "notes": "={notes}"
+    },
+    "expense.transfer4": {
+      "notes": "={notes}"
+    },
+    "expense.transfer5": {
+      "notes": "={notes}"
+    },
+    "income.invest": {
+      "notes": "={notes}"
+    },
+    "income.sales": {
+    },
+    "income.sales2": {
+    },
+    "income.sales3": {
+    },
+    "income.sales4": {
+    },
+    "income.sales5": {
+    }
   }
 }

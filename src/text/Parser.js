@@ -129,10 +129,18 @@ class Parser {
     Object.keys(texts.tx).forEach((type) => {
       this.typeMatch.push(Matcher.make(type, texts.tx[type]));
     });
-    this.optionMatch = [];
+    this.optionMatch = {};
     Object.keys(texts.options).forEach((type) => {
-      this.optionMatch.push(Matcher.make(type, texts.options[type]));
+      if (texts.options[type] === null) {
+        return;
+      }
+      // Array is multiple option possibilities.
+      this.optionMatch[type] = {};
+      Object.keys(texts.options[type]).forEach((name) => {
+        this.optionMatch[type][name] = Matcher.make(type, texts.options[type][name]);
+      });
     });
+
     this.tagsOfService = {};
     let services = Object.keys(config.services);
     for (let i = 0; i < services.length; i++) {
@@ -190,12 +198,12 @@ class Parser {
     });
     service = this.findService(tags);
 
-    // Extract notes.
-    let notes = [];
+    // Extract options.
+    let options = [];
     let sub = /(.*)\((.*)\)$/.exec(text);
     if (sub) {
       text = sub[1].trim();
-      notes = sub[2].split(', ');
+      options = sub[2].split(', ');
     }
 
     // Find matching transaction and construct data for it.
@@ -205,19 +213,22 @@ class Parser {
       data = this.typeMatch[i].exec(text);
       if (data) {
         type = this.typeMatch[i].type;
-        let opt;
-        for (let j = 0; j < notes.length; j++) {
+        for (let j = 0; j < options.length; j++) {
+          if (!this.optionMatch[type]) {
+            throw new Error('No options defined for type ' + JSON.stringify(type));
+          }
           let k = 0;
-          while (k < this.optionMatch.length) {
-            opt = this.optionMatch[k].exec(notes[j]);
+          const optionTypes = Object.keys(this.optionMatch[type]);
+          while (k < optionTypes.length) {
+            let opt = this.optionMatch[type][optionTypes[k]].exec(options[j]);
             if (opt) {
               data = Object.assign(data, opt);
               break;
             }
             k++;
           }
-          if (k === this.optionMatch.length) {
-            throw new Error('Failed to parse option: ' + notes[j] + ' in ' + JSON.stringify(orig));
+          if (k === optionTypes.length) {
+            throw new Error('Failed to parse option: "' + options[j] + '" in ' + JSON.stringify(orig));
           }
         }
         break;

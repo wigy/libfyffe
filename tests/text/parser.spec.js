@@ -99,5 +99,13 @@ describe('class Tx', () => {
     assert.equal(tx.target, 'LTC');
     assert.equal(tx.amount, -0.56756757);
     assert.equal(tx.stock, 0);
+
+    /*
+    TODO: Parse service.
+    tx = parser.parse('Talletus My Test Service-palveluun');
+    console.log(tx);
+    tx = parser.parse('Nosto My Test Service-palvelusta');
+    console.log(tx);
+    */
   });
 });

@@ -27,7 +27,7 @@ module.exports = class IncomeTx extends Tx {
 
   getMyText() {
     const key = 'income.' + this.target.toLowerCase();
-    let opts = [text.option(key, this)];
+    let opts = [text.option('notes', this)];
     return text.withOptions(text.tx(this, key), opts);
   }
 

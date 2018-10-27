@@ -217,5 +217,17 @@ describe('class Tx', () => {
       avg: 120,
       target: 'LTC'
     }, 'z').getText(), 'Siirto Service-Z-palvelusta -0.56756757 LTC (k.h. 120.00 €/LTC, jälj. 0 LTC)');
+
+    assert.equal(Tx.create('expense', {
+      total: 100,
+      target: 'MISC3',
+      notes: 'kankkulan kaivoon'
+    }, 'z').getText(), 'Satunnaiset kulut #3 (kankkulan kaivoon)');
+
+    assert.equal(Tx.create('income', {
+      total: 100,
+      target: 'MISC',
+      notes: 'lotto'
+    }, 'z').getText(), 'Satunnaiset tulot (lotto)');
   });
 });
