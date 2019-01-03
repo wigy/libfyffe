@@ -25,6 +25,10 @@ const Parser = require('../../text/Parser');
 function findPriceAndStock(knex, targets = null, date = null) {
   const parser = new Parser();
   const stamp = date === null ? new Date().getTime() : new Date(date + ' 00:00:00').getTime();
+  if (targets instanceof Array && !targets.length) {
+    d.warning('Invalid empty target list for findPriceAndStock(), please use null instead.');
+    targets = null;
+  }
   let missingAvg = new Set(targets);
   let missingStock = new Set(targets);
   return knex.distinct('description', 'date')

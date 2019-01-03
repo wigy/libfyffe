@@ -286,7 +286,7 @@ class Fyffe {
     const currencies = this.ledger.getCurrencies();
     targets.forEach((target) => this.stock.add(0, target, 0.00));
     currencies.forEach((currency) => this.stock.add(0, currency, 0.00));
-    const {avg, stock} = await this.loadPriceAndStock(dbName, targets, firstDate);
+    const {avg, stock} = await this.loadPriceAndStock(dbName, targets.length ? targets : null, firstDate);
     Object.assign(stock, this.initialStock);
     this.stock.setStock(stock);
     Object.assign(avg, this.initialAverages);
