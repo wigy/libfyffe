@@ -164,7 +164,7 @@ class Parser {
     let services = Object.keys(config.services);
     for (let i = 0; i < services.length; i++) {
       const [tag1, tag2] = this.tagsOfService[services[i]];
-      if (tags.includes(tag1) && tags.includes(tag2)) {
+      if (tag1 && tag2 && tags.includes(tag1.tag) && tags.includes(tag2.tag)) {
         return services[i];
       }
     }
@@ -241,6 +241,7 @@ class Parser {
     let ret = Tx.create(type, data);
     ret.tags = tags;
     ret.service = service;
+
     return ret;
   }
 }

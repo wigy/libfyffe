@@ -8,6 +8,7 @@
     "expense.computer": "Tietotekniikkahankinnat",
     "expense.gov-fees": "Viranomaismaksu",
     "expense.software": "Ohjelmistohankinnat",
+    "expense.entertainment": "Edustuskulut: ={notes}",
     "expense.transfer": "Siirto ={notes}-palveluun",
     "expense.transfer2": "Siirto #2 ={notes}-palveluun",
     "expense.transfer3": "Siirto #3 ={notes}-palveluun",
@@ -18,10 +19,12 @@
     "expense.misc3": "Satunnaiset kulut #3",
     "expense.misc4": "Satunnaiset kulut #4",
     "expense.misc5": "Satunnaiset kulut #5",
+    "expense.tax": "Verojen maksu",
     "fx-in": "Valuutanvaihto £{target} <- £{currency}",
     "fx-out": "Valuutanvaihto £{target} -> £{currency}",
     "interest": "C{service} lainakorko",
     "income.invest": "SVOP-sijoitus",
+    "income.loan": "Osakaslaina: ={notes}",
     "income.misc": "Satunnaiset tulot",
     "income.misc2": "Satunnaiset tulot #2",
     "income.misc3": "Satunnaiset tulot #3",
@@ -32,6 +35,7 @@
     "income.sales3": "Myynti #3: ={notes}",
     "income.sales4": "Myynti #4: ={notes}",
     "income.sales5": "Myynti #5: ={notes}",
+    "income.vat": "ALV palautus",
     "loan-take": "Lainanotto: C{loanName}",
     "loan-pay": "Lainan lyhennys: C{loanName}",
     "move-in": "Siirto C{service}-palveluun +{amount} ={target}",
@@ -112,6 +116,9 @@
     "income.misc5": {
       "notes": "={notes}"
     },
+    "income.loan": {
+      "notes": ""
+    },
     "expense.bank": {
       "notes": "={notes}"
     },
@@ -120,6 +127,12 @@
     },
     "expense.vat": {
     },
+    "expense.tax": {
+      "notes": ""
+    },
+    "income.vat": {
+      "notes": "={notes}"
+    },
     "expense.computer": {
       "notes": "={notes}"
     },
@@ -127,28 +140,34 @@
       "notes": "={notes}"
     },
     "expense.transfer": {
-      "notes": "={notes}"
+      "notes": ""
     },
     "expense.transfer2": {
-      "notes": "={notes}"
+      "notes": ""
     },
     "expense.transfer3": {
-      "notes": "={notes}"
+      "notes": ""
     },
     "expense.transfer4": {
-      "notes": "={notes}"
+      "notes": ""
     },
     "expense.transfer5": {
-      "notes": "={notes}"
+      "notes": ""
+    },
+    "expense.entertainment": {
+      "notes": ""
     },
     "income.invest": {
       "notes": "={notes}"
     },
     "income.sales": {
+      "notes": ""
     },
     "income.sales2": {
+      "notes": ""
     },
     "income.sales3": {
+      "notes": ""
     },
     "income.sales4": {
     },
