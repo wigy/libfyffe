@@ -347,7 +347,7 @@ class Fyffe {
     // TODO: Apply loans.
     this.ledger.apply(this.stock);
 
-    if (config.flags.dryRun) {
+    if (config.flags.debug) {
       this.ledger.showTransactions('Transactions:');
     }
     if (config.flags.showStock) {
