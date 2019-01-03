@@ -131,7 +131,7 @@ class NordnetImport extends Import {
       }
       throw new Error('Cannot recognize target from ' + JSON.stringify(group));
     }
-    return ticker.replace(' ', '-');
+    return ticker.replace(/ /g, '-');
   }
 
   total(group, obj) {
