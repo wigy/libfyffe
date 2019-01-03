@@ -19,7 +19,7 @@ function periodOf(knex, date, failOnError = false) {
   return knex.select('id')
     .from('period')
     .where('start_date', '<=', seconds)
-    .andWhere('end_date', '>', seconds)
+    .andWhere('end_date', '>=', seconds)
     .then((period) => period.length ? period[0].id : null)
     .then((periodId) => {
       if (periodId === null && failOnError) {
