@@ -25,12 +25,21 @@ class NordnetImport extends Import {
     return group.filter((tx) => this.num(tx.Summa) > 0)[0];
   }
 
+  // Helper to get ID from entry.
+  _id(entry) {
+    let ret = entry.Vahvistusnumero_Laskelma;
+    if (entry.Tapahtumatyyppi === 'LAINAKORKO') {
+      ret += entry.Valuutta;
+    }
+    return ret;
+  }
+
   load(file) {
     return this.loadCSV(file, {delimiter: ';'});
   }
 
   id(group) {
-    return group[0].Vahvistusnumero_Laskelma;
+    return this._id(group[0]);
   }
 
   trimItem(obj) {
@@ -48,8 +57,9 @@ class NordnetImport extends Import {
       if (!entry.Vahvistusnumero_Laskelma) {
         return;
       }
-      ret[entry.Vahvistusnumero_Laskelma] = ret[entry.Vahvistusnumero_Laskelma] || [];
-      ret[entry.Vahvistusnumero_Laskelma].push(entry);
+      const idx = this._id(entry);
+      ret[idx] = ret[idx] || [];
+      ret[idx].push(entry);
     });
     return Object.values(ret);
   }
