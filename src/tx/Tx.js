@@ -345,7 +345,7 @@ module.exports = class Tx {
   }
 
   /**
-   * Get full target name including service.
+   * Get full target name including service name capitalized.
    */
   getTarget() {
     if (!this.service) {

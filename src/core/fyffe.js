@@ -227,6 +227,25 @@ class Fyffe {
   }
 
   /**
+   * Pick all target names as seen in the import data (skip import errors).
+   * @param {Object} dataPerImporter
+   * @param {String} [service] If not given, importer name is used as a service key in config.
+   * @return {Set<String>}
+   */
+  scanTargets(dataPerImporter, service = null) {
+    let txs = new Set();
+    Object.keys(dataPerImporter).forEach((name) => {
+      dataPerImporter[name].forEach((group) => {
+        try {
+          let tx = this.modules[name].createTransaction(group, this, service || name);
+          txs.add(tx.getTarget());
+        } catch (err) {}
+      });
+    });
+    return txs;
+  }
+
+  /**
    * Convert raw group data to transactions and add them to the ledger.
    * @param {Object} dataPerImporter
    * @param {String} [service] If not given, importer name is used as a service key in config.
@@ -280,13 +299,10 @@ class Fyffe {
    * Initialize stock and average price information for the current ledger.
    * @param {String} dbName
    * @param {String} firstDate
+   * @param {Set<String>} targets
    */
-  async initializeStock(dbName, firstDate) {
-    const targets = this.ledger.getTargets();
-    const currencies = this.ledger.getCurrencies();
-    targets.forEach((target) => this.stock.add(0, target, 0.00));
-    currencies.forEach((currency) => this.stock.add(0, currency, 0.00));
-    const {avg, stock} = await this.loadPriceAndStock(dbName, targets.length ? targets : null, firstDate);
+  async initializeStock(dbName, firstDate, targets) {
+    const {avg, stock} = await this.loadPriceAndStock(dbName, firstDate, targets);
     Object.assign(stock, this.initialStock);
     this.stock.setStock(stock);
     Object.assign(avg, this.initialAverages);
@@ -338,7 +354,8 @@ class Fyffe {
       this.ledger.accounts.showBalances('Initial balances:');
     }
 
-    await this.initializeStock(dbName, firstDate);
+    const targets = this.scanTargets(dataPerImporter, options.service);
+    await this.initializeStock(dbName, firstDate, targets);
 
     // Convert raw group data to transactions and add them to ledger.
     this.createTransactions(dataPerImporter, options.service);

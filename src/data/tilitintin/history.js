@@ -4,8 +4,8 @@ const Parser = require('../../text/Parser');
 /**
  * Scan for the latest average price and stock for the given targets.
  * @param {*} knex
- * @param {Array<String>|null} targets
  * @param {String} date
+ * @param {Set<String>} targets
  * @return {Promise<Object>}
  *
  * The format of the returned object is
@@ -22,15 +22,13 @@ const Parser = require('../../text/Parser');
  * }
  * ```
  */
-function findPriceAndStock(knex, targets = null, date = null) {
+function findPriceAndStock(knex, date = null, targets = null) {
   const parser = new Parser();
   const stamp = date === null ? new Date().getTime() : new Date(date + ' 00:00:00').getTime();
-  if (targets instanceof Array && !targets.length) {
-    d.warning('Invalid empty target list for findPriceAndStock(), please use null instead.');
-    targets = null;
-  }
+
   let missingAvg = new Set(targets);
   let missingStock = new Set(targets);
+
   return knex.distinct('description', 'date')
     .select()
     .from('entry')
@@ -76,6 +74,7 @@ function findPriceAndStock(knex, targets = null, date = null) {
             }
           }
         }
+
         // Are we done?
         if (targets !== null && missingAvg.values().length === 0 && missingStock.values().length === 0) {
           break;
