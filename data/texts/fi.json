@@ -84,7 +84,8 @@
     "trade": {
       "stock": "yht. #{stock} ={target}",
       "stockLeft": "jäi #{stock2} ={source}",
-      "averageNow": "k.h. nyt ${avg} X{$}/={target}"
+      "averageNow": "k.h. nyt ${avg} X{$}/={target}",
+      "burn": "kulu #{burnAmount} ={burnTarget}"
     },
     "expense.misc": {
       "notes": "={notes}"
