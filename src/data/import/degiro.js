@@ -29,6 +29,7 @@ class DegiroImport extends Import {
       } else {
         switch (entry.Kuvaus) {
           case 'Giro CashFund Compensation':
+          case 'DEGIRO Money Market Fund Compensation':
             entry.type = 'income';
             break;
           case 'DEGIRO Transaction Fee':
