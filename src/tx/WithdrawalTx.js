@@ -9,7 +9,7 @@ const text = require('../text/make');
 module.exports = class WithdrawalTx extends Tx {
 
   constructor(data = {}) {
-    super('withdrawal', { fee: 0.0 }, data);
+    super('withdrawal', { fee: 0.0, currency: config.currency }, data);
   }
 
   getMyEntries() {
