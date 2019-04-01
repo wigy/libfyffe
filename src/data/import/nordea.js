@@ -110,6 +110,13 @@ class NordeaImport extends Import {
     return Math.abs(this.num(group[0].M__r_));
   }
 
+  rawValue(group) {
+    if (group.length > 1) {
+      throw new Error('Only single entry raw values supported.');
+    }
+    return this.num(group[0].M__r_);
+  }
+
   tax(group, obj) {
     switch (obj.type) {
       case 'dividend':

@@ -6,6 +6,7 @@ const Ledger = require('./Ledger');
 const config = require('../config');
 const tilitintin = require('../data/tilitintin');
 const Import = require('../data/import');
+const { Tx } = require('../tx');
 
 /**
  * A system instance for transforming and inspecting financial data.
@@ -272,6 +273,16 @@ class Fyffe {
             console.log();
             console.log(err);
             d.error('__________________');
+          } else if (config.flags.importErrors) {
+            const raw = this.modules[name].rawValue(group);
+            let tx;
+            const acc = config.get('accounts.bank');
+            if (raw < 0) {
+              tx = Tx.create('error', {total: -raw, target: acc, notes: 'out', time: group.timestamp});
+            } else {
+              tx = Tx.create('error', {total: raw, target: acc, notes: 'in', time: group.timestamp});
+            }
+            txs.push(tx);
           } else {
             throw err;
           }

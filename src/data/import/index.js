@@ -189,6 +189,16 @@ class Import {
   }
 
   /**
+   * Parse raw transaction value used as backup on failed import.
+   *
+   * @param {Array<Object>} group A source data group.
+   * @return {Number}
+   */
+  rawValue(group) {
+    throw new Error('Importer does not implement rawValue().');
+  }
+
+  /**
    * Find out currency as 'EUR' or 'USD'.
    *
    * @param {Array<Object>} group A source data group.

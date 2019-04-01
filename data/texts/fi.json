@@ -3,6 +3,7 @@
     "buy": "Osto +{amount} ={target}",
     "deposit": "Talletus C{service}-palveluun",
     "dividend": "Osinko #{amount} x ={target}",
+    "error": "Puutteellinen tuonti",
     "expense.vat": "ALV maksu",
     "expense.bank": "Palvelumaksu",
     "expense.computer": "Tietotekniikkahankinnat",

@@ -37,7 +37,11 @@ class Config {
         // If set, do not add to stock commodities received with `move-in`.
         zeroMoves: false,
         // If set, force the operation.
-        force: false
+        force: false,
+        // If import fails, just print and skip the failed transaction.
+        skipErrors: false,
+        // If import fails, create move transaction to imbalance account
+        importErrors: false
       },
       // Account numbers.
       accounts: {

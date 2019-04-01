@@ -18,6 +18,7 @@ const types = {
   deposit: './DepositTx',
   dividend: './DividendTx',
   expense: './ExpenseTx',
+  error: './ErrorTx',
   income: './IncomeTx',
   interest: './InterestTx',
   'loan-take': './LoanTakeTx',
