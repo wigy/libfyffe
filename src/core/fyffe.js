@@ -278,9 +278,9 @@ class Fyffe {
             let tx;
             const acc = config.get('accounts.bank');
             if (raw < 0) {
-              tx = Tx.create('error', {total: -raw, target: acc, notes: 'out', time: group.timestamp});
+              tx = Tx.create('error', {total: -raw, target: acc, notes: 'out', time: group.timestamp, id: group.id});
             } else {
-              tx = Tx.create('error', {total: raw, target: acc, notes: 'in', time: group.timestamp});
+              tx = Tx.create('error', {total: raw, target: acc, notes: 'in', time: group.timestamp, id: group.id});
             }
             txs.push(tx);
           } else {
