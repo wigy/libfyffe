@@ -29,7 +29,7 @@ class NordnetImport extends Import {
   _id(entry) {
     let ret = entry.Vahvistusnumero_Laskelma;
     if (entry.Tapahtumatyyppi === 'LAINAKORKO') {
-      ret += entry.Valuutta;
+      ret += entry.Valuutta + entry.Kirjausp_iv_;
     }
     return ret;
   }
@@ -139,7 +139,7 @@ class NordnetImport extends Import {
       if (group[0].Tapahtumateksti.startsWith('REVERSE SPLIT')) {
         return group[0].Arvopaperi;
       }
-      ticker = group.filter(g => g.Tapahtumatyyppi === 'VAIHTO_AP_J_TT_')[0].Arvopaperi
+      ticker = group.filter(g => g.Tapahtumatyyppi === 'VAIHTO_AP_J_TT_')[0].Arvopaperi;
     } else {
       ticker = group[0].Arvopaperi;
     }
