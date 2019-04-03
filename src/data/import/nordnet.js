@@ -90,6 +90,9 @@ class NordnetImport extends Import {
     if (types.includes('VAIHTO_AP_OTTO') && types.includes('VAIHTO_AP_J_TT_')) {
       return 'trade';
     }
+    if (group.length === 2 && group[0].Tapahtumateksti.startsWith('REVERSE SPLIT')) {
+      return 'trade';
+    }
     throw new Error('Cannot recognize entry with types ' + types.join(', ') + ': ' + JSON.stringify(group));
   }
 
@@ -131,9 +134,15 @@ class NordnetImport extends Import {
   }
 
   target(group, obj) {
-    const ticker = obj.type === 'tradenge'
-      ? group.filter(g => g.Tapahtumatyyppi === 'VAIHTO_AP_J_TT_')[0].Arvopaperi
-      : group[0].Arvopaperi;
+    let ticker;
+    if (obj.type === 'trade') {
+      if (group[0].Tapahtumateksti.startsWith('REVERSE SPLIT')) {
+        return group[0].Arvopaperi;
+      }
+      ticker = group.filter(g => g.Tapahtumatyyppi === 'VAIHTO_AP_J_TT_')[0].Arvopaperi
+    } else {
+      ticker = group[0].Arvopaperi;
+    }
     if (!ticker) {
       const given = this._given(group);
       if (given && given.Valuutta) {
@@ -197,15 +206,19 @@ class NordnetImport extends Import {
 
   given(group, obj) {
     if (obj.type === 'trade') {
+      if (group[0].Tapahtumateksti.startsWith('REVERSE SPLIT')) {
+        const old = group.filter(g => g.Arvopaperi.endsWith('OLD'))[0];
+        return -parseInt(this.num(old.M__r_));
+      }
       const burn = group.filter(g => g.Tapahtumatyyppi === 'VAIHTO_AP_OTTO')[0];
       return -parseInt(burn.M__r_);
     }
     const dividend = group.filter((tx) => tx.Tapahtumatyyppi === 'OSINKO');
     const text = dividend[0].Tapahtumateksti;
     if (text) {
-      const match = /^OSINKO .*? ([0-9,.]+) /.exec(text);
+      const match = /^(VOPR )?OSINKO .*? ([0-9,.]+) /.exec(text);
       if (match) {
-        return parseFloat(match[1].replace(/,/, '.'));
+        return parseFloat(match[2].replace(/,/, '.'));
       }
     }
     return null;
@@ -213,6 +226,10 @@ class NordnetImport extends Import {
 
   amount(group, obj) {
     if (obj.type === 'trade') {
+      if (group[0].Tapahtumateksti.startsWith('REVERSE SPLIT')) {
+        const fresh = group.filter(g => !g.Arvopaperi.endsWith('OLD'))[0];
+        return parseInt(this.num(fresh.M__r_));
+      }
       const burn = group.filter(g => g.Tapahtumatyyppi === 'VAIHTO_AP_J_TT_')[0];
       return parseInt(burn.M__r_);
     }
@@ -226,6 +243,10 @@ class NordnetImport extends Import {
 
   source(group, obj) {
     if (obj.type === 'trade') {
+      if (group[0].Tapahtumateksti.startsWith('REVERSE SPLIT')) {
+        const fresh = group.filter(g => !g.Arvopaperi.endsWith('OLD'))[0];
+        return fresh.Arvopaperi;
+      }
       const burn = group.filter(g => g.Tapahtumatyyppi === 'VAIHTO_AP_OTTO')[0];
       return burn.Arvopaperi;
     }

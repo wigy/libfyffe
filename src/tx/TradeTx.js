@@ -3,7 +3,7 @@ const num = require('../util/num');
 const text = require('../text/make');
 
 /**
- * Tradeable commodity `given` x `source` is exchanged into the other tradable commodity `amount` x target`.
+ * Tradeable commodity `given` x `source` is exchanged into the other tradable commodity `amount` x `target`.
  * Optionally the trade is paid with burning some `burnAmount` of the commodity `burnTarget`.
  */
 module.exports = class TradeTx extends Tx {
