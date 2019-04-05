@@ -191,9 +191,9 @@ class DegiroImport extends Import {
   currency(group, obj) {
     let currencies = new Set(group.map(tx => tx.M__r_));
     if (currencies.size > 1) {
-      const targets = group.filter(tx => tx.M__r_ !== 'EUR');
-      if (targets.length === 1) {
-        return targets[0].M__r_;
+      currencies.delete('EUR');
+      if (currencies.size === 1) {
+        return [...currencies][0];
       }
       throw new Error('Cannot figure out currencies ' + JSON.stringify(group));
     }
@@ -237,12 +237,15 @@ class DegiroImport extends Import {
   }
 
   amount(group, obj) {
+    let match;
     const targets = group.filter(tx => tx.type === 'buy' || tx.type === 'sell');
     switch (obj.type) {
       case 'sell':
+        match = /Sell (\d+) (.+?)@([0-9,]+)/.exec(targets[0].Kuvaus);
+        return -parseInt(match[1]);
       case 'buy':
-        const match = /(Buy|Sell) (\d+) (.+?)@([0-9,]+)/.exec(targets[0].Kuvaus);
-        return parseInt(match[2]);
+        match = /Buy (\d+) (.+?)@([0-9,]+)/.exec(targets[0].Kuvaus);
+        return parseInt(match[1]);
       case 'dividend':
         // Rough estimate - not working if bought in this same import.
         return this.stock.getStock(this.service.toUpperCase() + ':' + obj.target);
