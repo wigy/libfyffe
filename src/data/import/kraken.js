@@ -13,6 +13,18 @@ class KrakenImport extends Import {
   // Helper to convert asset code to target.
   asset2target(asset) {
     switch (asset) {
+      case 'XXRP':
+        return 'XRP';
+      case 'XMLN':
+        return 'MLN';
+      case 'XXLM':
+        return 'XLM';
+      case 'XTZ':
+        return 'XTZ';
+      case 'XZEC':
+        return 'ZEC';
+      case 'XLTC':
+        return 'LTC';
       case 'XETH':
         return 'ETH';
       case 'XXBT':

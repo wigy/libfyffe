@@ -247,7 +247,7 @@ function add(knex, date, description, txs, options = {}) {
   // Second helper to fill in missing account IDs and making final checks.
   function fill(tx) {
     tx.accountId = tx.accountId || accountNumberToId[tx.number];
-    if (!tx.amount) {
+    if (!tx.amount && tx.amount !== 0) {
       throw new Error('Missing `amount` in TX ' + JSON.stringify(tx));
     }
     if (!tx.description) {
