@@ -25,16 +25,34 @@ module.exports = class TradeTx extends Tx {
   }
 
   getMyEntries() {
-    if (config.flags.tradeProfit) {
-      // console.log('TODO:');
-    }
-    let ret = [
-      {number: this.getAccount('targets', this.target), amount: num.cents(this.total - this.fee)},
+    const ret = [
       {number: this.getAccount('targets', this.source), amount: num.cents(-this.total)}
     ];
     if (this.fee) {
       ret.push({number: this.getAccount('fees'), amount: this.fee});
     }
+    if (config.flags.tradeProfit) {
+      // Calculate profit immediately if historical rate is found.
+      const buyPrice = num.cents(-this.given * this.avg2);
+      const sellRate = Tx.getRate(this.date, this.service.toUpperCase() + ':' + this.target);
+      if (sellRate !== null) {
+        const sellPrice = num.cents(this.amount * sellRate);
+        const diff = num.cents(buyPrice - sellPrice);
+        if (diff > 0) {
+          // In losses, add to debit side into losses.
+          ret.push({number: this.getAccount('losses'), amount: diff});
+          ret.push({number: this.getAccount('targets', this.target), amount: sellPrice});
+        } else if (diff < 0) {
+          // In profits, add to credit side into profits
+          ret.push({number: this.getAccount('profits'), amount: diff});
+          ret.push({number: this.getAccount('targets', this.target), amount: sellPrice});
+        } else {
+          ret.push({number: this.getAccount('targets', this.target), amount: num.cents(this.total - this.fee)});
+        }
+        return ret;
+      }
+    }
+    ret.push({number: this.getAccount('targets', this.target), amount: num.cents(this.total - this.fee)});
     return ret;
   }
 
