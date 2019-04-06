@@ -1,5 +1,6 @@
 const fs = require('fs');
 const moment = require('moment');
+const http = require('request-promise-json');
 const d = require('neat-dump');
 const Stock = require('./Stock');
 const Ledger = require('./Ledger');
@@ -247,19 +248,45 @@ class Fyffe {
   }
 
   /**
+   * Fetch the rate for the ticker.
+   */
+  async fetchRate(date, service, target) {
+    const ticker = service.toUpperCase() + ':' + target;
+    const rate = Tx.getRate(date, ticker);
+    if (rate !== null) {
+      return rate;
+    }
+    const url = process.env.HARVEST_URL || 'http://localhost:9001';
+    const json = await http.get(url + '/ticker/' + ticker + '/' + date + '/' + date)
+      .catch(err => {
+        throw new Error(err);
+      });
+
+    if (json && json.length && json[0].close) {
+      const rate = json[0].close;
+      Tx.setRate(date, ticker, rate);
+      return rate;
+    }
+    return null;
+  }
+
+  /**
    * Convert raw group data to transactions and add them to the ledger.
    * @param {Object} dataPerImporter
    * @param {String} [service] If not given, importer name is used as a service key in config.
    */
-  createTransactions(dataPerImporter, service = null) {
-    Object.keys(dataPerImporter).forEach((name) => {
+  async createTransactions(dataPerImporter, service = null) {
+    for (const name of Object.keys(dataPerImporter)) {
 
       // Create txs.
       let txs = [];
-      dataPerImporter[name].forEach((group) => {
+      for (const group of dataPerImporter[name]) {
         try {
           let tx = this.modules[name].createTransaction(group, this, service || name);
           if (tx) {
+            if (config.flags.tradeProfit && tx.type === 'trade') {
+              await this.fetchRate(tx.date, tx.service, tx.target);
+            }
             txs.push(tx);
           } else {
             d.warning('Skipping', group);
@@ -287,7 +314,7 @@ class Fyffe {
             throw err;
           }
         }
-      });
+      }
 
       // Add tags based on the configuration.
       txs.forEach((tx) => {
@@ -303,7 +330,7 @@ class Fyffe {
 
       // Store the result.
       this.ledger.add(txs);
-    });
+    }
   }
 
   /**
@@ -365,14 +392,13 @@ class Fyffe {
       this.ledger.accounts.showBalances('Initial balances:');
     }
 
-    const targets = this.scanTargets(dataPerImporter, options.service);
+    const targets = await this.scanTargets(dataPerImporter, options.service);
     await this.initializeStock(dbName, firstDate, targets);
 
     // Convert raw group data to transactions and add them to ledger.
-    this.createTransactions(dataPerImporter, options.service);
+    await this.createTransactions(dataPerImporter, options.service);
 
     // Finally apply all transactions.
-    // TODO: Apply loans.
     this.ledger.apply(this.stock);
 
     if (config.flags.debug) {

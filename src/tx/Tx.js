@@ -28,6 +28,12 @@ const types = {
   withdrawal: './WithdrawalTx'
 };
 
+/**
+ * Daily rates, if known.
+ */
+const dailyRates = {
+};
+
 let stockDebugTitle = false;
 
 /**
@@ -566,5 +572,29 @@ module.exports = class Tx {
       ret[type] = require(types[type]);
     });
     return ret;
+  }
+
+  /**
+   * Set the daily rating for some target.
+   * @param {String} date
+   * @param {String} target
+   * @param {Number} value
+   */
+  static setRate(date, target, value) {
+    dailyRates[target] = dailyRates[target] || {};
+    dailyRates[target][date] = value;
+  }
+
+  /**
+   * Get the daily rating for some target.
+   * @param {String} date
+   * @param {String} target
+   * @return {Number|null}
+   */
+  static getRate(date, target) {
+    if (target in dailyRates && date in dailyRates[target]) {
+      return dailyRates[target][date];
+    }
+    return null;
   }
 };

@@ -1,3 +1,4 @@
+const config = require('../config');
 const Tx = require('./Tx');
 const num = require('../util/num');
 const text = require('../text/make');
@@ -24,6 +25,9 @@ module.exports = class TradeTx extends Tx {
   }
 
   getMyEntries() {
+    if (config.flags.tradeProfit) {
+      // console.log('TODO:');
+    }
     let ret = [
       {number: this.getAccount('targets', this.target), amount: num.cents(this.total - this.fee)},
       {number: this.getAccount('targets', this.source), amount: num.cents(-this.total)}

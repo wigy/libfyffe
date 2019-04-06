@@ -30,6 +30,8 @@ class Config {
       flags: {
         // If set, do not generate profit/loss entries for selling.
         noProfit: false,
+        // If set, generate immediate profit/loss entries for trading using the closing price of the target.
+        tradeProfit: false,
         // If set, avoid doing permanent changes.
         dryRun: false,
         // If set, show verbose debug information.

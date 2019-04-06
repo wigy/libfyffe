@@ -22,7 +22,7 @@ module.exports = class SellTx extends Tx {
     }
 
     if (config.flags.noProfit) {
-      // In case of not calculating profits yet, put in only buy price.
+      // In case of not calculating profits yet, use the total price.
       ret.push({number: this.getAccount('targets', this.target), amount: num.cents(-this.total)});
     } else {
       // Otherwise calculate losses or profits from the average price.
