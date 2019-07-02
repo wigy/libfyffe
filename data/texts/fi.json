@@ -15,6 +15,10 @@
     "expense.transfer3": "Siirto #3 ={notes}-palveluun",
     "expense.transfer4": "Siirto #4 ={notes}-palveluun",
     "expense.transfer5": "Siirto #5 ={notes}-palveluun",
+    "expense.transfer6": "Siirto #6 ={notes}-palveluun",
+    "expense.transfer7": "Siirto #7 ={notes}-palveluun",
+    "expense.transfer8": "Siirto #8 ={notes}-palveluun",
+    "expense.transfer9": "Siirto #9 ={notes}-palveluun",
     "expense.misc": "Satunnaiset kulut",
     "expense.misc2": "Satunnaiset kulut #2",
     "expense.misc3": "Satunnaiset kulut #3",
@@ -128,6 +132,7 @@
       "notes": "={notes}"
     },
     "expense.vat": {
+      "notes": ""
     },
     "expense.tax": {
       "notes": ""
@@ -154,6 +159,18 @@
       "notes": ""
     },
     "expense.transfer5": {
+      "notes": ""
+    },
+    "expense.transfer6": {
+      "notes": ""
+    },
+    "expense.transfer7": {
+      "notes": ""
+    },
+    "expense.transfer8": {
+      "notes": ""
+    },
+    "expense.transfer9": {
       "notes": ""
     },
     "expense.entertainment": {
