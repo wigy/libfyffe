@@ -87,6 +87,9 @@ class NordnetImport extends Import {
     if (types.includes('NOSTO')) {
       return 'withdrawal';
     }
+    if (types.includes('DEBET_KORON_KORJ_')) {
+      return 'income';
+    }
     if (types.includes('VAIHTO_AP_OTTO') && types.includes('VAIHTO_AP_J_TT_')) {
       return 'trade';
     }
@@ -104,6 +107,7 @@ class NordnetImport extends Import {
     switch (acc.Valuutta) {
       case 'USD':
       case 'EUR':
+      case 'SEK':
         return acc.Valuutta;
       default:
         throw new Error('Cannot figure out currency from ' + JSON.stringify(group));
@@ -140,6 +144,8 @@ class NordnetImport extends Import {
         return group[0].Arvopaperi;
       }
       ticker = group.filter(g => g.Tapahtumatyyppi === 'VAIHTO_AP_J_TT_')[0].Arvopaperi;
+    } else if (obj.type === 'income') {
+      return 'MISC';
     } else {
       ticker = group[0].Arvopaperi;
     }
@@ -254,6 +260,13 @@ class NordnetImport extends Import {
   }
 
   burnAmount(group, obj) {
+    return null;
+  }
+
+  notes(group, obj) {
+    if (obj.target === 'MISC') {
+      return 'Koron korjaus';
+    }
     return null;
   }
 }
