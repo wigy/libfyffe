@@ -30,6 +30,7 @@
     "object-merge": "^2.5.1",
     "promise-sequential": "^1.1.1",
     "request": "^2.88.0",
+    "request-promise": "^4.2.4",
     "request-promise-json": "^1.0.4",
     "safe-eval": "^0.4.1",
     "sprintf-js": "^1.1.1"

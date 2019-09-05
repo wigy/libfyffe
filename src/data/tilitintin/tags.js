@@ -1,3 +1,5 @@
+const fs = require('fs');
+const rp = require('request-promise');
 const Tag = require('../Tag');
 
 /**
@@ -70,15 +72,45 @@ function getByTypes(knex, types) {
  * @param {integer} order
  * @return {Promise}
  */
-function add(knex, tag, name, picture, type, order) {
+async function add(knex, tag, name, picture, type, order) {
+  if (!/^[a-z]+:\/\//.test(picture)) {
+    throw new Error('Please use file://full/path to local files.');
+  }
+  const url = new URL(picture);
+  let mime;
+  if (/\.jpe?g$/i.test(url.pathname)) {
+    mime = 'image/jpeg';
+  }
+  if (/\.png$/i.test(url.pathname)) {
+    mime = 'image/png';
+  }
+  if (/\.svg$/i.test(url.pathname)) {
+    mime = 'image/svg+xml';
+  }
+  if (!mime) {
+    throw new Error('Cannot recognize MIME type.');
+  }
+  let blob;
+  switch (url.protocol) {
+    case 'http:':
+    case 'https:':
+      blob = await rp({uri: picture, encoding: null});
+      break;
+    case 'file:':
+      blob = fs.readFileSync(url.pathname);
+      break;
+    default:
+      throw new Error(`Cannot handle protocol '${url.protocol}'.`);
+  }
   return ensure(knex)
     .then(() => {
       return knex('tags').insert({
-        tag: tag,
-        name: name,
-        picture: picture,
-        type: type,
-        order: order
+        tag,
+        mime,
+        name,
+        picture: blob,
+        type,
+        order
       });
     });
 }
