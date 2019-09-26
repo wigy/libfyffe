@@ -1,6 +1,5 @@
 const fs = require('fs');
 const moment = require('moment');
-const http = require('request-promise-json');
 const d = require('neat-dump');
 const Stock = require('./Stock');
 const Ledger = require('./Ledger');
@@ -251,24 +250,8 @@ class Fyffe {
    * Fetch the rate for the ticker.
    */
   async fetchRate(date, service, target) {
-    // TODO: Move to Tx.
     const ticker = service.toUpperCase() + ':' + target;
-    const rate = Tx.getRate(date, ticker);
-    if (rate !== null) {
-      return rate;
-    }
-    const url = process.env.HARVEST_URL || 'http://localhost:9001';
-    const json = await http.get(url + '/ticker/' + ticker + '/' + date + '/' + date)
-      .catch(err => {
-        throw new Error(err);
-      });
-
-    if (json && json.length && json[0].close) {
-      const rate = json[0].close;
-      Tx.setRate(date, ticker, rate);
-      return rate;
-    }
-    return null;
+    return Tx.getRate(date, ticker);
   }
 
   /**

@@ -1,4 +1,6 @@
+const Tx = require('../../tx/Tx');
 const { SinglePassImport } = require('../import');
+const { cents } = require('../../util/num');
 
 class LynxImport extends SinglePassImport {
 
@@ -56,8 +58,9 @@ class LynxImport extends SinglePassImport {
     return this.parseDividends(ret['Dividends']);
   }
 
-  parseDividends(data) {
-    return data.filter(e => e.Date && e.Currency && e.Amount).map(e => {
+  async parseDividends(data) {
+    const ret = [];
+    for (const e of data.filter(e => e.Date && e.Currency && e.Amount)) {
       let re = /^([A-Z ]+?)\s*\([0-9A-Z]+\) (Cash Dividend) ([A-Z][A-Z][A-Z]) ([0-9.]+)/.exec(e.Description);
       if (!re) {
         // Blah, sometimes they are other way around.
@@ -72,20 +75,22 @@ class LynxImport extends SinglePassImport {
         throw new Error(`Cannot parse dividend '${e.Description}'`);
       }
       const target = re[1].replace(/ PR([A-Z])/, '-$1');
-      // TODO: Tax, currency rate.
-      return {
+      const rate = await Tx.getRate(e.Date, `CURRENCY:${e.Currency}`);
+      // TODO: Tax calculation.
+      ret.push({
         amount: Math.round(parseFloat(e.Amount) / parseFloat(re[4])),
         currency: e.Currency,
         date: e.Date,
         given: parseFloat(re[4]),
         id: this.makeId('DIV', e.Date, target),
-        rate: 1.0,
+        rate,
         target,
         tax: 0,
-        total: parseFloat(e.Amount), // TODO: Multiply by rate.
+        total: cents(parseFloat(e.Amount) * rate),
         type: 'dividend'
-      };
-    });
+      });
+    }
+    return ret;
   }
 }
 

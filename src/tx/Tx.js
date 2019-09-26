@@ -2,6 +2,7 @@ const cc = require('currency-codes');
 const moment = require('moment');
 const clone = require('clone');
 const d = require('neat-dump');
+const http = require('request-promise-json');
 const config = require('../config');
 const validator = require('../data/validator');
 const num = require('../util/num');
@@ -591,9 +592,20 @@ module.exports = class Tx {
    * @param {String} target
    * @return {Number|null}
    */
-  static getRate(date, target) {
+  static async getRate(date, target) {
     if (target in dailyRates && date in dailyRates[target]) {
       return dailyRates[target][date];
+    }
+    const url = process.env.HARVEST_URL || 'http://localhost:9001';
+    const json = await http.get(url + '/ticker/' + target + '/' + date)
+      .catch(err => {
+        throw new Error(err);
+      });
+
+    if (json && json.close) {
+      const rate = json.close;
+      Tx.setRate(date, target, rate);
+      return rate;
     }
     return null;
   }
