@@ -17,6 +17,7 @@ class Import {
     this.stock = null;
     this.ledger = null;
     this.idsUsed = new Set();
+    this.ids = new Set();
   }
 
   /**
@@ -24,6 +25,7 @@ class Import {
    */
   init() {
     this.idsUsed = new Set();
+    this.ids = new Set();
   }
 
   /**

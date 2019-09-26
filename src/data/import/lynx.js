@@ -6,7 +6,6 @@ class LynxImport extends SinglePassImport {
 
   constructor() {
     super('Lynx');
-    this.ids = new Set();
   }
 
   isMine(content) {
@@ -14,7 +13,6 @@ class LynxImport extends SinglePassImport {
   }
 
   async load(file) {
-    this.ids = new Set();
     const data = {};
     let header;
     let prefix;
