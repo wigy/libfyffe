@@ -431,4 +431,69 @@ class Import {
   }
 }
 
+/**
+ * Alternative base-class for import where loader processes data alrady to the correct format.
+ */
+class SinglePassImport extends Import {
+
+  /**
+   * Generate unique ID.
+   */
+  makeId(...parts) {
+    let id = parts.join('-');
+    let n = 1;
+    while (this.ids.has(id)) {
+      n++;
+      id = parts.join('-') + '-' + n;
+    }
+    this.ids.add(id);
+    return id;
+  }
+
+  grouping(entries) {
+    return entries.map(e => [e]);
+  }
+
+  id(group) {
+    return group[0].id;
+  }
+
+  time(entry) {
+    return new Date(entry.date).getTime();
+  }
+
+  recognize(group) {
+    return group[0].type;
+  }
+
+  currency(group) {
+    return group[0].currency;
+  }
+
+  rate(group) {
+    return group[0].rate;
+  }
+
+  target(group) {
+    return group[0].target;
+  }
+
+  total(group) {
+    return group[0].total;
+  }
+
+  tax(group) {
+    return group[0].tax;
+  }
+
+  amount(group) {
+    return group[0].amount;
+  }
+
+  given(group) {
+    return group[0].given;
+  }
+}
+
 module.exports = Import;
+module.exports.SinglePassImport = SinglePassImport;

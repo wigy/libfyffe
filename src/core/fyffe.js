@@ -251,6 +251,7 @@ class Fyffe {
    * Fetch the rate for the ticker.
    */
   async fetchRate(date, service, target) {
+    // TODO: Move to Tx.
     const ticker = service.toUpperCase() + ':' + target;
     const rate = Tx.getRate(date, ticker);
     if (rate !== null) {
