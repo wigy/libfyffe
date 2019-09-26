@@ -15,7 +15,7 @@ class LynxImport extends SinglePassImport {
 
   async load(file) {
     this.ids = new Set();
-    const ret = {};
+    const data = {};
     let header;
     let prefix;
     let body = '';
@@ -27,7 +27,7 @@ class LynxImport extends SinglePassImport {
         continue;
       }
       if (header && !same) {
-        ret[prefix] = await this.loadCSV(header + '\n' + body);
+        data[prefix] = await this.loadCSV(header + '\n' + body);
         header = undefined;
         prefix = undefined;
         body = '';
@@ -41,51 +41,69 @@ class LynxImport extends SinglePassImport {
         continue;
       }
     }
-    delete ret['Statement'];
-    delete ret['Account Information'];
-    delete ret['Net Asset Value'];
-    delete ret['Change in NAV'];
-    delete ret['Mark-to-Market Performance Summary'];
-    delete ret['Realized & Unrealized Performance Summary'];
-    delete ret['Cash Report'];
-    delete ret['Open Positions'];
-    delete ret['Forex Balances'];
-    delete ret['Change in Dividend Accruals'];
-    delete ret['Financial Instrument Information'];
-    delete ret['Codes'];
-    delete ret['Notes/Legal Notes'];
+    delete data['Statement'];
+    delete data['Account Information'];
+    delete data['Net Asset Value'];
+    delete data['Change in NAV'];
+    delete data['Mark-to-Market Performance Summary'];
+    delete data['Realized & Unrealized Performance Summary'];
+    delete data['Cash Report'];
+    delete data['Open Positions'];
+    delete data['Forex Balances'];
+    delete data['Change in Dividend Accruals'];
+    delete data['Financial Instrument Information'];
+    delete data['Codes'];
+    delete data['Notes/Legal Notes'];
 
-    return this.parseDividends(ret['Dividends']);
+    const taxes = await this.parseTax(data['Withholding Tax']);
+    return this.parseDividends(data['Dividends'], taxes);
   }
 
-  async parseDividends(data) {
+  matchDividend(str) {
+    let re = /^([A-Z ]+?)\s*\([0-9A-Z]+\) (Cash Dividend) ([A-Z][A-Z][A-Z]) ([0-9.]+)/.exec(str);
+    if (!re) {
+      // Blah, sometimes they are other way around.
+      re = /^([A-Z ]+?)\s*\([0-9A-Z]+\) (Cash Dividend) ([0-9.]+) ([A-Z][A-Z][A-Z])/.exec(str);
+      if (re) {
+        const a = re[3];
+        re[3] = re[4];
+        re[4] = a;
+      }
+    }
+    if (!re) {
+      throw new Error(`Cannot parse dividend '${str}'`);
+    }
+    re[1] = re[1].replace(/ PR([A-Z])/, '-$1');
+    return re;
+  }
+
+  async parseTax(data) {
+    const taxes = {};
+    for (const e of data.filter(e => e.Date && e.Currency && e.Amount)) {
+      const [ , target ] = this.matchDividend(e.Description);
+      const rate = await Tx.getRate(e.Date, `CURRENCY:${e.Currency}`);
+      const amount = cents(-parseFloat(e.Amount) * rate);
+      taxes[this.makeId('TAX', e.Date, target)] = amount;
+    }
+    return taxes;
+  }
+
+  async parseDividends(data, taxes) {
     const ret = [];
     for (const e of data.filter(e => e.Date && e.Currency && e.Amount)) {
-      let re = /^([A-Z ]+?)\s*\([0-9A-Z]+\) (Cash Dividend) ([A-Z][A-Z][A-Z]) ([0-9.]+)/.exec(e.Description);
-      if (!re) {
-        // Blah, sometimes they are other way around.
-        re = /^([A-Z ]+?)\s*\([0-9A-Z]+\) (Cash Dividend) ([0-9.]+) ([A-Z][A-Z][A-Z])/.exec(e.Description);
-        if (re) {
-          const a = re[3];
-          re[3] = re[4];
-          re[4] = a;
-        }
-      }
-      if (!re) {
-        throw new Error(`Cannot parse dividend '${e.Description}'`);
-      }
-      const target = re[1].replace(/ PR([A-Z])/, '-$1');
+      const [ , target, , , count ] = this.matchDividend(e.Description);
       const rate = await Tx.getRate(e.Date, `CURRENCY:${e.Currency}`);
-      // TODO: Tax calculation.
+      const id = this.makeId('DIV', e.Date, target);
+
       ret.push({
-        amount: Math.round(parseFloat(e.Amount) / parseFloat(re[4])),
+        amount: Math.round(parseFloat(e.Amount) / parseFloat(count)),
         currency: e.Currency,
         date: e.Date,
-        given: parseFloat(re[4]),
-        id: this.makeId('DIV', e.Date, target),
+        given: parseFloat(count),
+        id,
         rate,
         target,
-        tax: 0,
+        tax: taxes[id.replace('DIV', 'TAX')] || 0,
         total: cents(parseFloat(e.Amount) * rate),
         type: 'dividend'
       });
