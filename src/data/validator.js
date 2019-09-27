@@ -24,6 +24,18 @@ module.exports = {
   },
 
   /**
+   * Check that value is a number or null.
+   * @param {String} name
+   * @param {any} val
+   */
+  isNumOrNull: (name, val) => {
+    if (val === null) {
+      return;
+    }
+    return module.exports.isNum(name, val);
+  },
+
+  /**
    * Check that value is a string.
    * @param {String} name
    * @param {any} val

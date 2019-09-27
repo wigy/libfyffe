@@ -309,6 +309,15 @@ class Import {
   }
 
   /**
+   * Get the profit of sales.
+   * @param {Array<Object>} group A source data group.
+   * @param {Object} obj Data known so far.
+   */
+  profit(group, obj) {
+    return null;
+  }
+
+  /**
    * Get the custom tags to be added to the transaction.
    * @return {String[]}
    */
@@ -420,6 +429,9 @@ class Import {
         obj.burnTarget = this.burnTarget(group, obj);
       }
     }
+    if (obj.type === 'sell') {
+      obj.profit = this.profit(group, obj);
+    }
 
     const type = obj.type;
     delete obj.type;
@@ -461,7 +473,7 @@ class SinglePassImport extends Import {
   }
 
   time(entry) {
-    return new Date(entry.date).getTime();
+    return entry.time ? new Date(entry.time).getTime() : new Date(entry.date).getTime();
   }
 
   recognize(group) {
@@ -494,6 +506,18 @@ class SinglePassImport extends Import {
 
   given(group) {
     return group[0].given;
+  }
+
+  fee(group) {
+    return group[0].fee;
+  }
+
+  profit(group) {
+    return group[0].profit || null;
+  }
+
+  burnAmount(group) {
+    return group[0].burnAmount || null;
   }
 }
 

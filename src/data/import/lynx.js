@@ -53,8 +53,52 @@ class LynxImport extends SinglePassImport {
     delete data['Codes'];
     delete data['Notes/Legal Notes'];
 
+    console.log(data['Trades']);
+    return this.parseTrades(data['Trades']);
+
     const taxes = await this.parseTax(data['Withholding Tax']);
     return this.parseDividends(data['Dividends'], taxes);
+  }
+
+  async parseTrades(data) {
+    const ret = [];
+    for (const e of data.filter(e => e.Asset_Category === 'Stocks' && e.Header === 'Data')) {
+      const q = parseFloat(e.Quantity);
+      let rate = await Tx.getRate(e.Date_Time.substr(0, 10), `CURRENCY:${e.Currency}`);
+      // To debug foreign currencies, might use rate 1.0 here.
+      rate = 1;
+      console.log(e, rate);
+      if (q < 0) {
+        ret.push({
+          amount: q,
+          currency: e.Currency,
+          date: e.Date_Time.substr(0, 10),
+          fee: cents(-parseFloat(e.Comm_Fee) * rate),
+          id: this.makeId('SELL', e.Date_Time, e.Symbol),
+          rate,
+          target: e.Symbol,
+          time: e.Date_Time.replace(',', ''),
+          total: cents((parseFloat(e.Proceeds) - parseFloat(e.Comm_Fee)) * rate),
+          profit: cents(parseFloat(e.Realized_P_L) * rate),
+          type: 'sell'
+        });
+      } else if (e.Symbol === 'XOM') { // TODO: Debug
+        ret.push({
+          amount: q,
+          currency: e.Currency,
+          date: e.Date_Time.substr(0, 10),
+          fee: cents(-parseFloat(e.Comm_Fee) * rate),
+          id: this.makeId('BUY', e.Date_Time, e.Symbol),
+          rate,
+          target: e.Symbol,
+          time: e.Date_Time.replace(',', ''),
+          total: cents((-parseFloat(e.Proceeds) - parseFloat(e.Comm_Fee)) * rate),
+          type: 'buy'
+        });
+      }
+    }
+    console.log(ret);
+    return ret;
   }
 
   matchDividend(str) {
