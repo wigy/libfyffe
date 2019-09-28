@@ -78,8 +78,7 @@ class LynxImport extends SinglePassImport {
           rate,
           target: e.Symbol,
           time: e.Date_Time.replace(',', ''),
-          total: cents((parseFloat(e.Proceeds) - parseFloat(e.Comm_Fee)) * rate),
-//          profit: cents((parseFloat(e.Realized_P_L) - parseFloat(e.Comm_Fee)) * rate),
+          total: cents(parseFloat(e.Proceeds) * rate),
           type: 'sell'
         });
       } else if (e.Symbol === 'XOM') { // TODO: Debug
