@@ -2,31 +2,20 @@ const config = require('../config');
 const Tx = require('./Tx');
 const num = require('../util/num');
 const text = require('../text/make');
-const validator = require('../data/validator');
 
 /**
  * An (negative) `amount` of tradeable commodity `target` is sold possibly with trading `fee`.
- * Optionally selling can happen in different `currency`. Also `profit` can be given
- * (negative if losses). Otherwise it is calculated from average price.
+ * Optionally selling can happen in different `currency`.
  */
 module.exports = class SellTx extends Tx {
 
   constructor(data = {}) {
-    super('sell', { target: undefined, amount: undefined, currency: config.currency, rate: undefined, fee: 0.0, stock: undefined, avg: undefined, profit: null }, data);
-  }
-
-  set profit(val) {
-    validator.isNumOrNull('profit', val);
-    this.data.profit = val;
-  }
-  get profit() {
-    return this.get('profit');
+    super('sell', { target: undefined, amount: undefined, currency: config.currency, rate: undefined, fee: 0.0, stock: undefined, avg: undefined }, data);
   }
 
   getMyEntries() {
-    const total = num.cents(this.total - this.fee);
     let ret = [
-      {number: this.getAccount('currencies', this.currency), amount: total}
+      {number: this.getAccount('currencies', this.currency), amount: num.cents(this.total - this.fee)}
     ];
     if (this.fee) {
       ret.push({number: this.getAccount('fees'), amount: this.fee});
@@ -37,15 +26,8 @@ module.exports = class SellTx extends Tx {
       ret.push({number: this.getAccount('targets', this.target), amount: num.cents(-this.total)});
     } else {
       // Otherwise calculate losses or profits from the losses or average price.
-      let buyPrice;
-      let diff;
-      if (this.profit === null) {
-        buyPrice = num.cents(-this.amount * this.avg);
-        diff = num.cents(buyPrice - this.total);
-      } else {
-        diff = num.cents(-this.profit);
-        buyPrice = num.cents(total + diff);
-      }
+      const buyPrice = num.cents(-this.amount * this.avg);
+      const diff = num.cents(buyPrice - this.total);
       if (diff > 0) {
         // In losses, add to debit side into losses.
         ret.push({number: this.getAccount('losses'), amount: diff});

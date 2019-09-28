@@ -309,15 +309,6 @@ class Import {
   }
 
   /**
-   * Get the profit of sales.
-   * @param {Array<Object>} group A source data group.
-   * @param {Object} obj Data known so far.
-   */
-  profit(group, obj) {
-    return null;
-  }
-
-  /**
    * Get the custom tags to be added to the transaction.
    * @return {String[]}
    */
@@ -429,9 +420,6 @@ class Import {
         obj.burnTarget = this.burnTarget(group, obj);
       }
     }
-    if (obj.type === 'sell') {
-      obj.profit = this.profit(group, obj);
-    }
 
     const type = obj.type;
     delete obj.type;
@@ -510,10 +498,6 @@ class SinglePassImport extends Import {
 
   fee(group) {
     return group[0].fee;
-  }
-
-  profit(group) {
-    return group[0].profit || null;
   }
 
   burnAmount(group) {
