@@ -43,19 +43,29 @@ class StringMapper {
    * @param {Object} object
    */
   matchRule(rule, obj) {
+    // If array, match any.
+    if (rule instanceof Array) {
+      for (let i = 0; i < rule.length; i++) {
+        if (this.matchRule(rule[i], obj)) {
+          return true;
+        }
+      }
+      return false;
+    }
+
     if (rule instanceof Object) {
       // Fixed key value pairs requiring exact match.
       return Object.keys(rule).reduce((prev, curr) => prev && this.compare(rule[curr], obj[curr]), true);
     }
     throw new Error('No handler for rule ' + JSON.stringify(rule));
   }
+
   /**
    * Compare a single field value to the rule.
    * @param {String|Array} rule
    * @param {any} value
    */
   compare(rule, value) {
-
     if (rule instanceof Array) {
       for (let i = 0; i < rule.length; i++) {
         if (this.compare(rule[i], value)) {
@@ -65,8 +75,9 @@ class StringMapper {
       return false;
     }
 
-    if (rule.startsWith('/') && rule.endsWith('/')) {
-      const regex = new RegExp(rule.substr(1, rule.length - 2));
+    if (rule.startsWith('/')) {
+      const parts = rule.split('/');
+      const regex = new RegExp(parts[1], parts[2]);
       return regex.test(value);
     }
 
