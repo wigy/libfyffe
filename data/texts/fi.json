@@ -6,6 +6,8 @@
     "error": "Puutteellinen tuonti",
     "expense.ambiguous": "Epäselvä siirron kohde",
     "expense.bank": "Palvelumaksu",
+    "expense.book": "Kirjallisuus",
+    "expense.info": "Tietopalvelut",
     "expense.computer": "Tietotekniikkahankinnat",
     "expense.entertainment": "Edustuskulut: ={notes}",
     "expense.gov-fees": "Viranomaismaksu",
@@ -25,6 +27,16 @@
     "expense.transfer7": "Siirto #7 ={notes}-palveluun",
     "expense.transfer8": "Siirto #8 ={notes}-palveluun",
     "expense.transfer9": "Siirto #9 ={notes}-palveluun",
+    "expense.transfer10": "Siirto #10 ={notes}-palveluun",
+    "expense.transfer11": "Siirto #11 ={notes}-palveluun",
+    "expense.transfer12": "Siirto #12 ={notes}-palveluun",
+    "expense.transfer13": "Siirto #13 ={notes}-palveluun",
+    "expense.transfer14": "Siirto #14 ={notes}-palveluun",
+    "expense.transfer15": "Siirto #15 ={notes}-palveluun",
+    "expense.transfer16": "Siirto #16 ={notes}-palveluun",
+    "expense.transfer17": "Siirto #17 ={notes}-palveluun",
+    "expense.transfer18": "Siirto #18 ={notes}-palveluun",
+    "expense.transfer19": "Siirto #19 ={notes}-palveluun",
     "expense.vat": "ALV maksu",
     "fx-in": "Valuutanvaihto £{target} <- £{currency}",
     "fx-out": "Valuutanvaihto £{target} -> £{currency}",
@@ -50,6 +62,16 @@
     "income.transfer7": "Siirto #7 ={notes}-palvelusta",
     "income.transfer8": "Siirto #8 ={notes}-palvelusta",
     "income.transfer9": "Siirto #9 ={notes}-palvelusta",
+    "income.transfer10": "Siirto #10 ={notes}-palvelusta",
+    "income.transfer11": "Siirto #11 ={notes}-palvelusta",
+    "income.transfer12": "Siirto #12 ={notes}-palvelusta",
+    "income.transfer13": "Siirto #13 ={notes}-palvelusta",
+    "income.transfer14": "Siirto #14 ={notes}-palvelusta",
+    "income.transfer15": "Siirto #15 ={notes}-palvelusta",
+    "income.transfer16": "Siirto #16 ={notes}-palvelusta",
+    "income.transfer17": "Siirto #17 ={notes}-palvelusta",
+    "income.transfer18": "Siirto #18 ={notes}-palvelusta",
+    "income.transfer19": "Siirto #19 ={notes}-palvelusta",
     "income.vat": "ALV palautus",
     "interest": "C{service} lainakorko",
     "loan-pay": "Lainan lyhennys: C{loanName}",
@@ -157,6 +179,12 @@
     "expense.software": {
       "notes": "={notes}"
     },
+    "expense.book": {
+      "notes": "={notes}"
+    },
+    "expense.info": {
+      "notes": "={notes}"
+    },
     "expense.transfer": {
       "notes": ""
     },
@@ -184,6 +212,36 @@
     "expense.transfer9": {
       "notes": ""
     },
+    "expense.transfer10": {
+      "notes": ""
+    },
+    "expense.transfer11": {
+      "notes": ""
+    },
+    "expense.transfer12": {
+      "notes": ""
+    },
+    "expense.transfer13": {
+      "notes": ""
+    },
+    "expense.transfer14": {
+      "notes": ""
+    },
+    "expense.transfer15": {
+      "notes": ""
+    },
+    "expense.transfer16": {
+      "notes": ""
+    },
+    "expense.transfer17": {
+      "notes": ""
+    },
+    "expense.transfer18": {
+      "notes": ""
+    },
+    "expense.transfer19": {
+      "notes": ""
+    },
     "expense.entertainment": {
       "notes": ""
     },
@@ -205,6 +263,9 @@
     "income.sales4": {
     },
     "income.sales5": {
+    },
+    "income.ambiguous": {
+      "notes": ""
     },
     "income.transfer": {
       "notes": ""
@@ -233,7 +294,34 @@
     "income.transfer9": {
       "notes": ""
     },
-    "income.ambiguous": {
+    "income.transfer10": {
+      "notes": ""
+    },
+    "income.transfer11": {
+      "notes": ""
+    },
+    "income.transfer12": {
+      "notes": ""
+    },
+    "income.transfer13": {
+      "notes": ""
+    },
+    "income.transfer14": {
+      "notes": ""
+    },
+    "income.transfer15": {
+      "notes": ""
+    },
+    "income.transfer16": {
+      "notes": ""
+    },
+    "income.transfer17": {
+      "notes": ""
+    },
+    "income.transfer18": {
+      "notes": ""
+    },
+    "income.transfer19": {
       "notes": ""
     }
   }
