@@ -2,5 +2,6 @@ module.exports = {
   tags: require('./tags'),
   accounts: require('./accounts'),
   history: require('./history'),
-  imports: require('./imports')
+  imports: require('./imports'),
+  tx: require('./tx')
 };
