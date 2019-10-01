@@ -20,6 +20,13 @@ module.exports = class FxInTx extends Tx {
   }
 
   getMyEntries() {
+    if (this.fee) {
+      return [
+        {number: this.getAccount('currencies', this.target), amount: num.cents(this.total - this.fee)},
+        {number: this.getAccount('currencies', this.currency), amount: num.cents(-this.total)},
+        {number: this.getAccount('fees'), amount: num.cents(this.fee)}
+      ];
+    }
     return [
       {number: this.getAccount('currencies', this.target), amount: num.cents(this.total)},
       {number: this.getAccount('currencies', this.currency), amount: num.cents(-this.total)}
