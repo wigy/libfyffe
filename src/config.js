@@ -43,7 +43,9 @@ class Config {
         // If import fails, just print and skip the failed transaction.
         skipErrors: false,
         // If import fails, create move transaction to imbalance account
-        importErrors: false
+        importErrors: false,
+        // If import fails, stop there but continue with successful entries before that.
+        stopOnError: false
       },
       // Account numbers.
       accounts: {

@@ -276,7 +276,7 @@ class Fyffe {
             d.warning('Skipping', group);
           }
         } catch (err) {
-          if (config.flags.skipErrors) {
+          if (config.flags.skipErrors || config.flags.stopOnError) {
             d.error('==================');
             d.error('  Import failed:');
             d.error('==================');
@@ -284,6 +284,9 @@ class Fyffe {
             console.log();
             console.log(err);
             d.error('__________________');
+            if (config.flags.stopOnError) {
+              break;
+            }
           } else if (config.flags.importErrors) {
             const raw = this.modules[name].rawValue(group);
             let tx;
