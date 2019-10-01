@@ -12,6 +12,14 @@ class LynxImport extends SinglePassImport {
     return /^\sStatement,Header,Field Name,Field Value/.test(content);
   }
 
+  symbol(str) {
+    return str.replace(/ PR([A-Z])$/, '-$1');
+  }
+
+  num(str) {
+    return parseFloat(str.replace(/,/g, ''));
+  }
+
   async load(file) {
     const data = {};
     let header;
@@ -53,21 +61,88 @@ class LynxImport extends SinglePassImport {
     delete data['Codes'];
     delete data['Notes/Legal Notes'];
 
-    console.log(data['Trades']);
-    return this.parseTrades(data['Trades']);
-
+    const trades = await this.parseTrades(data['Trades']);
+    const forex = await this.parseForex(data['Trades']);
+    const deposits = await this.parseFunding(data['Deposits & Withdrawals']);
     const taxes = await this.parseTax(data['Withholding Tax']);
-    return this.parseDividends(data['Dividends'], taxes);
+    const dividends = await this.parseDividends(data['Dividends'], taxes);
+
+    return trades.concat(forex).concat(deposits).concat(dividends);
+  }
+
+  async parseFunding(data) {
+    const ret = [];
+    for (const e of data.filter(e => e.Settle_Date && e.Amount && e.Header === 'Data')) {
+      const q = parseFloat(e.Amount);
+      if (q > 0) {
+        ret.push({
+          date: e.Settle_Date,
+          fee: 0.0,
+          id: this.makeId('DEPOSIT', e.Date_Time, e.Symbol),
+          time: e.Settle_Date,
+          total: cents(q),
+          type: 'deposit'
+        });
+      } else {
+        ret.push({
+          date: e.Settle_Date,
+          fee: 0.0,
+          id: this.makeId('WITHDRAW', e.Date_Time, e.Symbol),
+          time: e.Settle_Date,
+          total: cents(-q),
+          type: 'withdrawal'
+        });
+      }
+    }
+    return ret;
+  }
+
+  async parseForex(data) {
+    const ret = [];
+    for (const e of data.filter(e => e.Asset_Category === 'Forex' && e.Header === 'Data')) {
+      const q = this.num(e.Quantity);
+      const [cur1, cur2] = e.Symbol.split('.');
+      const rate = 1.0 / parseFloat(e.T__Price);
+      const fee = cents(-parseFloat(e.Comm_Fee));
+      if (q < 0) {
+        ret.push({
+          amount: q,
+          currency: cur1,
+          date: e.Date_Time.substr(0, 10),
+          fee,
+          id: this.makeId('FX-IN', e.Date_Time, e.Symbol),
+          rate,
+          target: cur2,
+          time: e.Date_Time.replace(',', ''),
+          total: cents(-q + fee),
+          type: 'fx-in'
+        });
+      } else {
+        ret.push({
+          amount: q,
+          currency: cur1,
+          date: e.Date_Time.substr(0, 10),
+          fee,
+          id: this.makeId('FX-OUT', e.Date_Time, e.Symbol),
+          rate,
+          target: cur2,
+          time: e.Date_Time.replace(',', ''),
+          total: cents(q + fee),
+          type: 'fx-out'
+        });
+      }
+    }
+
+    return ret;
   }
 
   async parseTrades(data) {
     const ret = [];
     for (const e of data.filter(e => e.Asset_Category === 'Stocks' && e.Header === 'Data')) {
-      const q = parseFloat(e.Quantity);
+      const q = this.num(e.Quantity);
       let rate = await Tx.getRate(e.Date_Time.substr(0, 10), `CURRENCY:${e.Currency}`);
       // To debug foreign currencies, might use rate 1.0 here.
-      rate = 1;
-      console.log(e, rate);
+      // rate = 1;
       if (q < 0) {
         ret.push({
           amount: q,
@@ -76,12 +151,12 @@ class LynxImport extends SinglePassImport {
           fee: cents(-parseFloat(e.Comm_Fee) * rate),
           id: this.makeId('SELL', e.Date_Time, e.Symbol),
           rate,
-          target: e.Symbol,
+          target: this.symbol(e.Symbol),
           time: e.Date_Time.replace(',', ''),
           total: cents(parseFloat(e.Proceeds) * rate),
           type: 'sell'
         });
-      } else if (e.Symbol === 'XOM') { // TODO: Debug
+      } else if (q > 0) {
         ret.push({
           amount: q,
           currency: e.Currency,
@@ -89,14 +164,13 @@ class LynxImport extends SinglePassImport {
           fee: cents(-parseFloat(e.Comm_Fee) * rate),
           id: this.makeId('BUY', e.Date_Time, e.Symbol),
           rate,
-          target: e.Symbol,
+          target: this.symbol(e.Symbol),
           time: e.Date_Time.replace(',', ''),
           total: cents((-parseFloat(e.Proceeds) - parseFloat(e.Comm_Fee)) * rate),
           type: 'buy'
         });
       }
     }
-    console.log(ret);
     return ret;
   }
 
@@ -114,7 +188,7 @@ class LynxImport extends SinglePassImport {
     if (!re) {
       throw new Error(`Cannot parse dividend '${str}'`);
     }
-    re[1] = re[1].replace(/ PR([A-Z])/, '-$1');
+    re[1] = this.symbol(re[1]);
     return re;
   }
 
