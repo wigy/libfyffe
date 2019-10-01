@@ -75,6 +75,14 @@ class StringMapper {
       return false;
     }
 
+    if (rule === '>0') {
+      return parseFloat(value.replace(/,(\d\d)$/, '.$1').replace(/ /g, '')) > 0;
+    }
+
+    if (rule === '<0') {
+      return parseFloat(value.replace(/,(\d\d)$/, '.$1').replace(/ /g, '')) < 0;
+    }
+
     if (rule.startsWith('/')) {
       const parts = rule.split('/');
       const regex = new RegExp(parts[1], parts[2]);

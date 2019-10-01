@@ -4,12 +4,18 @@
     "deposit": "Talletus C{service}-palveluun",
     "dividend": "Osinko #{amount} x ={target}",
     "error": "Puutteellinen tuonti",
-    "expense.vat": "ALV maksu",
+    "expense.ambiguous": "Epäselvä siirron kohde",
     "expense.bank": "Palvelumaksu",
     "expense.computer": "Tietotekniikkahankinnat",
-    "expense.gov-fees": "Viranomaismaksu",
-    "expense.software": "Ohjelmistohankinnat",
     "expense.entertainment": "Edustuskulut: ={notes}",
+    "expense.gov-fees": "Viranomaismaksu",
+    "expense.misc": "Satunnaiset kulut",
+    "expense.misc2": "Satunnaiset kulut #2",
+    "expense.misc3": "Satunnaiset kulut #3",
+    "expense.misc4": "Satunnaiset kulut #4",
+    "expense.misc5": "Satunnaiset kulut #5",
+    "expense.software": "Ohjelmistohankinnat",
+    "expense.tax": "Verojen maksu",
     "expense.transfer": "Siirto ={notes}-palveluun",
     "expense.transfer2": "Siirto #2 ={notes}-palveluun",
     "expense.transfer3": "Siirto #3 ={notes}-palveluun",
@@ -19,15 +25,10 @@
     "expense.transfer7": "Siirto #7 ={notes}-palveluun",
     "expense.transfer8": "Siirto #8 ={notes}-palveluun",
     "expense.transfer9": "Siirto #9 ={notes}-palveluun",
-    "expense.misc": "Satunnaiset kulut",
-    "expense.misc2": "Satunnaiset kulut #2",
-    "expense.misc3": "Satunnaiset kulut #3",
-    "expense.misc4": "Satunnaiset kulut #4",
-    "expense.misc5": "Satunnaiset kulut #5",
-    "expense.tax": "Verojen maksu",
+    "expense.vat": "ALV maksu",
     "fx-in": "Valuutanvaihto £{target} <- £{currency}",
     "fx-out": "Valuutanvaihto £{target} -> £{currency}",
-    "interest": "C{service} lainakorko",
+    "income.ambiguous": "Epäselvä siirron lähde",
     "income.invest": "SVOP-sijoitus",
     "income.loan": "Osakaslaina: ={notes}",
     "income.misc": "Satunnaiset tulot",
@@ -40,9 +41,19 @@
     "income.sales3": "Myynti #3: ={notes}",
     "income.sales4": "Myynti #4: ={notes}",
     "income.sales5": "Myynti #5: ={notes}",
+    "income.transfer": "Siirto ={notes}-palvelusta",
+    "income.transfer2": "Siirto #2 ={notes}-palvelusta",
+    "income.transfer3": "Siirto #3 ={notes}-palvelusta",
+    "income.transfer4": "Siirto #4 ={notes}-palvelusta",
+    "income.transfer5": "Siirto #5 ={notes}-palvelusta",
+    "income.transfer6": "Siirto #6 ={notes}-palvelusta",
+    "income.transfer7": "Siirto #7 ={notes}-palvelusta",
+    "income.transfer8": "Siirto #8 ={notes}-palvelusta",
+    "income.transfer9": "Siirto #9 ={notes}-palvelusta",
     "income.vat": "ALV palautus",
-    "loan-take": "Lainanotto: C{loanName}",
+    "interest": "C{service} lainakorko",
     "loan-pay": "Lainan lyhennys: C{loanName}",
+    "loan-take": "Lainanotto: C{loanName}",
     "move-in": "Siirto C{service}-palveluun +{amount} ={target}",
     "move-out": "Siirto C{service}-palvelusta +{amount} ={target}",
     "sell": "Myynti +{amount} ={target}",
@@ -176,6 +187,9 @@
     "expense.entertainment": {
       "notes": ""
     },
+    "expense.ambiguous": {
+      "notes": ""
+    },
     "income.invest": {
       "notes": "={notes}"
     },
@@ -191,6 +205,36 @@
     "income.sales4": {
     },
     "income.sales5": {
+    },
+    "income.transfer": {
+      "notes": ""
+    },
+    "income.transfer2": {
+      "notes": ""
+    },
+    "income.transfer3": {
+      "notes": ""
+    },
+    "income.transfer4": {
+      "notes": ""
+    },
+    "income.transfer5": {
+      "notes": ""
+    },
+    "income.transfer6": {
+      "notes": ""
+    },
+    "income.transfer7": {
+      "notes": ""
+    },
+    "income.transfer8": {
+      "notes": ""
+    },
+    "income.transfer9": {
+      "notes": ""
+    },
+    "income.ambiguous": {
+      "notes": ""
     }
   }
 }
