@@ -7,6 +7,26 @@ const moment = require('moment');
 const accounts = require('./accounts');
 
 /**
+ * Convert API date to database format in Tilitin compatible way.
+ * @param {String} date
+ * @return {Number}
+ */
+function dateToDb(date) {
+  const num = moment.utc(date).add(-2, 'hours').unix() * 1000;
+  return num;
+}
+
+/**
+ * Convert database date to API format in Tilitin compatible way.
+ * @param {Number} date
+ * @return {String}
+ */
+function dateFromDb(date) {
+  const str = moment.utc(date).add(2, 'hours').format('YYYY-MM-DD');
+  return str;
+}
+
+/**
  * Find the period id for the date.
  *
  * @param {Knex} knex Knex-instance configured for the database.
@@ -15,7 +35,7 @@ const accounts = require('./accounts');
  * @return {number} Period ID or null if not found.
  */
 function periodOf(knex, date, failOnError = false) {
-  const seconds = moment(date + ' 00:00:00').format('x');
+  const seconds = dateToDb(date);
   return knex.select('id')
     .from('period')
     .where('start_date', '<=', seconds)
@@ -37,7 +57,7 @@ function periodOf(knex, date, failOnError = false) {
  * @return {number} Document ID.
  */
 function addDocument(knex, date) {
-  const seconds = moment(date + ' 00:00:00').format('x');
+  const seconds = dateToDb(date);
   return periodOf(knex, date, true)
     .then((periodId) => {
       return knex
@@ -133,7 +153,7 @@ function _compareEntries(e1, e2) {
  * @return {Promise<Boolean>} Promise resolving to true, if transaction is found.
  */
 function _checkTxs(knex, date, txs) {
-  const seconds = moment(date + ' 00:00:00').format('x');
+  const seconds = dateToDb(date);
   // Check the period.
   return periodOf(knex, date)
     .then((periodId) => {
@@ -289,5 +309,5 @@ function add(knex, date, description, txs, options = {}) {
 }
 
 module.exports = {
-  add: add
+  add, dateToDb, dateFromDb
 };
