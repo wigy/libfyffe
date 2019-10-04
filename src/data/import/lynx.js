@@ -61,13 +61,31 @@ class LynxImport extends SinglePassImport {
     delete data['Codes'];
     delete data['Notes/Legal Notes'];
 
+    const interest = await this.parseInterest(data['Interest']);
     const trades = await this.parseTrades(data['Trades']);
     const forex = await this.parseForex(data['Trades']);
     const deposits = await this.parseFunding(data['Deposits & Withdrawals']);
     const taxes = await this.parseTax(data['Withholding Tax']);
     const dividends = await this.parseDividends(data['Dividends'], taxes);
 
-    return trades.concat(forex).concat(deposits).concat(dividends);
+    return interest.concat(trades).concat(forex).concat(deposits).concat(dividends);
+  }
+
+  async parseInterest(data) {
+    const ret = [];
+    for (const e of data.filter(e => e.Date && e.Amount && e.Header === 'Data')) {
+      let rate = await Tx.fetchRate(e.Date, `CURRENCY:${e.Currency}`);
+      ret.push({
+        currency: e.Currency,
+        date: e.Date,
+        id: this.makeId('INTEREST', e.Date),
+        rate,
+        time: e.Date,
+        total: cents(-parseFloat(e.Amount) * rate),
+        type: 'interest'
+      });
+    }
+    return ret;
   }
 
   async parseFunding(data) {
@@ -141,8 +159,6 @@ class LynxImport extends SinglePassImport {
     for (const e of data.filter(e => e.Asset_Category === 'Stocks' && e.Header === 'Data')) {
       const q = this.num(e.Quantity);
       let rate = await Tx.fetchRate(e.Date_Time.substr(0, 10), `CURRENCY:${e.Currency}`);
-      // To debug foreign currencies, might use rate 1.0 here.
-      // rate = 1;
       if (q < 0) {
         ret.push({
           amount: q,
