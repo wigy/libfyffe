@@ -231,14 +231,15 @@ class Fyffe {
    * Pick all target names as seen in the import data (skip import errors).
    * @param {Object} dataPerImporter
    * @param {String} [service] If not given, importer name is used as a service key in config.
+   * @param {Set<String>} [ignore] Ignore this transactions.
    * @return {Set<String>}
    */
-  scanTargets(dataPerImporter, service = null) {
+  scanTargets(dataPerImporter, service = null, ignore = new Set()) {
     let txs = new Set();
     Object.keys(dataPerImporter).forEach((name) => {
       dataPerImporter[name].forEach((group) => {
         try {
-          let tx = this.modules[name].createTransaction(group, this, service || name);
+          let tx = this.modules[name].createTransaction(group, this, service || name, ignore);
           txs.add(tx.getTarget());
         } catch (err) {}
       });
@@ -258,8 +259,9 @@ class Fyffe {
    * Convert raw group data to transactions and add them to the ledger.
    * @param {Object} dataPerImporter
    * @param {String} [service] If not given, importer name is used as a service key in config.
+   * @param {Set<String>} [ignore] Ignore this transactions.
    */
-  async createTransactions(dataPerImporter, service = null) {
+  async createTransactions(dataPerImporter, service = null, ignore = new Set()) {
     for (const name of Object.keys(dataPerImporter)) {
 
       // Create txs.
@@ -267,6 +269,9 @@ class Fyffe {
       for (const group of dataPerImporter[name]) {
         try {
           let tx = this.modules[name].createTransaction(group, this, service || name);
+          if (ignore.has(tx.type)) {
+            continue;
+          }
           if (tx) {
             if (config.flags.tradeProfit && tx.type === 'trade') {
               await this.fetchRate(tx.date, tx.service, tx.target);
@@ -343,6 +348,7 @@ class Fyffe {
    * @param {Object} options
    * @param {String} options.dbName Name of the database to use.
    * @param {String} options.service Name of the configuration section to use.
+   * @param {Set} options.ignore Drop transactions of this type.
    */
   async import(files, options) {
 
@@ -379,11 +385,11 @@ class Fyffe {
       this.ledger.accounts.showBalances('Initial balances:');
     }
 
-    const targets = await this.scanTargets(dataPerImporter, options.service);
+    const targets = await this.scanTargets(dataPerImporter, options.service, options.ignore || new Set());
     await this.initializeStock(dbName, firstDate, targets);
 
     // Convert raw group data to transactions and add them to ledger.
-    await this.createTransactions(dataPerImporter, options.service);
+    await this.createTransactions(dataPerImporter, options.service, options.ignore || new Set());
 
     // Finally apply all transactions.
     this.ledger.apply(this.stock);
