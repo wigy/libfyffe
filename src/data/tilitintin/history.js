@@ -1,6 +1,8 @@
 const d = require('neat-dump');
-
 const Parser = require('../../text/Parser');
+const { dateFromDb } = require('./utils');
+const moment = require('moment');
+
 /**
  * Scan for the latest average price and stock for the given targets.
  * @param {*} knex
@@ -24,10 +26,11 @@ const Parser = require('../../text/Parser');
  */
 function findPriceAndStock(knex, date = null, targets = null) {
   const parser = new Parser();
-  const stamp = date === null ? new Date().getTime() : new Date(date + ' 00:00:00').getTime();
-
   let missingAvg = new Set(targets);
   let missingStock = new Set(targets);
+  if (!date) {
+    date = moment().format('YYYY-MM-DD');
+  }
 
   return knex.distinct('description', 'date')
     .select()
@@ -50,8 +53,8 @@ function findPriceAndStock(knex, date = null, targets = null) {
         if (tx.has('target') && tx.has('avg') && tx.service) {
           const target = tx.getTarget();
           if (targets === null || missingAvg.has(tx.getTarget())) {
-            if (data[i].date > stamp) {
-              d.error('Found future average on', new Date(data[i].date), 'for ' + tx.getTarget() + ' that is newer than', date);
+            if (dateFromDb(data[i].date) > date) {
+              d.error('Found future average on', dateFromDb(data[i].date), 'for ' + tx.getTarget() + ' that is newer than', date);
             } else {
               missingAvg.delete(target);
               if (ret.avg[target] === undefined) {
@@ -64,8 +67,8 @@ function findPriceAndStock(knex, date = null, targets = null) {
         if (tx.has('target') && tx.has('stock') && tx.service) {
           const target = tx.getTarget();
           if (targets === null || missingStock.has(tx.getTarget())) {
-            if (data[i].date > stamp) {
-              d.error('Found future stock on', new Date(data[i].date), 'for ' + tx.getTarget() + ' that is newer than', date);
+            if (dateFromDb(data[i].date) > date) {
+              d.error('Found future stock on', dateFromDb(data[i].date), 'for ' + tx.getTarget() + ' that is newer than', date);
             } else {
               missingStock.delete(target);
               if (ret.stock[target] === undefined) {

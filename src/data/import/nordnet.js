@@ -243,7 +243,7 @@ class NordnetImport extends Import {
     if (!tx.length) {
       return null;
     }
-    let sum = parseInt(this.num(tx[0].M__r_));
+    let sum = parseFloat(this.num(tx[0].M__r_));
     return obj.type === 'sell' ? -sum : sum;
   }
 
