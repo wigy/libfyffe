@@ -241,6 +241,7 @@ class Fyffe {
         try {
           let tx = this.modules[name].createTransaction(group, this, service || name, ignore);
           txs.add(tx.getTarget());
+          txs.add(tx.getSource());
         } catch (err) {}
       });
     });
