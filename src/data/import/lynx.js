@@ -140,7 +140,7 @@ class LynxImport extends SinglePassImport {
     const ret = [];
     for (const e of data.filter(e => e.Asset_Category === 'Stocks' && e.Header === 'Data')) {
       const q = this.num(e.Quantity);
-      let rate = await Tx.getRate(e.Date_Time.substr(0, 10), `CURRENCY:${e.Currency}`);
+      let rate = await Tx.fetchRate(e.Date_Time.substr(0, 10), `CURRENCY:${e.Currency}`);
       // To debug foreign currencies, might use rate 1.0 here.
       // rate = 1;
       if (q < 0) {
@@ -196,7 +196,7 @@ class LynxImport extends SinglePassImport {
     const taxes = {};
     for (const e of data.filter(e => e.Date && e.Currency && e.Amount)) {
       const [ , target ] = this.matchDividend(e.Description);
-      const rate = await Tx.getRate(e.Date, `CURRENCY:${e.Currency}`);
+      const rate = await Tx.fetchRate(e.Date, `CURRENCY:${e.Currency}`);
       const amount = cents(-parseFloat(e.Amount) * rate);
       taxes[this.makeId('TAX', e.Date, target)] = amount;
     }
@@ -207,7 +207,7 @@ class LynxImport extends SinglePassImport {
     const ret = [];
     for (const e of data.filter(e => e.Date && e.Currency && e.Amount)) {
       const [ , target, , , count ] = this.matchDividend(e.Description);
-      const rate = await Tx.getRate(e.Date, `CURRENCY:${e.Currency}`);
+      const rate = await Tx.fetchRate(e.Date, `CURRENCY:${e.Currency}`);
       const id = this.makeId('DIV', e.Date, target);
 
       ret.push({

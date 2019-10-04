@@ -253,7 +253,7 @@ class Fyffe {
    */
   async fetchRate(date, service, target) {
     const ticker = service.toUpperCase() + ':' + target;
-    return Tx.getRate(date, ticker);
+    return Tx.fetchRate(date, ticker);
   }
 
   /**

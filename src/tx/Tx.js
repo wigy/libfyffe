@@ -602,9 +602,9 @@ module.exports = class Tx {
    * Get the daily rating for some target.
    * @param {String} date
    * @param {String} target
-   * @return {Number|null}
+   * @return {Promise<Number|null>}
    */
-  static async getRate(date, target) {
+  static async fetchRate(date, target) {
     if (target in dailyRates && date in dailyRates[target]) {
       return dailyRates[target][date];
     }
@@ -618,6 +618,19 @@ module.exports = class Tx {
       const rate = json.close;
       Tx.setRate(date, target, rate);
       return rate;
+    }
+    return null;
+  }
+
+  /**
+   * Get the daily rating for some target if known already.
+   * @param {String} date
+   * @param {String} target
+   * @return {Number|null}
+   */
+  static getRate(date, target) {
+    if (target in dailyRates && date in dailyRates[target]) {
+      return dailyRates[target][date];
     }
     return null;
   }
