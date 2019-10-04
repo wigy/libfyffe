@@ -21,7 +21,7 @@ class GDAXImport extends Import {
   }
 
   id(group) {
-    return group[0].trade_id || group[0].transfer_id;
+    return this.service + ':' + (group[0].trade_id || group[0].transfer_id);
   }
 
   time(entry) {

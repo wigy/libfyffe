@@ -449,7 +449,7 @@ class SinglePassImport extends Import {
       id = parts.join('-') + '-' + n;
     }
     this.ids.add(id);
-    return id;
+    return this.service + ':' + id;
   }
 
   grouping(entries) {

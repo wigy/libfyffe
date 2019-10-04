@@ -16,7 +16,7 @@ class CoinmotionImport extends Import {
   }
 
   id(group) {
-    return this.dateAndLineId(group);
+    return this.service + ':' + this.dateAndLineId(group);
   }
 
   time(entry) {

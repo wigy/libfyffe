@@ -31,7 +31,7 @@ class NordnetImport extends Import {
     if (entry.Tapahtumatyyppi === 'LAINAKORKO') {
       ret += entry.Valuutta + entry.Kirjausp_iv_;
     }
-    return ret;
+    return this.service + ':' + ret;
   }
 
   load(file) {
