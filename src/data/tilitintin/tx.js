@@ -3,28 +3,8 @@
  */
 const promiseSeq = require('promise-sequential');
 const d = require('neat-dump');
-const moment = require('moment');
 const accounts = require('./accounts');
-
-/**
- * Convert API date to database format in Tilitin compatible way.
- * @param {String} date
- * @return {Number}
- */
-function dateToDb(date) {
-  const num = moment.utc(date).add(-2, 'hours').unix() * 1000;
-  return num;
-}
-
-/**
- * Convert database date to API format in Tilitin compatible way.
- * @param {Number} date
- * @return {String}
- */
-function dateFromDb(date) {
-  const str = moment.utc(date).add(2, 'hours').format('YYYY-MM-DD');
-  return str;
-}
+const { dateToDb } = require('./utils');
 
 /**
  * Find the period id for the date.
@@ -309,5 +289,5 @@ function add(knex, date, description, txs, options = {}) {
 }
 
 module.exports = {
-  add, dateToDb, dateFromDb
+  add
 };
