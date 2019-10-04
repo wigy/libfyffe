@@ -400,6 +400,18 @@ module.exports = class Tx {
         ret = ret.concat(subEntries);
       });
     }
+
+    // Add currencies.
+    if (config.flags.addCurrencies) {
+      const isFx = ['fx-in', 'fx-out'].includes(this.type);
+      if (this.has('currency') && (this.currency !== config.currency || isFx) && this.has('rate')) {
+        const text = this.getText();
+        for (let i = 0; i < ret.length; i++) {
+          ret[i].description = text + ' | ' + num.currency(ret[i].amount / this.rate, isFx ? this.target : this.currency);
+        }
+      }
+    }
+
     return ret;
   }
 
@@ -408,7 +420,7 @@ module.exports = class Tx {
    * @return {Array<Entry>}
    */
   getMyEntries() {
-    throw new Error('A transaction class in ' + types[this.type] + ' does not implement `getEntries()`.');
+    throw new Error('A transaction class in ' + types[this.type] + ' does not implement `getMyEntries()`.');
   }
 
   /**

@@ -45,7 +45,9 @@ class Config {
         // If import fails, create move transaction to imbalance account
         importErrors: false,
         // If import fails, stop there but continue with successful entries before that.
-        stopOnError: false
+        stopOnError: false,
+        // If set, show converted currency values for entries with rate and currency set different from default.
+        addCurrencies: false
       },
       // Account numbers.
       accounts: {
