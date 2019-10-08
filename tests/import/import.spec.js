@@ -1,13 +1,31 @@
 const fs = require('fs');
 const path = require('path');
 const knex = require('knex');
+const assert = require('assert');
 const config = require('../../src/config');
 const { tilitintin } = require('../../src/data');
 const { fyffe } = require('../../src/core');
 
-describe('importing', () => {
+const BANK = '1910';
+const STOCKS = '1543';
+const FEES = '9690';
+const INTEREST = '9460';
+const PROFITS = '3460';
+const DIVIDENDS = '3470';
+const EUR = '1920';
+const USD = '1929';
+const TAX = '9930';
 
-  before(async () => {
+describe('importing', () => {
+  let db, period;
+
+  // Helper to summarize balances.
+  const balances = async () => tilitintin.data.getPeriodBalances(db, period.id)
+    .then((data) => data.balances.reduce((prev, cur) => ({ ...prev, [cur.number]: cur.total }), {}));
+
+  const check = (balances, acc, result) => assert(balances[acc] === Math.round(result * 100), `Incorrect balance ${balances[acc] / 100} for ${acc} - expected ${result}`);
+
+  beforeEach(async () => {
     // Reset DB.
     config.set({
       currency: 'EUR',
@@ -29,15 +47,15 @@ describe('importing', () => {
         addCurrencies: false
       },
       accounts: {
-        bank: '1910',
+        bank: BANK,
         currencies: {
           eur: null,
           usd: null
         },
         targets: {
-          default: '1543', eth: null, btc: null
+          default: STOCKS, eth: null, btc: null
         },
-        taxes: { source: null, income: null, vat: null },
+        taxes: { source: TAX, income: null, vat: null },
         loans: { eur: null },
         expenses: {
           'gov-fees': null,
@@ -77,12 +95,12 @@ describe('importing', () => {
           transfer4: null,
           transfer5: null
         },
-        fees: '9690',
-        interest: '9460',
+        fees: FEES,
+        interest: INTEREST,
         imbalance: null,
         losses: null,
-        profits: '3460',
-        dividends: null
+        profits: PROFITS,
+        dividends: DIVIDENDS
       },
       services: {
         nordnet: {
@@ -90,8 +108,8 @@ describe('importing', () => {
           'fund': 'Nordnet Funds',
           accounts: {
             currencies: {
-              eur: '1920',
-              usd: null
+              eur: EUR,
+              usd: USD
             }
           }
         }
@@ -101,22 +119,33 @@ describe('importing', () => {
     // Initialize database.
     const dbPath = path.join(__dirname, '..', '..', 'test.sqlite');
     fs.writeFileSync(dbPath, tilitintin.db.empty());
-    const db = knex({
+    db = knex({
       client: 'sqlite3',
       connection: {
         filename: dbPath
       },
       useNullAsDefault: true
     });
-    await tilitintin.data.createOne(db, 'period', {start_date: '2019-01-01', end_date: '2019-12-31', locked: false});
+    period = await tilitintin.data.createOne(db, 'period', {start_date: '2019-01-01', end_date: '2019-12-31', locked: false});
+    tilitintin.tx.add(db, '2019-01-01', 'Initial cash', [
+      {number: BANK, amount: 10000},
+      {number: '2251', amount: -10000}
+    ]);
 
     // Prepare library.
     fyffe.setDb('test', db);
   });
 
-  it('can parse transactions from texts', async () => {
-    await fyffe.import(['path-to-nordnet.csv'], {dbName: 'test'});
-    console.log('TODO: Test');
+  it('can import Nordnet correctly', async () => {
+    await fyffe.import([path.join(__dirname, 'samples', 'nordnet.csv')], {dbName: 'test'});
+    await fyffe.export('tilitintin', {dbName: 'test'});
+    const balance = await balances();
+    console.log(balance);
+    check(balance, BANK, 9600.00);
+    check(balance, STOCKS, 0.00);
+    check(balance, INTEREST, 1.43);
+    check(balance, FEES, 29.90);
+    check(balance, TAX, 13.02);
   });
 
 });

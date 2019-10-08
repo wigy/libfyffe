@@ -178,7 +178,7 @@ function _checkTxs(knex, date, txs) {
  * Insert transaction into the database.
  *
  * @param {Knex} knex Knex-instance configured for the database.
- * @param {string} date A date in YYYY-MM-DD format.
+ * @param {String} date A date in YYYY-MM-DD format.
  * @param {string} description A text to be added to each entry (unless given in each entry).
  * @param {array} txs List of transactions.
  * @param {Object} options Additional options for processing.
