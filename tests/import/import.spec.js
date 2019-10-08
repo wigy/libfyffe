@@ -3,10 +3,12 @@ const path = require('path');
 const knex = require('knex');
 const config = require('../../src/config');
 const { tilitintin } = require('../../src/data');
+const { fyffe } = require('../../src/core');
 
 describe('importing', () => {
 
   before(async () => {
+    // Reset DB.
     config.set({
       currency: 'EUR',
       language: 'fi',
@@ -27,9 +29,14 @@ describe('importing', () => {
         addCurrencies: false
       },
       accounts: {
-        bank: null,
-        currencies: { eur: null, usd: null },
-        targets: { default: null, eth: null, btc: null },
+        bank: '1910',
+        currencies: {
+          eur: null,
+          usd: null
+        },
+        targets: {
+          default: '1543', eth: null, btc: null
+        },
         taxes: { source: null, income: null, vat: null },
         loans: { eur: null },
         expenses: {
@@ -70,30 +77,46 @@ describe('importing', () => {
           transfer4: null,
           transfer5: null
         },
-        fees: null,
-        interest: null,
+        fees: '9690',
+        interest: '9460',
         imbalance: null,
         losses: null,
-        profits: null,
+        profits: '3460',
         dividends: null
       },
-      services: {}
+      services: {
+        nordnet: {
+          'service': 'Nordnet',
+          'fund': 'Nordnet Funds',
+          accounts: {
+            currencies: {
+              eur: '1920',
+              usd: null
+            }
+          }
+        }
+      }
     });
 
+    // Initialize database.
     const dbPath = path.join(__dirname, '..', '..', 'test.sqlite');
-    knex({
+    fs.writeFileSync(dbPath, tilitintin.db.empty());
+    const db = knex({
       client: 'sqlite3',
       connection: {
         filename: dbPath
       },
       useNullAsDefault: true
     });
+    await tilitintin.data.createOne(db, 'period', {start_date: '2019-01-01', end_date: '2019-12-31', locked: false});
 
-    fs.writeFileSync(dbPath, tilitintin.db.empty());
+    // Prepare library.
+    fyffe.setDb('test', db);
   });
 
-  it('can parse transactions from texts', () => {
-    console.log('OK');
+  it('can parse transactions from texts', async () => {
+    await fyffe.import(['path-to-nordnet.csv'], {dbName: 'test'});
+    console.log('TODO: Test');
   });
 
 });
