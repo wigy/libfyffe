@@ -4,8 +4,8 @@
   "description": "A collection of common functionality for fintech-projects.",
   "main": "src/index.js",
   "scripts": {
-    "test-watch": "mocha --watch 'tests/**/*.spec.js'",
-    "test": "mocha 'tests/**/*.spec.js'",
+    "test-watch": "mocha --exit --watch 'tests/**/*.spec.js'",
+    "test": "mocha --exit 'tests/**/*.spec.js'",
     "lint": "eslint src tests",
     "lint-fix": "eslint --fix src tests"
   },

@@ -17,7 +17,7 @@ const USD = '1929';
 const TAX = '9930';
 
 describe('importing', () => {
-  let db, period;
+  let db, period, dbPath;
 
   // Helper to summarize balances.
   const balances = async () => tilitintin.data.getPeriodBalances(db, period.id)
@@ -34,18 +34,6 @@ describe('importing', () => {
       fund: null,
       loanName: null,
       tags: {},
-      flags: {
-        noProfit: false,
-        tradeProfit: false,
-        dryRun: false,
-        debug: false,
-        zeroMoves: false,
-        force: false,
-        skipErrors: false,
-        importErrors: false,
-        stopOnError: false,
-        addCurrencies: false
-      },
       accounts: {
         bank: BANK,
         currencies: {
@@ -58,42 +46,8 @@ describe('importing', () => {
         taxes: { source: TAX, income: null, vat: null },
         loans: { eur: null },
         expenses: {
-          'gov-fees': null,
-          bank: null,
-          misc: null,
-          misc1: null,
-          misc2: null,
-          misc3: null,
-          misc4: null,
-          misc5: null,
-          computer: null,
-          software: null,
-          transfer: null,
-          transfer2: null,
-          transfer3: null,
-          transfer4: null,
-          transfer5: null,
-          vat: null
         },
         incomes: {
-          invest: null,
-          invest2: null,
-          misc: null,
-          misc1: null,
-          misc2: null,
-          misc3: null,
-          misc4: null,
-          misc5: null,
-          sales: null,
-          sales2: null,
-          sales3: null,
-          sales4: null,
-          sales5: null,
-          transfer: null,
-          transfer2: null,
-          transfer3: null,
-          transfer4: null,
-          transfer5: null
         },
         fees: FEES,
         interest: INTEREST,
@@ -105,7 +59,7 @@ describe('importing', () => {
       services: {
         nordnet: {
           'service': 'Nordnet',
-          'fund': 'Nordnet Funds',
+          'fund': 'NN',
           accounts: {
             currencies: {
               eur: EUR,
@@ -117,7 +71,7 @@ describe('importing', () => {
     });
 
     // Initialize database.
-    const dbPath = path.join(__dirname, '..', '..', 'test.sqlite');
+    dbPath = path.join(__dirname, '..', '..', 'test.sqlite');
     fs.writeFileSync(dbPath, tilitintin.db.empty());
     db = knex({
       client: 'sqlite3',
@@ -127,7 +81,7 @@ describe('importing', () => {
       useNullAsDefault: true
     });
     period = await tilitintin.data.createOne(db, 'period', {start_date: '2019-01-01', end_date: '2019-12-31', locked: false});
-    tilitintin.tx.add(db, '2019-01-01', 'Initial cash', [
+    await tilitintin.tx.add(db, '2019-01-01', 'Initial cash', [
       {number: BANK, amount: 10000},
       {number: '2251', amount: -10000}
     ]);
@@ -140,12 +94,15 @@ describe('importing', () => {
     await fyffe.import([path.join(__dirname, 'samples', 'nordnet.csv')], {dbName: 'test'});
     await fyffe.export('tilitintin', {dbName: 'test'});
     const balance = await balances();
-    console.log(balance);
     check(balance, BANK, 9600.00);
     check(balance, STOCKS, 0.00);
     check(balance, INTEREST, 1.43);
     check(balance, FEES, 29.90);
     check(balance, TAX, 13.02);
+    check(balance, PROFITS, -90.42);
+    check(balance, DIVIDENDS, -99.80);
+    check(balance, EUR, 398.57);
+    check(balance, USD, 147.30);
   });
 
 });
