@@ -1,8 +1,9 @@
 module.exports = {
   config: require('./config'),
-  util: require('./util'),
+  core: require('./core'),
   data: require('./data'),
-  tx: require('./tx'),
+  stakes: require('./stakes'),
   text: require('./text'),
-  core: require('./core')
+  tx: require('./tx'),
+  util: require('./util')
 };
