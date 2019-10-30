@@ -164,12 +164,37 @@ async function addWithdrawal(knex, { investorId, date, amount, comment = {} }) {
   await addShares(knex, { date, amount: -amount, transferId, fundId, investorId });
 }
 
+/**
+ * Add an investor if it doesn't exist.
+ * @param {Knex} knex
+ */
+async function addInvestor(knex, { name, email, tag }) {
+  return addIf(knex, 'investors', {email, name, tag}, 'email');
+}
+
+/**
+ * Add a fund if it doesn't exist.
+ * @param {Knex} knex
+ */
+async function addFund(knex, { name, tag }) {
+  return addIf(knex, 'funds', {name, tag}, 'name');
+}
+
+/**
+ * Add a fund if it doesn't exist.
+ * @param {Knex} knex
+ */
+async function addService(knex, { name, tag }) {
+  return addIf(knex, 'services', {name, tag}, 'name');
+}
+
 module.exports = {
-  add,
-  addIf,
   addAccount,
   addComment,
   addDeposit,
+  addFund,
+  addInvestor,
+  addService,
   addShares,
   addTransfer,
   addWithdrawal,
