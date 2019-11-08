@@ -1,6 +1,6 @@
 const fs = require('fs');
 const moment = require('moment');
-const d = require('neat-dump');
+const dump = require('neat-dump');
 const Stock = require('./Stock');
 const Ledger = require('./Ledger');
 const config = require('../config');
@@ -14,6 +14,8 @@ const { Tx } = require('../tx');
 class Fyffe {
 
   constructor() {
+    this.service = null;
+    this.fund = null;
     this.stock = new Stock();
     this.ledger = new Ledger();
     this.modules = Import.modules();
@@ -112,9 +114,21 @@ class Fyffe {
     if (!config.get('services.' + service)) {
       throw new Error('Service ' + JSON.stringify(service) + ' not configured.');
     }
-    const serviceName = config.get('service', service);
     const tags = config.get('tags', service);
-    return tags[serviceName] || null;
+    return tags[service] || null;
+  }
+
+  /**
+   * Fetch the configured fund tag or null.
+   * @param {String} fund
+   * @return {Tag}
+   */
+  getFundTag(service, fund) {
+    if (!config.get('services.' + service + '.funds.' + fund)) {
+      throw new Error('Service + fund ' + JSON.stringify(service + ' + ' + fund) + ' not configured.');
+    }
+    const tags = config.get('tags', service, fund);
+    return tags[fund] || null;
   }
 
   /**
@@ -211,7 +225,7 @@ class Fyffe {
     }
 
     return Promise.all(Object.keys(dataPerImporter).map((name) => {
-      const tag = this.getServiceTag(name) ? this.getServiceTag(name).tag : '<' + name + '>';
+      let tag = this.service + ':' + this.fund;
       return tilitintin.imports.doneFor(knex, tag)
         .then((ids) => ({name, ids}));
     }))
@@ -230,16 +244,15 @@ class Fyffe {
   /**
    * Pick all target names as seen in the import data (skip import errors).
    * @param {Object} dataPerImporter
-   * @param {String} [service] If not given, importer name is used as a service key in config.
-   * @param {Set<String>} [ignore] Ignore this transactions.
+   * @param {Set<String>} [ignore] Ignore these transactions.
    * @return {Set<String>}
    */
-  scanTargets(dataPerImporter, service = null, ignore = new Set()) {
+  scanTargets(dataPerImporter, ignore = new Set()) {
     let txs = new Set();
     Object.keys(dataPerImporter).forEach((name) => {
       dataPerImporter[name].forEach((group) => {
         try {
-          let tx = this.modules[name].createTransaction(group, this, service || name, ignore);
+          let tx = this.modules[name].createTransaction(group, this, ignore);
           txs.add(tx.getTarget());
           txs.add(tx.getSource());
         } catch (err) {}
@@ -259,17 +272,16 @@ class Fyffe {
   /**
    * Convert raw group data to transactions and add them to the ledger.
    * @param {Object} dataPerImporter
-   * @param {String} [service] If not given, importer name is used as a service key in config.
    * @param {Set<String>} [ignore] Ignore this transactions.
    */
-  async createTransactions(dataPerImporter, service = null, ignore = new Set()) {
+  async createTransactions(dataPerImporter, ignore = new Set()) {
     for (const name of Object.keys(dataPerImporter)) {
 
       // Create txs.
       let txs = [];
       for (const group of dataPerImporter[name]) {
         try {
-          let tx = this.modules[name].createTransaction(group, this, service || name);
+          let tx = this.modules[name].createTransaction(group, this);
           if (ignore.has(tx.type)) {
             continue;
           }
@@ -279,17 +291,17 @@ class Fyffe {
             }
             txs.push(tx);
           } else {
-            d.warning('Skipping', group);
+            dump.warning('Skipping', group);
           }
         } catch (err) {
           if (config.flags.skipErrors || config.flags.stopOnError) {
-            d.error('==================');
-            d.error('  Import failed:');
-            d.error('==================');
+            dump.error('==================');
+            dump.error('  Import failed:');
+            dump.error('==================');
             console.log(group);
             console.log();
             console.log(err);
-            d.error('__________________');
+            dump.error('__________________');
             if (config.flags.stopOnError) {
               break;
             }
@@ -311,8 +323,8 @@ class Fyffe {
 
       // Add tags based on the configuration.
       txs.forEach((tx) => {
-        const fundTag = config.getTag(config.get('fund', tx.service));
-        const serviceTag = config.getTag(config.get('service', tx.service));
+        const fundTag = config.getTag(tx.fund);
+        const serviceTag = config.getTag(tx.service);
         if (fundTag) {
           tx.tags.push(fundTag.tag);
         }
@@ -349,10 +361,12 @@ class Fyffe {
    * @param {Object} options
    * @param {String} options.dbName Name of the database to use.
    * @param {String} options.service Name of the configuration section to use.
+   * @param {String} options.fund Name of the configuration section to use.
    * @param {Set} options.ignore Drop transactions of this type.
    */
   async import(files, options) {
-
+    this.service = options.service;
+    this.fund = options.fund;
     let dataPerImporter = this.recognize(this.readFiles(files));
 
     const {dbName} = options;
@@ -368,7 +382,7 @@ class Fyffe {
     // Sort them according to the timestamps and find the earliest timestamp.
     let minDate = null;
     Object.keys(dataPerImporter).forEach((name) => {
-      this.modules[name].setService(options.service || name);
+      this.modules[name].setFundAndService(options.fund, options.service);
       const sorter = (a, b) => {
         return this.modules[name].time(a[0]) - this.modules[name].time(b[0]);
       };
@@ -386,11 +400,11 @@ class Fyffe {
       this.ledger.accounts.showBalances('Initial balances:');
     }
 
-    const targets = await this.scanTargets(dataPerImporter, options.service, options.ignore || new Set());
+    const targets = await this.scanTargets(dataPerImporter, options.ignore || new Set());
     await this.initializeStock(dbName, firstDate, targets);
 
     // Convert raw group data to transactions and add them to ledger.
-    await this.createTransactions(dataPerImporter, options.service, options.ignore || new Set());
+    await this.createTransactions(dataPerImporter, options.ignore || new Set());
 
     // Finally apply all transactions.
     this.ledger.apply(this.stock);

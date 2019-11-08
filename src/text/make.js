@@ -44,6 +44,8 @@ function substitute(text, target) {
     }
     const variable = match[1];
     let conf = config.services[target.service];
+    conf.service = target.service;
+    conf.fund = target.fund;
     if (conf[variable] === undefined) {
       throw new Error('Cannot translate text ' + JSON.stringify(text) + ' since `' + variable + '` not configured for `' + target.service + '`.');
     }

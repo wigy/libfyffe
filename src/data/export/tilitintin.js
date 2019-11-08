@@ -3,7 +3,6 @@ const promiseSeq = require('promise-sequential');
 const Export = require('../export');
 const tilitintinTx = require('../tilitintin/tx');
 const imports = require('../tilitintin/imports');
-const config = require('../../config');
 
 class TilitintinExport extends Export {
 
@@ -12,8 +11,7 @@ class TilitintinExport extends Export {
   }
 
   async save(knex, tx) {
-    const serviceTag = config.getTag(config.getServiceName(tx.service));
-    const tag = serviceTag ? serviceTag.tag : '<' + tx.service + '>';
+    const tag = tx.service + ':' + tx.fund;
     return tilitintinTx.add(knex, tx.date, tx.getText(), tx.getEntries(), {force: true})
       .then((docId) => imports.add(knex, tag, tx.id, docId))
       .catch((err) => {

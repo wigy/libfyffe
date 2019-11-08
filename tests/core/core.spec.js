@@ -6,7 +6,7 @@ describe('core', () => {
   let fyffe;
 
   before(() => {
-    config.set({});
+    config.clear();
     fyffe = require('../../src/core/fyffe');
   });
 

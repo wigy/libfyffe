@@ -1,7 +1,7 @@
 const cc = require('currency-codes');
 const moment = require('moment');
 const clone = require('clone');
-const d = require('neat-dump');
+const dump = require('neat-dump');
 const http = require('request-promise-json');
 const config = require('../config');
 const validator = require('../data/validator');
@@ -62,6 +62,7 @@ module.exports = class Tx {
     this.chained = [];
     this.tags = [];
     this.service = null;
+    this.fund = null;
     // Initialize defaults.
     this.data = Object.assign({
       time: undefined,
@@ -333,19 +334,19 @@ module.exports = class Tx {
     if (arg2) {
       name += '.' + arg2.toLowerCase();
     }
-
-    let acc = config.get(name, this.service);
+    let acc = config.get(name, this.service, this.fund);
     if (!acc && arg1 === 'targets') {
-      acc = config.get('accounts.targets.default', this.service);
+      acc = config.get('accounts.targets.default', this.service, this.fund);
     }
     if (!acc && arg1 === 'expenses') {
-      acc = config.get('accounts.expenses.default', this.service);
+      acc = config.get('accounts.expenses.default', this.service, this.fund);
     }
     if (!acc && arg1 === 'incomes') {
-      acc = config.get('accounts.incomes.default', this.service);
+      acc = config.get('accounts.incomes.default', this.service, this.fund);
     }
 
     if (!acc) {
+      console.log(this.service, this.fund);
       throw new Error('Account ' + JSON.stringify(name) + ' is not configured.');
     }
 
@@ -469,7 +470,7 @@ module.exports = class Tx {
     this.updateStock(stock);
     if (config.flags.debugStock) {
       if (!stockDebugTitle) {
-        d.purple('Stock changes:');
+        dump.purple('Stock changes:');
         stockDebugTitle = true;
       }
       let title = false;
@@ -478,16 +479,16 @@ module.exports = class Tx {
         if (oldStock.stock[target] !== stock.stock[target]) {
           if (!title) {
             title = true;
-            d.green('  ', this.getTitle());
+            dump.green('  ', this.getTitle());
           }
-          d.yellow('       ', target, oldStock.stock[target], '=>', stock.stock[target], short);
+          dump.yellow('       ', target, oldStock.stock[target], '=>', stock.stock[target], short);
         }
         if (oldStock.average[target] !== stock.average[target]) {
           if (!title) {
             title = true;
-            d.green('  ', this.getTitle());
+            dump.green('  ', this.getTitle());
           }
-          d.yellow('       ', target, oldStock.average[target], '=>', stock.average[target], '€/' + short);
+          dump.yellow('       ', target, oldStock.average[target], '=>', stock.average[target], '€/' + short);
         }
       });
     }
@@ -557,9 +558,10 @@ module.exports = class Tx {
    * Create an instance of transaction.
    * @param {String} type
    * @param {Object} data
-   * @param {String} service
+   * @param {String} [service]
+   * @param {String} [fund]
    */
-  static create(type, data = {}, service = null) {
+  static create(type, data = {}, service = null, fund = null) {
     if (!types[type]) {
       throw new Error('Invalid TX type in create(): ' + JSON.stringify(type));
     }
@@ -570,6 +572,7 @@ module.exports = class Tx {
     }
     let ret = new constructor(data);
     ret.service = service;
+    ret.fund = fund;
     ret.id = id;
 
     return ret;

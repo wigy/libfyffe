@@ -26,6 +26,7 @@ describe('importing', () => {
   const check = (balances, acc, result) => assert(balances[acc] === Math.round(result * 100), `Incorrect balance ${balances[acc] / 100} for ${acc} - expected ${result}`);
 
   beforeEach(async () => {
+    config.clear();
     // Reset DB.
     config.set({
       currency: 'EUR',
@@ -33,7 +34,8 @@ describe('importing', () => {
       service: null,
       fund: null,
       loanName: null,
-      tags: {},
+      tags: {
+      },
       accounts: {
         bank: BANK,
         currencies: {
@@ -57,13 +59,15 @@ describe('importing', () => {
         dividends: DIVIDENDS
       },
       services: {
-        nordnet: {
-          'service': 'Nordnet',
-          'fund': 'NN',
-          accounts: {
-            currencies: {
-              eur: EUR,
-              usd: USD
+        Nordnet: {
+          funds: {
+            NNF: {
+              accounts: {
+                currencies: {
+                  eur: EUR,
+                  usd: USD
+                }
+              }
             }
           }
         }
@@ -91,7 +95,11 @@ describe('importing', () => {
   });
 
   it('can import Nordnet correctly', async () => {
-    await fyffe.import([path.join(__dirname, 'samples', 'nordnet.csv')], {dbName: 'test'});
+    await fyffe.import([path.join(__dirname, 'samples', 'nordnet.csv')], {
+      dbName: 'test',
+      service: 'Nordnet',
+      fund: 'NNF'
+    });
     await fyffe.export('tilitintin', {dbName: 'test'});
     const balance = await balances();
     check(balance, BANK, 9600.00);

@@ -12,6 +12,7 @@ class Import {
   constructor(name) {
     this.name = name;
     this.service = null;
+    this.fund = null;
     this.mapper = null;
     // Initialized when creating transactions.
     this.stock = null;
@@ -32,9 +33,10 @@ class Import {
    * Select the configuration section to use.
    * @param {String} service
    */
-  setService(service) {
+  setFundAndService(fund, service) {
+    this.fund = fund;
     this.service = service;
-    this.mapper = new StringMapper(config.get('import', service) || {});
+    this.mapper = new StringMapper(config.get('import', service, fund) || {});
   }
 
   /**
@@ -362,10 +364,9 @@ class Import {
    * Convert a source data group to transaction.
    * @param {Array<Object>} group
    * @param {Fyffe} fyffe
-   * @param {String} service
    * @return {Tx|null} Transaction or null, if type `skipped`.
    */
-  createTransaction(group, fyffe, service) {
+  createTransaction(group, fyffe) {
 
     this.stock = fyffe.stock;
     this.ledger = fyffe.ledger;
@@ -423,8 +424,7 @@ class Import {
 
     const type = obj.type;
     delete obj.type;
-    let ret = Tx.create(type, obj, service);
-
+    let ret = Tx.create(type, obj, this.service, this.fund);
     this.tags(group, obj).forEach((tag) => {
       ret.tags.push(tag);
     });

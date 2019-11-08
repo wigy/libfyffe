@@ -18,10 +18,6 @@ class Config {
       currency: 'EUR',
       // Language used in entry descriptions.
       language: 'fi',
-      // Current service name.
-      service: null,
-      // Current fund name.
-      fund: null,
       // Name of the loan provided in this service.
       loanName: null,
       // Mapping from tags and their full names to tag objects.
@@ -157,6 +153,9 @@ class Config {
       },
       // Service specific overrides.
       services: {
+        // Fund specific overrides.
+        funds: {
+        }
       }
     });
   }
@@ -197,17 +196,24 @@ class Config {
   }
 
   /**
-   * Find the configuration variable value from service or from defaults.
+   * Find the configuration variable value from service/fund or from defaults.
    * @param {String} name
-   * @param {String} service
+   * @param {String} [service]
+   * @param {String} [fund]
    * @return {null|String}
    */
-  get(name, service = null) {
+  get(name, service = null, fund = null) {
     let vars;
     if (service === null) {
       vars = this;
-    } else {
+    } else if (fund === null) {
       vars = this.services[service] || {};
+    } else {
+      if (!this.services[service] || !this.services[service].funds) {
+        vars = {};
+      } else {
+        vars = this.services[service].funds[fund] || {};
+      }
     }
 
     let ret = null;
@@ -218,33 +224,14 @@ class Config {
       }
     });
 
+    if (ret === null && fund !== null) {
+      return this.get(name, service);
+    }
     if (ret === null && service !== null) {
       return this.get(name);
     }
 
     return ret;
-  }
-
-  /**
-   * Get the full name of the service.
-   * @param {String} service
-   */
-  getServiceName(service) {
-    if (this.services[service]) {
-      return this.services[service].service || null;
-    }
-    return null;
-  }
-
-  /**
-   * Get the name of the fund.
-   * @param {String} service
-   */
-  getFundName(service) {
-    if (this.services[service]) {
-      return this.services[service].fund || null;
-    }
-    return null;
   }
 
   /**

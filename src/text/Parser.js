@@ -141,31 +141,57 @@ class Parser {
       });
     });
 
-    this.tagsOfService = {};
-    let services = Object.keys(config.services);
+    this.tagToService = {};
+    this.tagToFund = {};
+    const services = Object.keys(config.services);
     for (let i = 0; i < services.length; i++) {
-      const tag1 = config.getTag(config.getServiceName(services[i]));
-      const tag2 = config.getTag(config.getFundName(services[i]));
-      this.tagsOfService[services[i]] = [];
-      if (tag1) {
-        this.tagsOfService[services[i]].push(tag1);
+      if (services[i] === 'funds') {
+        const funds = Object.keys(config.services[services[i]]);
+        for (let j = 0; j < funds.length; j++) {
+          const tag = config.getTag(funds[j]);
+          if (tag) {
+            this.tagToFund[tag] = funds[j];
+          }
+        }
+        continue;
       }
-      if (tag2) {
-        this.tagsOfService[services[i]].push(tag2);
+      const tag = config.getTag(services[i]);
+      if (tag) {
+        this.tagToService[tag] = services[i];
+      }
+      if (config.services[services[i]].funds) {
+        const funds = Object.keys(config.services[services[i]].funds);
+        for (let j = 0; j < funds.length; j++) {
+          const tag = config.getTag(funds[j]);
+          if (tag) {
+            this.tagToFund[tag] = funds[j];
+          }
+        }
       }
     }
   }
 
   /**
-   * Find the service key for the given tags.
+   * Find the service name for the given tags.
    * @param {String[]} tags
    */
   findService(tags) {
-    let services = Object.keys(config.services);
-    for (let i = 0; i < services.length; i++) {
-      const [tag1, tag2] = this.tagsOfService[services[i]];
-      if (tag1 && tag2 && tags.includes(tag1.tag) && tags.includes(tag2.tag)) {
-        return services[i];
+    for (let i = 0; i < tags.length; i++) {
+      if (this.tagToService[tags[i]]) {
+        return this.tagToService[tags[i]];
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Find the fund name for the given tags.
+   * @param {String[]} tags
+   */
+  findFund(tags) {
+    for (let i = 0; i < tags.length; i++) {
+      if (this.tagToFund[tags[i]]) {
+        return this.tagToFund[tags[i]];
       }
     }
     return null;
@@ -189,14 +215,16 @@ class Parser {
       text = match[2];
     } while (true);
 
-    // Verify tags and find the service.
+    // Verify tags and find the service and fund.
     let service = null;
+    let fund = null;
     tags.forEach((tag) => {
       if (!config.tags[tag]) {
         throw new Error('Invalid tag ' + JSON.stringify(tag) + ' in ' + JSON.stringify(orig));
       }
     });
     service = this.findService(tags);
+    fund = this.findFund(tags);
 
     // Extract options.
     let options = [];
@@ -241,6 +269,7 @@ class Parser {
     let ret = Tx.create(type, data);
     ret.tags = tags;
     ret.service = service;
+    ret.fund = fund;
 
     return ret;
   }
