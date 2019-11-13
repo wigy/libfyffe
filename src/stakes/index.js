@@ -121,6 +121,10 @@ async function addComment(knex, data) {
  * @param {Knex} knex
  */
 async function addTransfer(knex, { date, fromId = null, toId = null, amount, commentId }) {
+  if (amount < 0) {
+    amount = -amount;
+    [fromId, toId] = [toId, fromId];
+  }
   if (fromId) {
     fromId = await add(knex, 'value_changes', {accountId: fromId, date, amount: -amount, commentId});
   }
