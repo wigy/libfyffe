@@ -24,6 +24,7 @@
     "cryptocurrencies": "^2.0.0",
     "csvtojson": "^1.1.9",
     "currency-codes": "^1.1.2",
+    "detect-character-encoding": "^0.8.0",
     "escape-string-regexp": "^1.0.5",
     "knex": "^0.19.5",
     "moment": "^2.22.2",

@@ -1,6 +1,7 @@
 const fs = require('fs');
 const moment = require('moment');
 const dump = require('neat-dump');
+const dce = require('detect-character-encoding');
 const Stock = require('./Stock');
 const Ledger = require('./Ledger');
 const config = require('../config');
@@ -164,7 +165,9 @@ class Fyffe {
   readFiles(files) {
     let ret = {};
     files.forEach((path) => {
-      ret[path] = fs.readFileSync(path, {encoding: 'utf-8'});
+      const buf = fs.readFileSync(path);
+      const { encoding } = dce(buf);
+      ret[path] = buf.toString(encoding);
     });
     return ret;
   }
