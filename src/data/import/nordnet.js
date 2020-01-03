@@ -4,10 +4,21 @@ class NordnetImport extends Import {
 
   constructor() {
     super('Nordnet');
+    this.delimiter = null;
+    this.version = null;
   }
 
   isMine(content) {
-    return /^Id;Kirjausp.iv.;Kauppap.iv.;Maksup.iv.;/.test(content);
+    if (/^Id;Kirjausp.iv.;Kauppap.iv.;Maksup.iv.;/.test(content)) {
+      this.delimiter = ';';
+      this.version = 1;
+      return true;
+    }
+    if (/^\s*Id\tKirjausp.iv.\sKauppap.iv.\sMaksup.iv./.test(content)) {
+      this.delimiter = '\t';
+      this.version = 2;
+      return true;
+    }
   }
 
   // Helper to convert string amount to float value.
@@ -34,8 +45,15 @@ class NordnetImport extends Import {
     return ret;
   }
 
-  load(file) {
-    return this.loadCSV(file, {delimiter: ';'});
+  async load(file) {
+    let data = await this.loadCSV(file, {delimiter: this.delimiter});
+    if (this.version === 2) {
+      data = data.map(e => ({...e,
+        Vahvistusnumero_Laskelma: e.Vahvistusnumero,
+        Valuuttakurssi: e.Vaihtokurssi
+      }));
+    }
+    return data;
   }
 
   id(group) {
