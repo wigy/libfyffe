@@ -16,6 +16,7 @@
     "expense.misc3": "Satunnaiset kulut #3",
     "expense.misc4": "Satunnaiset kulut #4",
     "expense.misc5": "Satunnaiset kulut #5",
+    "expense.net": "Tietoliikenne",
     "expense.software": "Ohjelmistohankinnat",
     "expense.tax": "Verojen maksu",
     "expense.transfer": "Siirto ={notes}-palveluun",
@@ -48,11 +49,11 @@
     "income.misc3": "Satunnaiset tulot #3",
     "income.misc4": "Satunnaiset tulot #4",
     "income.misc5": "Satunnaiset tulot #5",
-    "income.sales": "Myynti: ={notes}",
-    "income.sales2": "Myynti #2: ={notes}",
-    "income.sales3": "Myynti #3: ={notes}",
-    "income.sales4": "Myynti #4: ={notes}",
-    "income.sales5": "Myynti #5: ={notes}",
+    "income.sales": "Maksu: ={notes}",
+    "income.sales2": "Maksu #2: ={notes}",
+    "income.sales3": "Maksu #3: ={notes}",
+    "income.sales4": "Maksu #4: ={notes}",
+    "income.sales5": "Maksu #5: ={notes}",
     "income.transfer": "Siirto ={notes}-palvelusta",
     "income.transfer2": "Siirto #2 ={notes}-palvelusta",
     "income.transfer3": "Siirto #3 ={notes}-palvelusta",
@@ -183,6 +184,9 @@
       "notes": "={notes}"
     },
     "expense.info": {
+      "notes": "={notes}"
+    },
+    "expense.net": {
       "notes": "={notes}"
     },
     "expense.transfer": {
