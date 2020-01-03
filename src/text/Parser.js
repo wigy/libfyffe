@@ -150,21 +150,21 @@ class Parser {
         for (let j = 0; j < funds.length; j++) {
           const tag = config.getTag(funds[j]);
           if (tag) {
-            this.tagToFund[tag] = funds[j];
+            this.tagToFund[tag.tag] = funds[j];
           }
         }
         continue;
       }
       const tag = config.getTag(services[i]);
       if (tag) {
-        this.tagToService[tag] = services[i];
+        this.tagToService[tag.tag] = services[i];
       }
       if (config.services[services[i]].funds) {
         const funds = Object.keys(config.services[services[i]].funds);
         for (let j = 0; j < funds.length; j++) {
           const tag = config.getTag(funds[j]);
           if (tag) {
-            this.tagToFund[tag] = funds[j];
+            this.tagToFund[tag.tag] = funds[j];
           }
         }
       }
