@@ -39,7 +39,7 @@ class NordnetImport extends Import {
   }
 
   id(group) {
-    return this._id(group[0]);
+    return this.service + ':' + this.fund + ':' + this._id(group[0]);
   }
 
   trimItem(obj) {

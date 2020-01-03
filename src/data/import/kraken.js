@@ -42,7 +42,7 @@ class KrakenImport extends Import {
   }
 
   id(group) {
-    return group[0].refid;
+    return this.service + ':' + this.fund + ':' + group[0].refid;
   }
 
   time(entry) {

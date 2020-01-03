@@ -38,7 +38,7 @@ class CoinbaseImport extends Import {
   }
 
   id(group) {
-    return this.service + ':' + (group[0].Transfer_ID || group[0].Coinbase_ID);
+    return this.service + ':' + this.fund + ':' + (group[0].Transfer_ID || group[0].Coinbase_ID);
   }
 
   time(entry) {

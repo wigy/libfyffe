@@ -376,13 +376,16 @@ class Fyffe {
     await this.loadTags(dbName);
     await this.loadAccounts(dbName);
 
+    Object.keys(dataPerImporter).forEach((name) => {
+      this.modules[name].setFundAndService(options.fund, options.service);
+    });
+
     dataPerImporter = await this.loadFileData(dataPerImporter);
     dataPerImporter = await this.removeImported(knex, dataPerImporter);
 
     // Sort them according to the timestamps and find the earliest timestamp.
     let minDate = null;
     Object.keys(dataPerImporter).forEach((name) => {
-      this.modules[name].setFundAndService(options.fund, options.service);
       const sorter = (a, b) => {
         return this.modules[name].time(a[0]) - this.modules[name].time(b[0]);
       };

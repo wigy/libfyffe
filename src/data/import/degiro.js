@@ -74,7 +74,7 @@ class DegiroImport extends Import {
     if (/^FX (Credit|Withdrawal)/.test(group[0].Kuvaus)) {
       id += 'FX';
     }
-    return this.service + ':' + id;
+    return this.service + ':' + this.fund + ':' + id;
   }
 
   time(entry) {
