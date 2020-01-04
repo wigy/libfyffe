@@ -2,7 +2,7 @@ const Accounts = require('./Accounts');
 const Tx = require('../tx/Tx');
 const num = require('../util/num');
 const config = require('../config');
-const d = require('neat-dump');
+const dump = require('neat-dump');
 
 /**
  * A container for storing transactions.
@@ -113,11 +113,11 @@ module.exports = class Ledger {
    * @param {String} title
    */
   showTransactions(title) {
-    d.purple(title);
+    dump.purple(title);
     this.txs.forEach((tx) => {
-      d.green('  ', tx.getTitle());
+      dump.green('  ', tx.getTitle());
       tx.getEntries().forEach((entry) => {
-        d.yellow('       ', entry.number, this.accounts.get(entry.number).name, num.currency(entry.amount, config.currency), entry.description ? '  - ' + entry.description : '');
+        dump.yellow('       ', entry.number, this.accounts.get(entry.number).name, num.currency(entry.amount, config.currency), entry.description ? '  - ' + entry.description : '');
       });
     });
   }

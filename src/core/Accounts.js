@@ -1,6 +1,6 @@
 const num = require('../util/num');
 const config = require('../config');
-const d = require('neat-dump');
+const dump = require('neat-dump');
 
 /**
  * A container class for storing account balances.
@@ -69,11 +69,11 @@ module.exports = class Stock {
    * Display currently loaded balances.
    */
   showBalances(title) {
-    d.purple(title);
+    dump.purple(title);
     Object.values(this.accounts).sort((a, b) => a.number < b.number ? -1 : (a.number > b.number ? 1 : 0)).forEach((account) => {
       if (account.balance !== null) {
-        d.yellow('  ', account.number, account.name);
-        d.green('       ', num.currency(account.balance, config.currency));
+        dump.yellow('  ', account.number, account.name);
+        dump.green('       ', num.currency(account.balance, config.currency));
       }
     });
   }

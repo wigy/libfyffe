@@ -1,4 +1,4 @@
-const d = require('neat-dump');
+const dump = require('neat-dump');
 const num = require('../util/num');
 
 /**
@@ -85,11 +85,11 @@ module.exports = class Stock {
    * @param {String} title
    */
   showStock(title) {
-    d.purple(title);
+    dump.purple(title);
     Object.keys(this.stock).sort().forEach((target) => {
-      d.green('  ', target, num.trim(this.stock[target]));
+      dump.green('  ', target, num.trim(this.stock[target]));
       if (this.average[target]) {
-        d.yellow('       ', num.currency(this.average[target], '€ / ' + target));
+        dump.yellow('       ', num.currency(this.average[target], '€ / ' + target));
       }
     });
   }
