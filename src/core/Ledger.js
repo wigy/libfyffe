@@ -89,6 +89,7 @@ module.exports = class Ledger {
         let loanTx;
         const accBalance = this.accounts.getBalance(acc);
         const loanBalance = this.accounts.getBalance(loan);
+
         const id = 'LOAN@' + lastTime;
 
         if (accBalance < -0.001) {

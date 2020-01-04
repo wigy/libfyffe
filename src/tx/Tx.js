@@ -475,9 +475,11 @@ module.exports = class Tx {
    */
   apply(accounts, stock, loanCheck = true) {
     const ret = [];
+    let stockDebugTitle;
 
     let oldStock = clone(stock);
     this.updateStock(stock);
+
     if (config.flags.debugStock) {
       if (!stockDebugTitle) {
         dump.purple('Stock changes:');
@@ -507,7 +509,9 @@ module.exports = class Tx {
       if (!entry.number) {
         throw new Error('Invalid account number found in entries ' + JSON.stringify(this.getEntries()));
       }
+
       const balance = accounts.transfer(entry.number, entry.amount);
+
       if (loanCheck && this.has('currency')) {
         const loanAcc = config.get('accounts.loans', this.service, this.fund)[this.currency.toLowerCase()];
         const curAcc = this.getAccount('currencies', this.currency);
