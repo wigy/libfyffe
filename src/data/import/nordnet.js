@@ -84,6 +84,7 @@ class NordnetImport extends Import {
 
   recognize(group) {
     const types = group.map((tx) => tx.Tapahtumatyyppi);
+    const texts = group.map((tx) => tx.Tapahtumateksti);
     if (types.includes('OSINKO')) {
       return 'dividend';
     }
@@ -106,6 +107,9 @@ class NordnetImport extends Import {
       return 'withdrawal';
     }
     if (types.includes('DEBET_KORON_KORJ_')) {
+      return 'income';
+    }
+    if (texts.includes('RECLASSIFICATION OF DIVIDEND')) {
       return 'income';
     }
     if (types.includes('VAIHTO_AP_OTTO') && types.includes('VAIHTO_AP_J_TT_')) {
@@ -283,6 +287,10 @@ class NordnetImport extends Import {
 
   notes(group, obj) {
     if (obj.target === 'MISC') {
+      const texts = group.map((tx) => tx.Tapahtumateksti);
+      if (texts.includes('RECLASSIFICATION OF DIVIDEND')) {
+        return 'Osingon uudelleenluokittelu';
+      }
       return 'Koron korjaus';
     }
     return null;

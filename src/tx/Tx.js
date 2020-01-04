@@ -475,7 +475,6 @@ module.exports = class Tx {
    */
   apply(accounts, stock, loanCheck = true) {
     const ret = [];
-    let stockDebugTitle;
 
     let oldStock = clone(stock);
     this.updateStock(stock);

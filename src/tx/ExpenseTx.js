@@ -10,7 +10,7 @@ const validator = require('../data/validator');
 module.exports = class ExpenseTx extends Tx {
 
   constructor(data = {}) {
-    super('expense', { target: undefined, amount: undefined, currency: config.currency, vat: null, notes: '' }, data);
+    super('expense', { target: undefined, amount: undefined, currency: config.currency, rate: null, vat: null, notes: '' }, data);
   }
 
   set amount(val) {

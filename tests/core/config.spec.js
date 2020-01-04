@@ -73,7 +73,8 @@ describe('config', () => {
       '102': 'MyService.fees',
       '103': 'targets.eth',
       '104': 'MyService.targets.eth',
-      '201': 'losses'
+      '201': 'losses',
+      '304': 'MyService.MyFund.targets.eth'
     });
   });
 });

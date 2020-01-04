@@ -385,7 +385,7 @@ class Import {
     }
 
     if (obj.type !== 'withdrawal' && obj.type !== 'deposit' && obj.type !== 'move-in' &&
-      obj.type !== 'move-out' && obj.type !== 'trade' && obj.type !== 'expense' && obj.type !== 'income') {
+      obj.type !== 'move-out' && obj.type !== 'trade') {
       obj.currency = this.currency(group, obj);
       obj.rate = this.rate(group, obj);
     }
