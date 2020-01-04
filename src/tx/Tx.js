@@ -499,18 +499,18 @@ module.exports = class Tx {
       }
       const balance = accounts.transfer(entry.number, entry.amount);
       if (loanCheck && this.has('currency')) {
-        const loanAcc = config.get('accounts.loans', this.service)[this.currency.toLowerCase()];
+        const loanAcc = config.get('accounts.loans', this.service, this.fund)[this.currency.toLowerCase()];
         if (loanAcc && entry.number === this.getAccount('currencies', this.currency)) {
           let loan;
           const loanTotal = -accounts.getBalance(loanAcc);
           // If account is negative, then it goes to loan.
           if (balance < 0) {
-            loan = Tx.create('loan-take', {total: num.cents(-balance)}, this.service);
+            loan = Tx.create('loan-take', {total: num.cents(-balance)}, this.service, this.fund);
           } else if (balance > 0 && loanTotal > 0) {
             // Otherwise we can pay back, if we still owe money.
             const payBack = Math.min(loanTotal, balance);
             if (payBack > 0.001) {
-              loan = Tx.create('loan-pay', {total: num.cents(payBack)}, this.service);
+              loan = Tx.create('loan-pay', {total: num.cents(payBack)}, this.service, this.fund);
             }
           }
           if (loan) {
