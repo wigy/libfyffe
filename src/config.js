@@ -43,7 +43,9 @@ class Config {
         // If import fails, stop there but continue with successful entries before that.
         stopOnError: false,
         // If set, show converted currency values for entries with rate and currency set different from default.
-        addCurrencies: false
+        addCurrencies: false,
+        // If set, add loan update only at the end of the import.
+        singleLoanUpdate: false
       },
       // Account numbers.
       accounts: {
@@ -191,6 +193,11 @@ class Config {
     collect(this.accounts, '');
     Object.keys(this.services).forEach((service) => {
       collect(this.services[service].accounts, service);
+      if (this.services[service].funds) {
+        Object.keys(this.services[service].funds).forEach((fund) => {
+          collect(this.services[service].funds[fund].accounts, service + '.' + fund);
+        });
+      }
     });
     return ret;
   }

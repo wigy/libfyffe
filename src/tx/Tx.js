@@ -460,11 +460,21 @@ module.exports = class Tx {
    * Apply the transaction to the stock and accounts.
    * @param {Accounts} accounts
    * @param {Stock} stock
+   * @return {Object<Set>}
    *
    * After updating the balance, the account number is checked and if it has a matching loan account,
    * automatic loan payment or loan take is attached to the transaction.
+   *
+   * If single loan update is configured, a list of loan description objects are returned:
+   * {
+   *   loan: 5678,
+   *   account: 1234,
+   *   currency: 'EUR',
+   *   tags: ['A', 'B']
+   * }
    */
   apply(accounts, stock, loanCheck = true) {
+    const ret = [];
 
     let oldStock = clone(stock);
     this.updateStock(stock);
@@ -500,7 +510,18 @@ module.exports = class Tx {
       const balance = accounts.transfer(entry.number, entry.amount);
       if (loanCheck && this.has('currency')) {
         const loanAcc = config.get('accounts.loans', this.service, this.fund)[this.currency.toLowerCase()];
-        if (loanAcc && entry.number === this.getAccount('currencies', this.currency)) {
+        const curAcc = this.getAccount('currencies', this.currency);
+        if (loanAcc && entry.number === curAcc) {
+          // Single update for loans, then just collect notes.
+          if (config.flags.singleLoanUpdate) {
+            ret.push({
+              loan: loanAcc,
+              account: curAcc,
+              currency: this.currency,
+              tags: this.tags
+            });
+            return;
+          }
           let loan;
           const loanTotal = -accounts.getBalance(loanAcc);
           // If account is negative, then it goes to loan.
@@ -520,6 +541,8 @@ module.exports = class Tx {
         }
       }
     });
+
+    return ret;
   }
 
   /**
@@ -567,13 +590,18 @@ module.exports = class Tx {
     }
     const constructor = require(types[type]);
     const id = data.id || null;
+    const tags = data.tags || [];
     if (id) {
       delete data.id;
+    }
+    if (tags) {
+      delete data.tags;
     }
     let ret = new constructor(data);
     ret.service = service;
     ret.fund = fund;
     ret.id = id;
+    ret.tags = tags;
 
     return ret;
   }

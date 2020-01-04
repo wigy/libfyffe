@@ -273,9 +273,9 @@ class Fyffe {
   }
 
   /**
-   * Convert raw group data to transactions and add them to the ledger.
+   * Convert raw group data to transactions and store them to the ledger.
    * @param {Object} dataPerImporter
-   * @param {Set<String>} [ignore] Ignore this transactions.
+   * @param {Set<String>} [ignore] Ignore these transaction types.
    */
   async createTransactions(dataPerImporter, ignore = new Set()) {
     for (const name of Object.keys(dataPerImporter)) {

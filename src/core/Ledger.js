@@ -61,12 +61,50 @@ module.exports = class Ledger {
   apply(stock) {
     this.txs = this.txs.sort((a, b) => a.time - b.time);
 
+    // Apply txs.
+    const loans = {};
+    let service, fund;
+    let lastTime = 0;
     this.txs.forEach((tx) => {
       if (this.notApplied.has(tx)) {
+        lastTime = Math.max(lastTime, tx.time);
+        service = service || tx.service;
+        fund = fund || tx.fund;
         tx.updateFromStock(stock);
-        tx.apply(this.accounts, stock);
+        const result = tx.apply(this.accounts, stock);
+        for (const r of result) {
+          if (!loans[r.currency]) {
+            loans[r.currency] = {};
+          }
+          loans[r.currency][r.account] = {loan: r.loan, tags: r.tags};
+        }
         this.notApplied.delete(tx);
       }
+    });
+
+    // Create post processing txs.
+    Object.entries(loans).forEach(([currency, specs]) => {
+      Object.entries(specs).forEach(([acc, def]) => {
+        const { loan, tags } = def;
+        let loanTx;
+        const accBalance = this.accounts.getBalance(acc);
+        const loanBalance = this.accounts.getBalance(loan);
+        const id = 'LOAN@' + lastTime;
+
+        if (accBalance < -0.001) {
+          // Take more loan.
+          loanTx = Tx.create('loan-take', {id, tags, currency, time: lastTime, total: num.cents(-accBalance)}, service, fund);
+        } else if (loanBalance < -0.001 && accBalance > 0.001) {
+          // Pay loan back.
+          const payBack = Math.min(-loanBalance, accBalance);
+          loanTx = Tx.create('loan-pay', {id, tags, currency, time: lastTime, total: num.cents(payBack)}, service, fund);
+        }
+
+        if (loanTx) {
+          this.add(loanTx);
+          this.apply(stock);
+        }
+      });
     });
   }
 
