@@ -191,27 +191,29 @@ class LynxImport extends SinglePassImport {
   }
 
   matchDividend(str) {
+
     let re = /^([A-Z ]+?)\s*\([0-9A-Z]+\) (Cash Dividend) ([A-Z][A-Z][A-Z]) ([0-9.]+)/.exec(str);
-    if (!re) {
-      // Blah, sometimes they are other way around.
-      re = /^([A-Z ]+?)\s*\([0-9A-Z]+\) (Cash Dividend) ([0-9.]+) ([A-Z][A-Z][A-Z])/.exec(str);
-      if (re) {
-        const a = re[3];
-        re[3] = re[4];
-        re[4] = a;
-      }
+    if (re) {
+      return [this.symbol(re[1]), re[4]];
     }
-    if (!re) {
-      throw new Error(`Cannot parse dividend '${str}'`);
+    // Blah, sometimes they are other way around.
+    re = /^([A-Z ]+?)\s*\([0-9A-Z]+\) (Cash Dividend) ([0-9.]+) ([A-Z][A-Z][A-Z])/.exec(str);
+    if (re) {
+      return [this.symbol(re[1]), re[3]];
     }
-    re[1] = this.symbol(re[1]);
-    return re;
+    // Per share missing in special cases.
+    re = /^([A-Z ]+?)\s*\([0-9A-Z]+\) (Payment in Lieu of Dividend - US Tax|Payment in Lieu of Dividend \(Ordinary Dividend\))/.exec(str);
+    if (re) {
+      return [this.symbol(re[1]), null];
+    }
+
+    throw new Error(`Cannot parse dividend '${str}'`);
   }
 
   async parseTax(data) {
     const taxes = {};
     for (const e of data.filter(e => e.Date && e.Currency && e.Amount)) {
-      const [ , target ] = this.matchDividend(e.Description);
+      const [ target ] = this.matchDividend(e.Description);
       const rate = await Tx.fetchRate(e.Date, `CURRENCY:${e.Currency}`);
       const amount = cents(-parseFloat(e.Amount) * rate);
       taxes[this.makeId('TAX', e.Date, target)] = amount;
@@ -222,15 +224,14 @@ class LynxImport extends SinglePassImport {
   async parseDividends(data, taxes) {
     const ret = [];
     for (const e of data.filter(e => e.Date && e.Currency && e.Amount)) {
-      const [ , target, , , count ] = this.matchDividend(e.Description);
+      const [ target, perShare ] = this.matchDividend(e.Description);
       const rate = await Tx.fetchRate(e.Date, `CURRENCY:${e.Currency}`);
       const id = this.makeId('DIV', e.Date, target);
-
       ret.push({
-        amount: Math.round(parseFloat(e.Amount) / parseFloat(count)),
+        amount: perShare === null ? 1 : Math.round(parseFloat(e.Amount) / parseFloat(perShare)),
         currency: e.Currency,
         date: e.Date,
-        given: parseFloat(count),
+        given: perShare === null ? cents(parseFloat(e.Amount) * rate) : parseFloat(perShare),
         id,
         rate,
         target,

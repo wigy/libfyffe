@@ -4,9 +4,10 @@ const num = require('../util/num');
 const text = require('../text/make');
 
 /**
- * A dividend `amount` (num of shares) x `given` (dividend per share) from `target` is distributed to some currency account.
+ * A dividend `amount` (num of shares) x `given` (dividend per share) from `target` is distributed to some `currency` account.
  *
  * Additionally amount of `tax` deducted and conversion `rate` for currency may be given.
+ * If `amount` is zero, then the dividend is a lump sum.
  */
 module.exports = class DividendTx extends Tx {
 

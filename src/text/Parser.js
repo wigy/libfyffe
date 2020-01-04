@@ -203,6 +203,10 @@ class Parser {
    */
   parse(text) {
     const orig = text;
+    // Drop additional currency valuation.
+    if (/ \| [-0-9,. ]+ /.test(text)) {
+      text = text.replace(/ \| [-0-9,. ]+ .*/, '');
+    }
 
     // Extract tags.
     let tags = [];

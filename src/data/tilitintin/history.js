@@ -1,4 +1,4 @@
-const d = require('neat-dump');
+const dump = require('neat-dump');
 const Parser = require('../../text/Parser');
 const { dateFromDb } = require('./utils');
 const moment = require('moment');
@@ -48,13 +48,12 @@ function findPriceAndStock(knex, date = null, targets = null) {
         } catch (err) {
           continue;
         }
-
         // Look for average.
         if (tx.has('target') && tx.has('avg') && tx.service) {
           const target = tx.getTarget();
           if (targets === null || missingAvg.has(tx.getTarget())) {
             if (dateFromDb(data[i].date) > date) {
-              d.error('Found future average on', dateFromDb(data[i].date), 'for ' + tx.getTarget() + ' that is newer than', date);
+              dump.error('Found future average on', dateFromDb(data[i].date), 'for ' + tx.getTarget() + ' that is newer than', date);
             } else {
               missingAvg.delete(target);
               if (ret.avg[target] === undefined) {
@@ -68,7 +67,7 @@ function findPriceAndStock(knex, date = null, targets = null) {
           const target = tx.getTarget();
           if (targets === null || missingStock.has(tx.getTarget())) {
             if (dateFromDb(data[i].date) > date) {
-              d.error('Found future stock on', dateFromDb(data[i].date), 'for ' + tx.getTarget() + ' that is newer than', date);
+              dump.error('Found future stock on', dateFromDb(data[i].date), 'for ' + tx.getTarget() + ' that is newer than', date);
             } else {
               missingStock.delete(target);
               if (ret.stock[target] === undefined) {

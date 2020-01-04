@@ -90,8 +90,7 @@ module.exports = class Ledger {
         const accBalance = this.accounts.getBalance(acc);
         const loanBalance = this.accounts.getBalance(loan);
 
-        const id = 'LOAN@' + lastTime;
-
+        const id = 'LOAN@' + lastTime + ':' + currency + ':' + acc + ':' + loan;
         if (accBalance < -0.001) {
           // Take more loan.
           loanTx = Tx.create('loan-take', {id, tags, currency, time: lastTime, total: num.cents(-accBalance)}, service, fund);
