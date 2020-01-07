@@ -166,7 +166,7 @@ class Fyffe {
     let ret = {};
     files.forEach((path) => {
       const buf = fs.readFileSync(path);
-      const { encoding } = dce(buf);
+      const { encoding } = config.encoding || dce(buf);
       ret[path] = buf.toString(encoding);
     });
     return ret;

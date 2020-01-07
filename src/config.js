@@ -18,6 +18,8 @@ class Config {
       currency: 'EUR',
       // Language used in entry descriptions.
       language: 'fi',
+      // Encoding used for reading in files (default: recognize automatically).
+      encoding: null,
       // Name of the loan provided in this service.
       loanName: null,
       // Mapping from tags and their full names to tag objects.
