@@ -89,6 +89,7 @@ module.exports = class Tx {
     validator.isGe('time', val, 946684800000); // Jan 1st 2000
     this.data.time = val;
   }
+
   get time() {
     return this.get('time');
   }
@@ -99,6 +100,7 @@ module.exports = class Tx {
   set date(val) {
     throw new Error('Do not set date, but time instead for transaction.');
   }
+
   get date() {
     return moment(this.get('time')).format('YYYY-MM-DD');
   }
@@ -110,6 +112,7 @@ module.exports = class Tx {
     validator.isGeZero('total', val);
     this.data.total = val;
   }
+
   get total() {
     return this.get('total');
   }
@@ -122,6 +125,7 @@ module.exports = class Tx {
     validator.check('currency', val, (val) => cc.code(val));
     this.data.currency = val;
   }
+
   get currency() {
     return this.get('currency');
   }
@@ -133,6 +137,7 @@ module.exports = class Tx {
     validator.isGtZero('rate', val);
     this.data.rate = val;
   }
+
   get rate() {
     return this.get('rate');
   }
@@ -144,6 +149,7 @@ module.exports = class Tx {
     validator.isRegexMatch('target', val, /^[-A-Z0-9]+\**?$/);
     this.data.target = val;
   }
+
   get target() {
     return this.get('target');
   }
@@ -157,6 +163,7 @@ module.exports = class Tx {
     validator.isNum('amount', val);
     this.data.amount = val;
   }
+
   get amount() {
     return this.get('amount');
   }
@@ -168,6 +175,7 @@ module.exports = class Tx {
     validator.isGeZero('fee', val);
     this.data.fee = val;
   }
+
   get fee() {
     return this.get('fee');
   }
@@ -179,6 +187,7 @@ module.exports = class Tx {
     validator.isGeZero('tax', val);
     this.data.tax = val;
   }
+
   get tax() {
     return this.get('tax');
   }
@@ -190,6 +199,7 @@ module.exports = class Tx {
     validator.isGeZeroOrNull('vat', val);
     this.data.vat = val;
   }
+
   get vat() {
     return this.get('vat');
   }
@@ -201,6 +211,7 @@ module.exports = class Tx {
     validator.isGeZero('avg', val);
     this.data.avg = val;
   }
+
   get avg() {
     return this.get('avg');
   }
@@ -212,6 +223,7 @@ module.exports = class Tx {
     validator.isNum('stock', val);
     this.data.stock = val;
   }
+
   get stock() {
     return this.get('stock');
   }
@@ -223,6 +235,7 @@ module.exports = class Tx {
     validator.isRegexMatch('source', val, /^[-A-Z0-9]+\**?$/);
     this.data.source = val;
   }
+
   get source() {
     return this.get('source');
   }
@@ -235,6 +248,7 @@ module.exports = class Tx {
     validator.isNum('given', val);
     this.data.given = val;
   }
+
   get given() {
     return this.get('given');
   }
@@ -246,6 +260,7 @@ module.exports = class Tx {
     validator.isGeZero('avg2', val);
     this.data.avg2 = val;
   }
+
   get avg2() {
     return this.get('avg2');
   }
@@ -257,6 +272,7 @@ module.exports = class Tx {
     validator.isNum('stock2', val);
     this.data.stock2 = val;
   }
+
   get stock2() {
     return this.get('stock2');
   }
@@ -268,6 +284,7 @@ module.exports = class Tx {
     validator.isRegexMatchOrNull('burnTarget', val, /^[-A-Z0-9]+\**?$/);
     this.data.burnTarget = val;
   }
+
   get burnTarget() {
     return this.get('burnTarget');
   }
@@ -279,6 +296,7 @@ module.exports = class Tx {
     validator.isLtZeroOrNull('burnAmount', val);
     this.data.burnAmount = val;
   }
+
   get burnAmount() {
     return this.get('burnAmount');
   }
@@ -290,6 +308,7 @@ module.exports = class Tx {
     validator.isString('notes', val);
     this.data.notes = val;
   }
+
   get notes() {
     return this.get('notes');
   }
@@ -397,7 +416,7 @@ module.exports = class Tx {
     }
     if (this.chained.length) {
       this.chained.forEach((sub) => {
-        let subEntries = sub.getEntries();
+        const subEntries = sub.getEntries();
         ret = ret.concat(subEntries);
       });
     }
@@ -476,7 +495,7 @@ module.exports = class Tx {
   apply(accounts, stock, loanCheck = true) {
     const ret = [];
 
-    let oldStock = clone(stock);
+    const oldStock = clone(stock);
     this.updateStock(stock);
 
     if (config.flags.debugStock) {
@@ -529,12 +548,12 @@ module.exports = class Tx {
           const loanTotal = -accounts.getBalance(loanAcc);
           // If account is negative, then it goes to loan.
           if (balance < 0) {
-            loan = Tx.create('loan-take', {total: num.cents(-balance)}, this.service, this.fund);
+            loan = Tx.create('loan-take', { total: num.cents(-balance) }, this.service, this.fund);
           } else if (balance > 0 && loanTotal > 0) {
             // Otherwise we can pay back, if we still owe money.
             const payBack = Math.min(loanTotal, balance);
             if (payBack > 0.001) {
-              loan = Tx.create('loan-pay', {total: num.cents(payBack)}, this.service, this.fund);
+              loan = Tx.create('loan-pay', { total: num.cents(payBack) }, this.service, this.fund);
             }
           }
           if (loan) {
@@ -573,7 +592,7 @@ module.exports = class Tx {
    * @param {String} target
    */
   requireAverage(stock, target) {
-    let avg = stock.getAverage(target);
+    const avg = stock.getAverage(target);
     if (!avg) {
       throw new Error('No average available for ' + target);
     }
@@ -600,7 +619,7 @@ module.exports = class Tx {
     if (tags) {
       delete data.tags;
     }
-    let ret = new constructor(data);
+    const ret = new constructor(data);
     ret.service = service;
     ret.fund = fund;
     ret.id = id;
@@ -614,7 +633,7 @@ module.exports = class Tx {
    * @return {Object<Class>} A mapping from type names to their constructors.
    */
   static classes() {
-    let ret = {};
+    const ret = {};
     Object.keys(types).forEach((type) => {
       ret[type] = require(types[type]);
     });

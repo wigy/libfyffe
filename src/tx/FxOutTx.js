@@ -22,19 +22,19 @@ module.exports = class FxOutTx extends Tx {
   getMyEntries() {
     if (this.fee) {
       return [
-        {number: this.getAccount('currencies', this.currency), amount: num.cents(this.total - this.fee)},
-        {number: this.getAccount('fees'), amount: num.cents(this.fee)},
-        {number: this.getAccount('currencies', this.target), amount: num.cents(-this.total)}
+        { number: this.getAccount('currencies', this.currency), amount: num.cents(this.total - this.fee) },
+        { number: this.getAccount('fees'), amount: num.cents(this.fee) },
+        { number: this.getAccount('currencies', this.target), amount: num.cents(-this.total) }
       ];
     }
     return [
-      {number: this.getAccount('currencies', this.currency), amount: num.cents(this.total)},
-      {number: this.getAccount('currencies', this.target), amount: num.cents(-this.total)}
+      { number: this.getAccount('currencies', this.currency), amount: num.cents(this.total) },
+      { number: this.getAccount('currencies', this.target), amount: num.cents(-this.total) }
     ];
   }
 
   getMyText() {
-    let opts = [text.option('outRate', this)];
+    const opts = [text.option('outRate', this)];
     return text.withOptions(text.tx(this), opts);
   }
 

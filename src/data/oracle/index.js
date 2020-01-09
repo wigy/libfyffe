@@ -1,5 +1,5 @@
 
-let tickers = require('./isin2ticker.json');
+const tickers = require('./isin2ticker.json');
 
 function isin2ticker(isin, failIfNotFound = true) {
   if (tickers[isin]) {

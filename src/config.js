@@ -177,7 +177,7 @@ class Config {
    * @return {Object} A mapping from account numbers to configuration variable names.
    */
   getAllAccounts() {
-    let ret = {};
+    const ret = {};
     const collect = (accounts, prefix) => {
       if (!accounts) {
         return;
@@ -260,7 +260,7 @@ class Config {
   iniPath() {
     let dir = process.cwd();
     while (true) {
-      let file = path.join(dir, '.fyffe');
+      const file = path.join(dir, '.fyffe');
       if (fs.existsSync(file)) {
         return file;
       }
@@ -286,6 +286,6 @@ class Config {
   }
 }
 
-let config = new Config();
+const config = new Config();
 
 module.exports = config;

@@ -34,7 +34,7 @@ module.exports = class Ledger {
    * Collect all different targets from the transactions.
    */
   getTargets() {
-    let targets = new Set(this.txs.filter(tx => tx.has('target')).map(tx => tx.getTarget()));
+    const targets = new Set(this.txs.filter(tx => tx.has('target')).map(tx => tx.getTarget()));
     this.txs.filter(tx => tx.has('source')).forEach(tx => targets.add(tx.getSource()));
     return [...targets];
   }
@@ -43,7 +43,7 @@ module.exports = class Ledger {
    * Collect all different currencies from the transactions.
    */
   getCurrencies() {
-    let targets = this.txs.filter(tx => tx.has('currency')).map(tx => tx.currency);
+    const targets = this.txs.filter(tx => tx.has('currency')).map(tx => tx.currency);
     return [...new Set(targets)];
   }
 
@@ -76,7 +76,7 @@ module.exports = class Ledger {
           if (!loans[r.currency]) {
             loans[r.currency] = {};
           }
-          loans[r.currency][r.account] = {loan: r.loan, tags: r.tags};
+          loans[r.currency][r.account] = { loan: r.loan, tags: r.tags };
         }
         this.notApplied.delete(tx);
       }
@@ -93,11 +93,11 @@ module.exports = class Ledger {
         const id = 'LOAN@' + lastTime + ':' + currency + ':' + acc + ':' + loan;
         if (accBalance < -0.001) {
           // Take more loan.
-          loanTx = Tx.create('loan-take', {id, tags, currency, time: lastTime, total: num.cents(-accBalance)}, service, fund);
+          loanTx = Tx.create('loan-take', { id, tags, currency, time: lastTime, total: num.cents(-accBalance) }, service, fund);
         } else if (loanBalance < -0.001 && accBalance > 0.001) {
           // Pay loan back.
           const payBack = Math.min(-loanBalance, accBalance);
-          loanTx = Tx.create('loan-pay', {id, tags, currency, time: lastTime, total: num.cents(payBack)}, service, fund);
+          loanTx = Tx.create('loan-pay', { id, tags, currency, time: lastTime, total: num.cents(payBack) }, service, fund);
         }
 
         if (loanTx) {

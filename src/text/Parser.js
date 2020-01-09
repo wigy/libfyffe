@@ -48,7 +48,7 @@ class Matcher {
     if (!match) {
       return null;
     }
-    let ret = {};
+    const ret = {};
     for (let n = 0; n < this.regex.length; n++) {
       if (this.variables[n] !== null) {
         ret[this.variables[n]] = this.conversions[n](match[n + 1]);
@@ -63,10 +63,10 @@ class Matcher {
    * @param {String} text
    */
   static make(type, text) {
-    let ret = new Matcher(type);
+    const ret = new Matcher(type);
     let n = 0;
     do {
-      let match = /^(.*?)([X=C+#$£])\{(\w+|[$])\}(.*)$/.exec(text);
+      const match = /^(.*?)([X=C+#$£])\{(\w+|[$])\}(.*)$/.exec(text);
       if (!match) {
         break;
       }
@@ -209,9 +209,9 @@ class Parser {
     }
 
     // Extract tags.
-    let tags = [];
+    const tags = [];
     do {
-      let match = /^\[([a-zA-Z0-9]+)\]\s*(.*)/.exec(text);
+      const match = /^\[([a-zA-Z0-9]+)\]\s*(.*)/.exec(text);
       if (!match) {
         break;
       }
@@ -232,7 +232,7 @@ class Parser {
 
     // Extract options.
     let options = [];
-    let sub = /(.*)\((.*)\)$/.exec(text);
+    const sub = /(.*)\((.*)\)$/.exec(text);
     if (sub) {
       text = sub[1].trim();
       options = sub[2].split(', ');
@@ -252,7 +252,7 @@ class Parser {
           let k = 0;
           const optionTypes = Object.keys(this.optionMatch[type]);
           while (k < optionTypes.length) {
-            let opt = this.optionMatch[type][optionTypes[k]].exec(options[j]);
+            const opt = this.optionMatch[type][optionTypes[k]].exec(options[j]);
             if (opt) {
               data = Object.assign(data, opt);
               break;
@@ -270,7 +270,7 @@ class Parser {
     if (!type) {
       throw new Error('Failed to parse ' + JSON.stringify(orig));
     }
-    let ret = Tx.create(type, data);
+    const ret = Tx.create(type, data);
     ret.tags = tags;
     ret.service = service;
     ret.fund = fund;

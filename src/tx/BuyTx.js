@@ -15,19 +15,19 @@ module.exports = class BuyTx extends Tx {
   getMyEntries() {
     if (this.fee) {
       return [
-        {number: this.getAccount('targets', this.target), amount: num.cents(this.total - this.fee)},
-        {number: this.getAccount('fees'), amount: num.cents(this.fee)},
-        {number: this.getAccount('currencies', this.currency), amount: num.cents(-this.total)}
+        { number: this.getAccount('targets', this.target), amount: num.cents(this.total - this.fee) },
+        { number: this.getAccount('fees'), amount: num.cents(this.fee) },
+        { number: this.getAccount('currencies', this.currency), amount: num.cents(-this.total) }
       ];
     }
     return [
-      {number: this.getAccount('targets', this.target), amount: num.cents(this.total)},
-      {number: this.getAccount('currencies', this.currency), amount: num.cents(-this.total)}
+      { number: this.getAccount('targets', this.target), amount: num.cents(this.total) },
+      { number: this.getAccount('currencies', this.currency), amount: num.cents(-this.total) }
     ];
   }
 
   getMyText() {
-    let opts = [];
+    const opts = [];
     if (this.burnAmount) {
       opts.push(text.option('burn', this));
     }
@@ -44,7 +44,7 @@ module.exports = class BuyTx extends Tx {
       stock.add(this.burnAmount, this.getBurnTarget(), burned);
       this.fee = num.cents(this.fee + burned);
     }
-    const {amount, avg} = stock.add(this.amount, this.getTarget(), this.total - this.fee);
+    const { amount, avg } = stock.add(this.amount, this.getTarget(), this.total - this.fee);
     this.stock = amount;
     this.avg = avg;
   }

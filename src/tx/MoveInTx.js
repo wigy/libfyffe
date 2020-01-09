@@ -13,18 +13,18 @@ module.exports = class MoveInTx extends Tx {
   }
 
   getMyEntries() {
-    let ret = [
-      {number: this.getAccount('targets', this.target), amount: num.cents(this.total - this.fee)},
-      {number: this.getAccount('imbalance'), amount: num.cents(-this.total)}
+    const ret = [
+      { number: this.getAccount('targets', this.target), amount: num.cents(this.total - this.fee) },
+      { number: this.getAccount('imbalance'), amount: num.cents(-this.total) }
     ];
     if (this.fee) {
-      ret.push({number: this.getAccount('fees'), amount: this.fee});
+      ret.push({ number: this.getAccount('fees'), amount: this.fee });
     }
     return ret;
   }
 
   getMyText() {
-    let opts = [];
+    const opts = [];
     if (this.burnAmount) {
       opts.push(text.option('burn', this));
     }
@@ -45,7 +45,7 @@ module.exports = class MoveInTx extends Tx {
       stock.add(this.burnAmount, this.getBurnTarget(), burned);
       this.fee = num.cents(this.fee + burned);
     }
-    const {amount, avg} = stock.add(config.flags.zeroMoves ? 0 : this.amount, this.getTarget(), this.total);
+    const { amount, avg } = stock.add(config.flags.zeroMoves ? 0 : this.amount, this.getTarget(), this.total);
     this.stock = amount;
     this.avg = avg;
   }

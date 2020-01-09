@@ -26,9 +26,9 @@ class CoinmotionImport extends Import {
   }
 
   grouping(entries) {
-    let ret = {};
+    const ret = {};
     entries.forEach((entry) => {
-      let name = entry.Date + '/' + entry.Type;
+      const name = entry.Date + '/' + entry.Type;
       ret[name] = ret[name] || [];
       ret[name].push(entry);
     });

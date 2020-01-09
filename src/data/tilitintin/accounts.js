@@ -6,8 +6,8 @@
  */
 async function getAccountId(knex, number) {
   return knex.select('id').from('account')
-    .where({'account.number': number})
-    .then(account => (account.length ? {number: number, id: account[0].id} : null));
+    .where({ 'account.number': number })
+    .then(account => (account.length ? { number: number, id: account[0].id } : null));
 }
 
 /**
@@ -20,7 +20,7 @@ async function getIdsByNumber(knex, numbers) {
     .from('account')
     .whereIn('number', numbers)
     .then((data) => {
-      let ret = {};
+      const ret = {};
       data.forEach((account) => (ret[account.number] = account.id));
       return ret;
     });
@@ -70,13 +70,13 @@ async function getBalances(knex, numbers, date = null) {
         return knex.select(knex.raw('SUM(debit * amount) + SUM((debit - 1) * amount) AS total, ' + number + ' as number'))
           .from('entry')
           .join('document', 'document.id', '=', 'entry.document_id')
-          .where({account_id: idByNumber[number] || 0})
+          .where({ account_id: idByNumber[number] || 0 })
           .andWhere('document.period_id', '=', periodId)
           .andWhere('document.date', '<', stamp)
           .then((data) => data[0]);
       }))
         .then((data) => {
-          let ret = {};
+          const ret = {};
           data.forEach((res) => (ret[res.number] = res.total || 0));
           return ret;
         });

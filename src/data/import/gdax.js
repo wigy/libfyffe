@@ -29,7 +29,7 @@ class GDAXImport extends Import {
   }
 
   grouping(entries) {
-    let ret = {};
+    const ret = {};
     entries.forEach((entry) => {
       let key = entry.trade_id;
       if (['deposit', 'withdrawal'].includes(entry.type)) {

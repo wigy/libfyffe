@@ -66,7 +66,7 @@ class DegiroImport extends Import {
   }
 
   load(file) {
-    return this.loadCSV(file, {delimiter: ','});
+    return this.loadCSV(file, { delimiter: ',' });
   }
 
   id(group) {
@@ -83,7 +83,7 @@ class DegiroImport extends Import {
   }
 
   grouping(entries) {
-    let ret = {};
+    const ret = {};
     entries.forEach((entry) => {
       let id = entry.P_iv_ys + ' ' + entry.Aika + entry.ISIN;
       if (!id) {
@@ -189,7 +189,7 @@ class DegiroImport extends Import {
   }
 
   currency(group, obj) {
-    let currencies = new Set(group.map(tx => tx.M__r_));
+    const currencies = new Set(group.map(tx => tx.M__r_));
     if (currencies.size > 1) {
       currencies.delete('EUR');
       if (currencies.size === 1) {

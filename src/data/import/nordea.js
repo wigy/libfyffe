@@ -18,7 +18,7 @@ class NordeaImport extends Import {
   }
 
   load(file) {
-    return this.loadCSV(file, {delimiter: '\t', eol: '\n\r\n', cutFromBeginning: 1});
+    return this.loadCSV(file, { delimiter: '\t', eol: '\n\r\n', cutFromBeginning: 1 });
   }
 
   grouping(entries) {

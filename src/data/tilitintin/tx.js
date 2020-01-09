@@ -76,7 +76,7 @@ function addEntry(knex, accountId, documentId, debit, amount, desc, row, flags) 
   let account;
   return knex('account')
     .select('number', 'name')
-    .where({id: accountId})
+    .where({ id: accountId })
     .then((acc) => (account = acc[0]))
     .then(() => knex('entry')
       .insert({
@@ -105,8 +105,8 @@ function _compareEntries(e1, e2) {
     return false;
   }
   // Construct mapping from account IDs to amounts and debit-flags.
-  let accountAmounts = {};
-  let accountDebits = {};
+  const accountAmounts = {};
+  const accountDebits = {};
   e1.forEach((e) => {
     accountAmounts[e.accountId] = Math.round(100 * parseFloat(e.amount));
     accountDebits[e.accountId] = parseInt(e.debit);
@@ -143,7 +143,7 @@ function _checkTxs(knex, date, txs) {
       // Check if there are documents having the same date.
       return knex('document')
         .select('id')
-        .where({period_id: periodId, date: seconds})
+        .where({ period_id: periodId, date: seconds })
         .then((docs) => {
           if (docs.length === 0) {
             return false;
@@ -155,7 +155,7 @@ function _checkTxs(knex, date, txs) {
             .whereIn('document_id', docIds)
             .then((entries) => {
               // Group documents by their ID.
-              let docsById = {};
+              const docsById = {};
               entries.forEach((entry) => {
                 docsById[entry.documentId] = docsById[entry.documentId] || [];
                 docsById[entry.documentId].push(entry);
@@ -198,7 +198,7 @@ function _checkTxs(knex, date, txs) {
 function add(knex, date, description, txs, options = {}) {
 
   // Unknown accounts to resolve.
-  let accountNumberToId = {};
+  const accountNumberToId = {};
   // Total amount in transaction.
   let total = 0;
   // Counter for line number.

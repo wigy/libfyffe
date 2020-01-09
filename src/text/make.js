@@ -43,7 +43,7 @@ function substitute(text, target) {
       throw new Error('Cannot translate transaction ' + JSON.stringify(target.toJSON()) + ' without service.');
     }
     const variable = match[1];
-    let conf = config.services[target.service];
+    const conf = config.services[target.service];
     conf.service = target.service;
     conf.fund = target.fund;
     if (conf[variable] === undefined) {
@@ -113,7 +113,7 @@ module.exports = {
    * @param {Tx} tx Transaction to describe.
    */
   tx: (tx, key = tx.type) => {
-    let text = texts[config.language].tx[key];
+    const text = texts[config.language].tx[key];
     if (text === undefined) {
       throw new Error('No translation for transaction ' + JSON.stringify(key) + ' in ' + config.language);
     }

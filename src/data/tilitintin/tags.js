@@ -94,7 +94,7 @@ async function add(knex, tag, name, picture, type, order) {
   switch (url.protocol) {
     case 'http:':
     case 'https:':
-      blob = await rp({uri: picture, encoding: null});
+      blob = await rp({ uri: picture, encoding: null });
       break;
     case 'file:':
       blob = fs.readFileSync(url.pathname);

@@ -21,20 +21,20 @@ module.exports = class ExpenseTx extends Tx {
   getMyEntries() {
     if (this.vat) {
       return [
-        {number: this.getAccount('expenses', this.target), amount: num.cents(this.total - this.vat)},
-        {number: this.getAccount('taxes', 'vat'), amount: num.cents(this.vat)},
-        {number: this.getAccount('currencies', this.currency), amount: num.cents(-this.total)}
+        { number: this.getAccount('expenses', this.target), amount: num.cents(this.total - this.vat) },
+        { number: this.getAccount('taxes', 'vat'), amount: num.cents(this.vat) },
+        { number: this.getAccount('currencies', this.currency), amount: num.cents(-this.total) }
       ];
     }
     return [
-      {number: this.getAccount('expenses', this.target), amount: num.cents(this.total)},
-      {number: this.getAccount('currencies', this.currency), amount: num.cents(-this.total)}
+      { number: this.getAccount('expenses', this.target), amount: num.cents(this.total) },
+      { number: this.getAccount('currencies', this.currency), amount: num.cents(-this.total) }
     ];
   }
 
   getMyText() {
     const key = 'expense.' + this.target.toLowerCase();
-    let opts = [text.option('notes', this)];
+    const opts = [text.option('notes', this)];
     return text.withOptions(text.tx(this, key), opts);
   }
 

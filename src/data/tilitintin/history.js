@@ -26,8 +26,8 @@ const moment = require('moment');
  */
 function findPriceAndStock(knex, date = null, targets = null) {
   const parser = new Parser();
-  let missingAvg = new Set(targets);
-  let missingStock = new Set(targets);
+  const missingAvg = new Set(targets);
+  const missingStock = new Set(targets);
   if (!date) {
     date = moment().format('YYYY-MM-DD');
   }
@@ -39,7 +39,7 @@ function findPriceAndStock(knex, date = null, targets = null) {
     .leftJoin('document', 'entry.document_id', 'document.id').orderBy('date', 'desc')
     .then((data) => {
 
-      let ret = {stock: {}, avg: {}};
+      const ret = { stock: {}, avg: {} };
       let tx;
       for (let i = 0; i < data.length; i++) {
         // Parse it.

@@ -21,7 +21,7 @@ class CoinbaseImport extends Import {
   }
 
   grouping(entries) {
-    let ret = {};
+    const ret = {};
     entries.forEach((entry) => {
       let key = entry.Transfer_ID;
       if (!key) {

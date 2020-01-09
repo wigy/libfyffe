@@ -138,11 +138,11 @@ class Fyffe {
    * @return {Map} A mapping from importer names to content recognized to belong to them.
    */
   recognize(contents) {
-    let ret = {};
+    const ret = {};
     Object.keys(contents).forEach((path) => {
       let found = false;
-      let content = contents[path];
-      for (let name in this.modules) {
+      const content = contents[path];
+      for (const name in this.modules) {
         if (this.modules[name].isMine(content)) {
           ret[name] = ret[name] || [];
           ret[name].push(content);
@@ -163,7 +163,7 @@ class Fyffe {
    * @return {Map} An array of file contents.
    */
   readFiles(files) {
-    let ret = {};
+    const ret = {};
     files.forEach((path) => {
       const buf = fs.readFileSync(path);
       const { encoding } = config.encoding || dce(buf);
@@ -179,7 +179,7 @@ class Fyffe {
    */
   async loadFileData(dataPerImporter) {
     // Read in each data cluster.
-    let ret = [];
+    const ret = [];
     Object.keys(dataPerImporter).forEach((name) => {
       this.modules[name].init();
       ret.push(this.modules[name].loadFiles(dataPerImporter[name]));
@@ -228,9 +228,9 @@ class Fyffe {
     }
 
     return Promise.all(Object.keys(dataPerImporter).map((name) => {
-      let tag = this.service + ':' + this.fund;
+      const tag = this.service + ':' + this.fund;
       return tilitintin.imports.doneFor(knex, tag)
-        .then((ids) => ({name, ids}));
+        .then((ids) => ({ name, ids }));
     }))
       .then((imported) => {
         Object.values(imported).forEach((set) => {
@@ -251,11 +251,11 @@ class Fyffe {
    * @return {Set<String>}
    */
   scanTargets(dataPerImporter, ignore = new Set()) {
-    let txs = new Set();
+    const txs = new Set();
     Object.keys(dataPerImporter).forEach((name) => {
       dataPerImporter[name].forEach((group) => {
         try {
-          let tx = this.modules[name].createTransaction(group, this, ignore);
+          const tx = this.modules[name].createTransaction(group, this, ignore);
           txs.add(tx.getTarget());
           txs.add(tx.getSource());
         } catch (err) {}
@@ -281,10 +281,10 @@ class Fyffe {
     for (const name of Object.keys(dataPerImporter)) {
 
       // Create txs.
-      let txs = [];
+      const txs = [];
       for (const group of dataPerImporter[name]) {
         try {
-          let tx = this.modules[name].createTransaction(group, this);
+          const tx = this.modules[name].createTransaction(group, this);
           if (ignore.has(tx.type)) {
             continue;
           }
@@ -313,9 +313,9 @@ class Fyffe {
             let tx;
             const acc = config.get('accounts.bank');
             if (raw < 0) {
-              tx = Tx.create('error', {total: -raw, target: acc, notes: 'out', time: group.timestamp, id: group.id});
+              tx = Tx.create('error', { total: -raw, target: acc, notes: 'out', time: group.timestamp, id: group.id });
             } else {
-              tx = Tx.create('error', {total: raw, target: acc, notes: 'in', time: group.timestamp, id: group.id});
+              tx = Tx.create('error', { total: raw, target: acc, notes: 'in', time: group.timestamp, id: group.id });
             }
             txs.push(tx);
           } else {
@@ -348,7 +348,7 @@ class Fyffe {
    * @param {Set<String>} targets
    */
   async initializeStock(dbName, firstDate, targets) {
-    const {avg, stock} = await this.loadPriceAndStock(dbName, firstDate, targets);
+    const { avg, stock } = await this.loadPriceAndStock(dbName, firstDate, targets);
     Object.assign(stock, this.initialStock);
     this.stock.setStock(stock);
     Object.assign(avg, this.initialAverages);
@@ -372,7 +372,7 @@ class Fyffe {
     this.fund = options.fund;
     let dataPerImporter = this.recognize(this.readFiles(files));
 
-    const {dbName} = options;
+    const { dbName } = options;
     const knex = this.dbs[dbName];
 
     // Get initial data.
@@ -393,14 +393,14 @@ class Fyffe {
         return this.modules[name].time(a[0]) - this.modules[name].time(b[0]);
       };
       dataPerImporter[name] = dataPerImporter[name].sort(sorter);
-      let first = this.modules[name].time(dataPerImporter[name][0][0]);
+      const first = this.modules[name].time(dataPerImporter[name][0][0]);
       if (minDate === null || first < minDate) {
         minDate = first;
       }
     });
 
     // Get starting balances for accounts.
-    let firstDate = moment(minDate).format('YYYY-MM-DD');
+    const firstDate = moment(minDate).format('YYYY-MM-DD');
     await this.loadBalances(dbName, firstDate);
     if (config.flags.showBalances) {
       this.ledger.accounts.showBalances('Initial balances:');
@@ -436,7 +436,7 @@ class Fyffe {
     if (config.flags.dryRun) {
       return;
     }
-    const {dbName} = options;
+    const { dbName } = options;
     const knex = this.dbs[dbName];
     const exporter = require('../data/export/' + format);
     const exportOptions = {

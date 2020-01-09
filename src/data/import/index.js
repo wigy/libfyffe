@@ -44,7 +44,7 @@ class Import {
    * @return {Map}
    */
   static modules() {
-    let ret = new Map();
+    const ret = new Map();
     fs.readdirSync(__dirname).filter((file) => file !== 'index.js').map((file) => file.replace(/\.js$/, ''))
       .forEach((name) => {
         ret[name] = require('./' + name);
@@ -97,7 +97,7 @@ class Import {
       let headers = null;
       opts.noheader = true;
 
-      let lines = [];
+      const lines = [];
 
       csv(opts)
         .fromString(file)
@@ -108,7 +108,7 @@ class Import {
             headers = opts.headers || row.map(r => r.replace(/\W/g, '_'));
             headers = headers.map((header, i) => header || 'Column' + (i + 1));
           } else {
-            let line = {};
+            const line = {};
             for (let i = 0; i < row.length; i++) {
               line[headers[i]] = row[i];
             }
@@ -334,7 +334,7 @@ class Import {
    * @return {Promise<Array<Array<any>>>}
    */
   makeGrouping(entries) {
-    let groups = this.grouping(entries);
+    const groups = this.grouping(entries);
     // Generate IDs and timestamps.
     groups.forEach((group, i) => {
       const id = this.id(group);
@@ -372,7 +372,7 @@ class Import {
     this.ledger = fyffe.ledger;
 
     // TODO: Cleanup. These can be figured from constructor data for each type.
-    let obj = {};
+    const obj = {};
     obj.id = this.id(group);
     obj.time = this.time(group[0]);
     obj.type = this.recognize(group);
@@ -424,7 +424,7 @@ class Import {
 
     const type = obj.type;
     delete obj.type;
-    let ret = Tx.create(type, obj, this.service, this.fund);
+    const ret = Tx.create(type, obj, this.service, this.fund);
     this.tags(group, obj).forEach((tag) => {
       ret.tags.push(tag);
     });

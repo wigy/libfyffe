@@ -20,14 +20,14 @@ module.exports = class IncomeTx extends Tx {
 
   getMyEntries() {
     return [
-      {number: this.getAccount('incomes', this.target), amount: num.cents(-this.total)},
-      {number: this.getAccount('currencies', this.currency), amount: num.cents(this.total)}
+      { number: this.getAccount('incomes', this.target), amount: num.cents(-this.total) },
+      { number: this.getAccount('currencies', this.currency), amount: num.cents(this.total) }
     ];
   }
 
   getMyText() {
     const key = 'income.' + this.target.toLowerCase();
-    let opts = [text.option('notes', this)];
+    const opts = [text.option('notes', this)];
     return text.withOptions(text.tx(this, key), opts);
   }
 

@@ -14,8 +14,8 @@ module.exports = class LoanTakeTx extends Tx {
 
   getMyEntries() {
     return [
-      {number: this.getAccount('currencies', this.currency), amount: num.cents(this.total)},
-      {number: this.getAccount('loans', this.currency), amount: num.cents(-this.total)}
+      { number: this.getAccount('currencies', this.currency), amount: num.cents(this.total) },
+      { number: this.getAccount('loans', this.currency), amount: num.cents(-this.total) }
     ];
   }
 

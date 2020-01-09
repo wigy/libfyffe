@@ -14,14 +14,14 @@ module.exports = class ErrorTx extends Tx {
   getMyEntries() {
     if (this.notes === 'in') {
       return [
-        {number: this.target, amount: num.cents(this.total)},
-        {number: this.getAccount('imbalance'), amount: num.cents(-this.total)}
+        { number: this.target, amount: num.cents(this.total) },
+        { number: this.getAccount('imbalance'), amount: num.cents(-this.total) }
       ];
     }
     if (this.notes === 'out') {
       return [
-        {number: this.target, amount: num.cents(-this.total)},
-        {number: this.getAccount('imbalance'), amount: num.cents(this.total)}
+        { number: this.target, amount: num.cents(-this.total) },
+        { number: this.getAccount('imbalance'), amount: num.cents(this.total) }
       ];
     }
     return [];

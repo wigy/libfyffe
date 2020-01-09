@@ -10,7 +10,8 @@ const text = require('../text/make');
 module.exports = class TradeTx extends Tx {
 
   constructor(data = {}) {
-    super('trade', { target: undefined,
+    super('trade', {
+      target: undefined,
       source: undefined,
       amount: undefined,
       given: undefined,
@@ -26,10 +27,10 @@ module.exports = class TradeTx extends Tx {
 
   getMyEntries() {
     const ret = [
-      {number: this.getAccount('targets', this.source), amount: num.cents(-this.total)}
+      { number: this.getAccount('targets', this.source), amount: num.cents(-this.total) }
     ];
     if (this.fee) {
-      ret.push({number: this.getAccount('fees'), amount: this.fee});
+      ret.push({ number: this.getAccount('fees'), amount: this.fee });
     }
     if (config.flags.tradeProfit) {
       // Calculate profit immediately if historical rate is found.
@@ -40,19 +41,19 @@ module.exports = class TradeTx extends Tx {
         const diff = num.cents(buyPrice - sellPrice);
         if (diff > 0) {
           // In losses, add to debit side into losses.
-          ret.push({number: this.getAccount('losses'), amount: diff});
-          ret.push({number: this.getAccount('targets', this.target), amount: sellPrice});
+          ret.push({ number: this.getAccount('losses'), amount: diff });
+          ret.push({ number: this.getAccount('targets', this.target), amount: sellPrice });
         } else if (diff < 0) {
           // In profits, add to credit side into profits
-          ret.push({number: this.getAccount('profits'), amount: diff});
-          ret.push({number: this.getAccount('targets', this.target), amount: sellPrice});
+          ret.push({ number: this.getAccount('profits'), amount: diff });
+          ret.push({ number: this.getAccount('targets', this.target), amount: sellPrice });
         } else {
-          ret.push({number: this.getAccount('targets', this.target), amount: num.cents(this.total - this.fee)});
+          ret.push({ number: this.getAccount('targets', this.target), amount: num.cents(this.total - this.fee) });
         }
         return ret;
       }
     }
-    ret.push({number: this.getAccount('targets', this.target), amount: num.cents(this.total - this.fee)});
+    ret.push({ number: this.getAccount('targets', this.target), amount: num.cents(this.total - this.fee) });
     return ret;
   }
 
@@ -83,10 +84,10 @@ module.exports = class TradeTx extends Tx {
       stock.add(this.burnAmount, this.getBurnTarget(), burned);
       this.fee = num.cents(this.fee + burned);
     }
-    let src = stock.add(this.given, this.getSource(), this.total);
+    const src = stock.add(this.given, this.getSource(), this.total);
     this.stock2 = src.amount;
     this.avg2 = src.avg;
-    let dst = stock.add(this.amount, this.getTarget(), this.total);
+    const dst = stock.add(this.amount, this.getTarget(), this.total);
     this.stock = dst.amount;
     this.avg = dst.avg;
   }

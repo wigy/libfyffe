@@ -22,65 +22,65 @@ const plural = {
 };
 
 const fields = {
-  'tags': {
-    'tag': true,
-    'name': true,
-    'picture': true,
-    'mime': true,
-    'type': true,
-    'order': true
+  tags: {
+    tag: true,
+    name: true,
+    picture: true,
+    mime: true,
+    type: true,
+    order: true
   },
-  'period': {
-    'end_date': true,
-    'locked': true,
-    'start_date': true
+  period: {
+    end_date: true,
+    locked: true,
+    start_date: true
   },
-  'document': {
-    'period_id': true,
-    'number': true,
-    'date': true
+  document: {
+    period_id: true,
+    number: true,
+    date: true
   },
-  'entry': {
-    'document_id': true,
-    'account_id': true,
-    'amount': true,
-    'debit': true,
-    'description': true,
-    'flags': true,
-    'row_number': true
+  entry: {
+    document_id: true,
+    account_id: true,
+    amount: true,
+    debit: true,
+    description: true,
+    flags: true,
+    row_number: true
   },
-  'account': {
-    'vat_account1_id': true,
-    'vat_account2_id': true,
-    'flags': true,
-    'name': true,
-    'number': true,
-    'type': true,
-    'vat_code': true,
-    'vat_percentage': true
+  account: {
+    vat_account1_id: true,
+    vat_account2_id: true,
+    flags: true,
+    name: true,
+    number: true,
+    type: true,
+    vat_code: true,
+    vat_percentage: true
   },
-  'coa_heading': {
-    'number': true,
-    'text': true,
-    'level': true
+  coa_heading: {
+    number: true,
+    text: true,
+    level: true
   },
-  'report_structure': {
-    'id': true,
-    'data': true
+  report_structure: {
+    id: true,
+    data: true
   }
 };
 
 //                      0        1            2         3          4          5              6
 const ACCOUNT_TYPES = ['ASSET', 'LIABILITY', 'EQUITY', 'REVENUE', 'EXPENSE', 'PROFIT_PREV', 'PROFIT'];
 const transformer = {
-  'account': (acc) => {
+  account: (acc) => {
     acc.type = ACCOUNT_TYPES[acc.type];
     return acc;
   }
 };
 
 const reverseTransformer = {
-  'account': (acc) => {
+  account: (acc) => {
     acc.type = ACCOUNT_TYPES.indexOf(acc.type);
     return acc;
   }
@@ -149,7 +149,7 @@ async function listAll(db, className, where, order) {
  */
 async function getOne(db, className, id, joinClass = null, joinClassOrder = null) {
   let ret = null;
-  return db.select('*').from(className).where({'id': id})
+  return db.select('*').from(className).where({ id: id })
     .then(entries => {
       ret = entries.length ? fillEntries(entries, className)[0] : null;
       if (joinClass) {
@@ -190,7 +190,7 @@ async function updateOne(db, className, id, data) {
   if (reverseTransformer[className]) {
     data = reverseTransformer[className](data);
   }
-  return db(className).where({'id': id}).update(data)
+  return db(className).where({ id: id }).update(data)
     .then(() => 204)
     .catch((err) => {
       dump.error(err);
@@ -205,7 +205,7 @@ async function updateOne(db, className, id, data) {
  * @param {Number} id
  */
 async function deleteOne(db, className, id) {
-  return deleteMany(db, className, {'id': id});
+  return deleteMany(db, className, { id: id });
 }
 
 /**
@@ -242,7 +242,7 @@ async function createOne(db, className, data) {
   }
   return db(className).insert(data)
     .then((data) => {
-      return db(className).where({id: data[0]}).first()
+      return db(className).where({ id: data[0] }).first()
         .then((res) => {
           dateFields[className].forEach(d => (res[d] = dateFromDb(res[d])));
           return res;
@@ -263,7 +263,7 @@ async function getPeriodAccounts(db, periodId) {
   return db.select('account.id', 'account.number', 'account.name').from('entry')
     .leftJoin('account', 'account.id', 'entry.account_id')
     .leftJoin('document', 'document.id', 'entry.document_id')
-    .where({'document.period_id': periodId})
+    .where({ 'document.period_id': periodId })
     .orderBy('account.number')
     .groupBy('entry.account_id');
 }
@@ -272,8 +272,8 @@ async function getPeriodCredits(db, periodId) {
   return db.select('account.id', 'account.number', 'account.name', db.raw('SUM(entry.amount * 100) as amount')).from('entry')
     .leftJoin('account', 'account.id', 'entry.account_id')
     .leftJoin('document', 'document.id', 'entry.document_id')
-    .where({'document.period_id': periodId})
-    .where({'entry.debit': 0})
+    .where({ 'document.period_id': periodId })
+    .where({ 'entry.debit': 0 })
     .orderBy('account.number')
     .groupBy('entry.account_id');
 }
@@ -282,8 +282,8 @@ async function getPeriodDebits(db, periodId) {
   return db.select('account.id', 'account.number', 'account.name', db.raw('SUM(entry.amount * 100) as amount')).from('entry')
     .leftJoin('account', 'account.id', 'entry.account_id')
     .leftJoin('document', 'document.id', 'entry.document_id')
-    .where({'document.period_id': periodId})
-    .where({'entry.debit': 1})
+    .where({ 'document.period_id': periodId })
+    .where({ 'entry.debit': 1 })
     .orderBy('account.number')
     .groupBy('entry.account_id');
 }
@@ -310,7 +310,7 @@ async function getPeriodBalances(db, periodId) {
         });
     })
     .then(data => {
-      let accounts = {};
+      const accounts = {};
       data.debit.forEach(item => {
         accounts[item.id] = item;
         accounts[item.id].debit = item.amount;
@@ -347,8 +347,8 @@ async function getPeriodBalances(db, periodId) {
 async function getAccountTransactions(db, periodId, accountId) {
   return db.select('document.*').from('document')
     .leftJoin('entry', 'document.id', 'entry.document_id')
-    .where({'document.period_id': periodId})
-    .where({'entry.account_id': accountId})
+    .where({ 'document.period_id': periodId })
+    .where({ 'entry.account_id': accountId })
     .orderBy(['document.date', 'document.number'])
     .groupBy('document.id')
     .then(entries => fillEntries(entries, 'document'));
@@ -363,7 +363,7 @@ async function getAccountTransactions(db, periodId, accountId) {
 async function getAccountTransactionsWithEntries(db, periodId, accountId) {
   return getAccountTransactions(db, periodId, accountId)
     .then((txs) => {
-      let txByDocID = {};
+      const txByDocID = {};
       const docIds = txs.map((tx) => {
         txByDocID[tx.id] = txByDocID[tx.id] || [];
         txByDocID[tx.id].push(tx);
@@ -391,16 +391,16 @@ async function getAccountTransactionsWithEntries(db, periodId, accountId) {
  * @param {Number} accountId
  */
 async function getPeriodTransactionsWithEntries(db, periodId) {
-  return db.select('*').from('document').where({period_id: periodId})
+  return db.select('*').from('document').where({ period_id: periodId })
     .then((docs) => {
       fillEntries(docs, 'document');
-      let docsById = {};
+      const docsById = {};
       docs.forEach((doc) => {
         docsById[doc.id] = doc;
         docsById[doc.id].entries = [];
       });
 
-      return db.select('entry.*').from('document').where({period_id: periodId})
+      return db.select('entry.*').from('document').where({ period_id: periodId })
         .join('entry', 'entry.document_id', 'document.id')
         .orderBy(['entry.document_id', 'entry.row_number'])
         .then((entries) => {
@@ -422,7 +422,7 @@ async function getPeriodTransactionsWithEntries(db, periodId) {
  */
 async function getAccountTransactionsByNumber(db, periodId, accountNumber) {
   return getAccountId(db, accountNumber)
-    .then(({id}) => {
+    .then(({ id }) => {
       return getAccountTransactions(db, periodId, id);
     });
 }
@@ -435,8 +435,8 @@ async function getAccountTransactionsByNumber(db, periodId, accountNumber) {
  */
 async function getAccountId(db, number) {
   return db.select('id').from('account')
-    .where({'account.number': number})
-    .then(account => (account.length ? {number: number, id: account[0].id} : null));
+    .where({ 'account.number': number })
+    .then(account => (account.length ? { number: number, id: account[0].id } : null));
 }
 
 /**
@@ -510,7 +510,7 @@ async function getNextDocument(db, periodId) {
   return db
     .select(db.raw('MAX(number) AS number'))
     .from('document')
-    .where({period_id: periodId})
+    .where({ period_id: periodId })
     .pluck('number')
     .first()
     .then((res) => {
@@ -526,22 +526,22 @@ async function getNextDocument(db, periodId) {
 async function isLocked(db, what, id) {
   switch (what) {
     case 'entry':
-      return db.select('document_id').from('entry').where({id}).first()
-        .then((res) => res && db.select('period_id').from('document').where({id: res.document_id}).first())
-        .then((res) => res && db.select('locked').from('period').where({id: res.period_id}).first())
+      return db.select('document_id').from('entry').where({ id }).first()
+        .then((res) => res && db.select('period_id').from('document').where({ id: res.document_id }).first())
+        .then((res) => res && db.select('locked').from('period').where({ id: res.period_id }).first())
         .then((res) => {
           return !res || res.locked;
         });
 
     case 'document':
-      return db.select('period_id').from('document').where({id}).first()
-        .then((res) => res && db.select('locked').from('period').where({id: res.period_id}).first())
+      return db.select('period_id').from('document').where({ id }).first()
+        .then((res) => res && db.select('locked').from('period').where({ id: res.period_id }).first())
         .then((res) => {
           return !res || res.locked;
         });
 
     case 'period':
-      return db.select('locked').from('period').where({id}).first()
+      return db.select('locked').from('period').where({ id }).first()
         .then((res) => {
           return !res || res.locked;
         });
@@ -559,7 +559,7 @@ async function getAccountTransactionCountByPeriod(db, id) {
   return db.select('period.*', db.raw('COUNT(*) AS entries')).from('entry')
     .leftJoin('document', 'entry.document_id', 'document.id')
     .leftJoin('period', 'document.period_id', 'period.id')
-    .where({account_id: id})
+    .where({ account_id: id })
     .orderBy('period.id')
     .groupBy('period.id');
 }

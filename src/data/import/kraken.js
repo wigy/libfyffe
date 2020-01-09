@@ -50,7 +50,7 @@ class KrakenImport extends Import {
   }
 
   grouping(entries) {
-    let ret = {};
+    const ret = {};
     entries.forEach((entry) => {
       // Drop entries without transaction ID.
       if (!entry.txid) {

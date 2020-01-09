@@ -16,24 +16,24 @@ module.exports = class DividendTx extends Tx {
   }
 
   getMyEntries() {
-    let ret = [
-      {number: this.getAccount('dividends'), amount: num.cents(-this.total)}
+    const ret = [
+      { number: this.getAccount('dividends'), amount: num.cents(-this.total) }
     ];
     if (this.tax) {
       const tax = num.cents(this.tax);
       const acc = this.currency === config.currency ? this.getAccount('taxes', 'income') : this.getAccount('taxes', 'source');
       const amount = num.cents(this.total - tax);
-      ret.push({number: this.getAccount('currencies', this.currency), amount: amount});
-      ret.push({number: acc, amount: tax});
+      ret.push({ number: this.getAccount('currencies', this.currency), amount: amount });
+      ret.push({ number: acc, amount: tax });
     } else {
-      ret.push({number: this.getAccount('currencies', this.currency), amount: num.cents(this.total)});
+      ret.push({ number: this.getAccount('currencies', this.currency), amount: num.cents(this.total) });
     }
 
     return ret;
   }
 
   getMyText() {
-    let opts = [text.option('dividend', this)];
+    const opts = [text.option('dividend', this)];
     if (this.currency !== config.currency) {
       opts.push(text.option('rate', this));
     }

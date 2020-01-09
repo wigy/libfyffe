@@ -15,14 +15,14 @@ module.exports = class WithdrawalTx extends Tx {
   getMyEntries() {
     if (this.fee) {
       return [
-        {number: this.getAccount('bank'), amount: num.cents(this.total - this.fee)},
-        {number: this.getAccount('fees'), amount: num.cents(this.fee)},
-        {number: this.getAccount('currencies', config.currency), amount: num.cents(-this.total)}
+        { number: this.getAccount('bank'), amount: num.cents(this.total - this.fee) },
+        { number: this.getAccount('fees'), amount: num.cents(this.fee) },
+        { number: this.getAccount('currencies', config.currency), amount: num.cents(-this.total) }
       ];
     }
     return [
-      {number: this.getAccount('bank'), amount: num.cents(this.total)},
-      {number: this.getAccount('currencies', config.currency), amount: num.cents(-this.total)}
+      { number: this.getAccount('bank'), amount: num.cents(this.total) },
+      { number: this.getAccount('currencies', config.currency), amount: num.cents(-this.total) }
     ];
   }
 

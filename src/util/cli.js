@@ -27,7 +27,7 @@ class Cli {
    * @param {String} desc
    */
   opt(name, initial, desc) {
-    this.__options[name] = {default: initial, description: desc};
+    this.__options[name] = { default: initial, description: desc };
     this.options[name] = initial;
     this.__desc.push('     --' + name + '\t' + desc);
   }
@@ -97,7 +97,7 @@ class Cli {
     values = '     ' + arg + '\t' + values;
     this.__desc.push(values);
 
-    let n = this.__args.length + 2;
+    const n = this.__args.length + 2;
     if (this.__remaining.length <= n) {
       if (this.__no_exit) {
         return;

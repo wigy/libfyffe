@@ -34,7 +34,7 @@ module.exports = class Stock {
       this.average[target] = (oldPrice + price) / newTotal;
     }
     // console.log('=>', count, target, this.stock[target]);
-    return {amount: this.stock[target], avg: this.average[target]};
+    return { amount: this.stock[target], avg: this.average[target] };
   }
 
   /**
