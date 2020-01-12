@@ -1,3 +1,5 @@
+const dump = require('neat-dump');
+
 /**
  * Convert account number to ID.
  * @param {Knex} knex Knex-instance configured for the database.
@@ -60,6 +62,7 @@ async function getBalances(knex, numbers, date = null) {
     .then((id) => {
       periodId = id;
       if (!periodId) {
+        dump.error(`Cannot find period for date ${stamp}.`);
         return {};
       }
       return getIdsByNumber(knex, numbers);

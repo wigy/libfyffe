@@ -385,6 +385,10 @@ class Fyffe {
 
     dataPerImporter = await this.loadFileData(dataPerImporter);
     dataPerImporter = await this.removeImported(knex, dataPerImporter);
+    if (Object.keys(dataPerImporter).length === 0) {
+      dump.info('No un-imported data.');
+      return;
+    }
 
     // Sort them according to the timestamps and find the earliest timestamp.
     let minDate = null;
