@@ -51,6 +51,9 @@ module.exports = class Stock {
    * @param {Number} balance
    */
   setBalance(number, balance) {
+    if (!this.accounts[number]) {
+      throw new Error(`No such account as ${number}.`);
+    }
     this.accounts[number].balance = balance;
   }
 
