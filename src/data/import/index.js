@@ -203,6 +203,16 @@ class Import {
   }
 
   /**
+   * Parse raw transaction text used on failed import.
+   *
+   * @param {Array<Object>} group A source data group.
+   * @return {Number}
+   */
+  rawText(group) {
+    throw new Error('Importer does not implement rawText().');
+  }
+
+  /**
    * Find out currency as 'EUR' or 'USD'.
    *
    * @param {Array<Object>} group A source data group.

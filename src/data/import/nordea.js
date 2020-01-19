@@ -117,6 +117,13 @@ class NordeaImport extends Import {
     return this.num(group[0].M__r_);
   }
 
+  rawText(group) {
+    if (group.length > 1) {
+      throw new Error('Only single entry raw values supported.');
+    }
+    return group[0].Tapahtuma + ': ' + group[0].Viesti;
+  }
+
   tax(group, obj) {
     switch (obj.type) {
       case 'dividend':

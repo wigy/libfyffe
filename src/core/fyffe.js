@@ -413,25 +413,42 @@ class Fyffe {
 
     // Import the pre-processed groups from importer module.
     for (const name of Object.keys(dataPerImporter)) {
-      const mod = this.modules[name];
-      mod.setFundAndService(null, mod.name);
-      const importRules = { rules: config.services[mod.service].import };
+      const module = this.modules[name];
+      module.setFundAndService(null, module.name);
+      const importRules = { rules: config.services[module.service].import };
       const mapper = new StringMapper(importRules);
       for (const group of dataPerImporter[name]) {
         if (group.length > 1) {
           throw new Error('Groups longer than one are not yet supported in simple import.');
         }
         const match = mapper.findMatch('rules', group[0]);
+        let tx;
         if (!match) {
           if (config.flags.importErrors) {
-            // TODO: Import errors to special account.
+            tx = {
+              date: moment(module.time(group[0])).format('YYYY-MM-DD'),
+              entries: [
+                {
+                  number: config.get('accounts.currencies.eur', module.service, module.fund),
+                  amount: num.cents(module.rawValue(group)),
+                  description: module.rawText(group)
+                },
+                {
+                  number: config.get('accounts.imbalance', module.service, module.fund),
+                  amount: num.cents(-module.rawValue(group)),
+                  description: module.rawText(group)
+                }
+              ]
+            };
             dump.warning(`Cannot recognize ${JSON.stringify(group[0])}`);
           } else {
             console.log(group);
             throw new Error('Cannot find the match.');
           }
         } else {
-          const tx = toTx(mod, group, importRules.rules[match]['=>']);
+          tx = toTx(module, group, importRules.rules[match]['=>']);
+        }
+        if (tx) {
           if (config.flags.debug) {
             console.log(tx);
           } else {
