@@ -193,7 +193,7 @@ class Import {
   }
 
   /**
-   * Parse raw transaction value used as backup on failed import.
+   * Parse raw transaction value used as backup on failed import or simplified import.
    *
    * @param {Array<Object>} group A source data group.
    * @return {Number}

@@ -187,8 +187,8 @@ function _checkTxs(knex, date, txs) {
  *
  * The transaction is an array of entries like
  *   [
- *     {number: 1910, amount: -20.50},
- *     {number: 7800, amount: 20.50}
+ *     {number: "1910", amount: -20.50},
+ *     {number: "7800", amount: 20.50}
  *   ]
  * Missing pieces are filled in as necessary. Account can be given as a `number` or
  * an `accountId`.
@@ -196,7 +196,6 @@ function _checkTxs(knex, date, txs) {
  * If option `force` is set, the existing transactions are not checked for duplicates.
  */
 function add(knex, date, description, txs, options = {}) {
-
   // Unknown accounts to resolve.
   const accountNumberToId = {};
   // Total amount in transaction.

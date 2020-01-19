@@ -55,7 +55,7 @@ class StringMapper {
 
     if (rule instanceof Object) {
       // Fixed key value pairs requiring exact match.
-      return Object.keys(rule).reduce((prev, curr) => prev && this.compare(rule[curr], obj[curr]), true);
+      return Object.keys(rule).reduce((prev, curr) => prev && (curr === '=>' || this.compare(rule[curr], obj[curr])), true);
     }
     throw new Error('No handler for rule ' + JSON.stringify(rule));
   }

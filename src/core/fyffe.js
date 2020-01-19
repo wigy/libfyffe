@@ -7,7 +7,9 @@ const Ledger = require('./Ledger');
 const config = require('../config');
 const tilitintin = require('../data/tilitintin');
 const Import = require('../data/import');
+const StringMapper = require('../text/StringMapper');
 const { Tx } = require('../tx');
+const num = require('../util/num');
 
 /**
  * A system instance for transforming and inspecting financial data.
@@ -359,6 +361,88 @@ class Fyffe {
   }
 
   /**
+   * Simple version of import.
+   * @param {Knex} knex
+   * @param {Object[]} data
+   * @param {Object} options
+   */
+  async importSimple(knex, dataPerImporter, options) {
+    const Parser = require('expr-eval').Parser;
+    const parser = new Parser();
+
+    // Helper to substitute expressions.
+    const calc = (str, vars) => {
+      if (typeof str === 'string') {
+        let match;
+        do {
+          match = /\$\{(.*?)\}/.exec(str);
+          if (match) {
+            const expr = parser.parse(match[1]);
+            const resp = expr.evaluate(vars);
+            str = str.replace(match[0], resp);
+          }
+        } while (match);
+        if (/^-?[0-9]+(\.[0-9]+)/.test(str)) {
+          str = parseFloat(str);
+        }
+        return str;
+      }
+      return str;
+    };
+
+    // Helper to construct an transaction.
+    const toTx = (module, group, rules) => {
+      const amount = module.rawValue(group);
+      const date = moment(module.time(group[0])).format('YYYY-MM-DD');
+      const number = config.get('accounts.currencies.eur', module.service, module.fund);
+      const entries = [];
+      let description;
+      (rules instanceof Array ? rules : [rules]).forEach(rule => {
+        const vars = { amount };
+        const text = calc(rule.text, vars);
+        description = description || text;
+        entries.push({
+          number: calc(rule.account, vars),
+          description,
+          amount: num.cents(calc(rule.amount, vars) || -amount)
+        });
+      });
+      entries.push({ number, amount: num.cents(amount), description });
+      return { date, entries };
+    };
+
+    // Import the pre-processed groups from importer module.
+    for (const name of Object.keys(dataPerImporter)) {
+      const mod = this.modules[name];
+      mod.setFundAndService(null, mod.name);
+      const importRules = { rules: config.services[mod.service].import };
+      const mapper = new StringMapper(importRules);
+      for (const group of dataPerImporter[name]) {
+        if (group.length > 1) {
+          throw new Error('Groups longer than one are not yet supported in simple import.');
+        }
+        const match = mapper.findMatch('rules', group[0]);
+        if (!match) {
+          if (config.flags.importErrors) {
+            // TODO: Import errors to special account.
+            dump.warning(`Cannot recognize ${JSON.stringify(group[0])}`);
+          } else {
+            console.log(group);
+            throw new Error('Cannot find the match.');
+          }
+        } else {
+          const tx = toTx(mod, group, importRules.rules[match]['=>']);
+          if (config.flags.debug) {
+            console.log(tx);
+          } else {
+            await tilitintin.tx.add(knex, tx.date, null, tx.entries);
+          }
+        }
+      }
+    }
+  }
+
+  /**
    * Import data from files into the system.
    * @param {Array<String>} files
    * @param {Object} options
@@ -366,6 +450,7 @@ class Fyffe {
    * @param {String} options.service Name of the configuration section to use.
    * @param {String} options.fund Name of the configuration section to use.
    * @param {Set} options.ignore Drop transactions of this type.
+   * @param {Boolean} options.simple If set, use simplified straightforward import.
    */
   async import(files, options) {
     this.service = options.service;
@@ -402,6 +487,11 @@ class Fyffe {
         minDate = first;
       }
     });
+
+    // Simple or not simple?
+    if (config.flags.simple) {
+      return this.importSimple(knex, dataPerImporter, options);
+    }
 
     // Get starting balances for accounts.
     const firstDate = moment(minDate).format('YYYY-MM-DD');
