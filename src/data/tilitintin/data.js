@@ -323,9 +323,9 @@ async function getPeriodBalances(db, periodId) {
       data.balances = Object.values(accounts);
       data.balances.forEach(account => {
         delete account.amount;
-        account.debit = parseInt(account.debit) || 0;
-        account.credit = parseInt(-account.credit) || 0;
-        account.total = parseInt(account.debit + account.credit);
+        account.debit = Math.round(account.debit) || 0;
+        account.credit = Math.round(-account.credit) || 0;
+        account.total = Math.round(account.debit + account.credit);
         account.period_id = parseInt(periodId);
       });
 
