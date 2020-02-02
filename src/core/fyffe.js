@@ -287,6 +287,9 @@ class Fyffe {
       for (const group of dataPerImporter[name]) {
         try {
           const tx = this.modules[name].createTransaction(group, this);
+          if (tx === 'skipped') {
+            continue;
+          }
           if (ignore.has(tx.type)) {
             continue;
           }

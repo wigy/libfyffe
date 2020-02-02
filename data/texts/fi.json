@@ -38,6 +38,7 @@
     "expense.transfer17": "Siirto #17 ={notes}-palveluun",
     "expense.transfer18": "Siirto #18 ={notes}-palveluun",
     "expense.transfer19": "Siirto #19 ={notes}-palveluun",
+    "expense.travel": "Matkakulu ={notes}",
     "expense.vat": "ALV maksu",
     "fx-in": "Valuutanvaihto £{target} <- £{currency}",
     "fx-out": "Valuutanvaihto £{target} -> £{currency}",
@@ -139,6 +140,9 @@
       "notes": "={notes}"
     },
     "expense.misc5": {
+      "notes": "={notes}"
+    },
+    "expense.travel": {
       "notes": "={notes}"
     },
     "income.misc": {

@@ -391,7 +391,7 @@ class Import {
     }
 
     if (obj.type === 'skipped') {
-      return null;
+      return 'skipped';
     }
 
     if (obj.type !== 'withdrawal' && obj.type !== 'deposit' && obj.type !== 'move-in' &&
