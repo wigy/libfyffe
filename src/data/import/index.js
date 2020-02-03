@@ -1,8 +1,8 @@
 const fs = require('fs');
-const csv = require('csvtojson');
 const Tx = require('../../tx/Tx');
 const StringMapper = require('../../text/StringMapper');
 const config = require('../../config');
+const csv = require('csvtojson');
 
 /**
  * Base class for importing data.
@@ -92,6 +92,7 @@ class Import {
    * If `cutFromBeginning` is set, then remove this many lines from the beginning.
    */
   async loadCSV(file, opts = {}) {
+    // TODO: Use our csv lib, once it works fully.
     return new Promise((resolve, reject) => {
 
       let headers = null;
