@@ -75,12 +75,13 @@ class CoinbaseImport extends Import {
   }
 
   target(group, obj) {
+    let other;
     switch (obj.type) {
       case 'buy':
       case 'sell':
       case 'move-out':
       case 'move-in':
-        const other = group.filter((g) => g.Currency !== config.currency);
+        other = group.filter((g) => g.Currency !== config.currency);
         if (other.length) {
           return other[0].Currency;
         }

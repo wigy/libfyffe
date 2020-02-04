@@ -2,7 +2,7 @@ const fs = require('fs');
 const Tx = require('../../tx/Tx');
 const StringMapper = require('../../text/StringMapper');
 const config = require('../../config');
-const csv = require('csvtojson');
+const csv = require('../csv');
 
 /**
  * Base class for importing data.
@@ -92,35 +92,42 @@ class Import {
    * If `cutFromBeginning` is set, then remove this many lines from the beginning.
    */
   async loadCSV(file, opts = {}) {
-    // TODO: Use our csv lib, once it works fully.
-    return new Promise((resolve, reject) => {
+    const USE_OLD = false;
+    if (USE_OLD) {
+      // TODO: Remove once library is reliable.
+      const csvtojson = require('csvtojson');
+      return new Promise((resolve, reject) => {
 
-      let headers = null;
-      opts.noheader = true;
+        let headers = null;
+        opts.noheader = true;
 
-      const lines = [];
+        const lines = [];
 
-      csv(opts)
-        .fromString(file)
-        .on('csv', (row) => {
-          if (opts.cutFromBeginning) {
-            opts.cutFromBeginning--;
-          } else if (headers === null) {
-            headers = opts.headers || row.map(r => r.replace(/\W/g, '_'));
-            headers = headers.map((header, i) => header || 'Column' + (i + 1));
-          } else {
-            const line = {};
-            for (let i = 0; i < row.length; i++) {
-              line[headers[i]] = row[i];
+        csvtojson(opts)
+          .fromString(file)
+          .on('csv', (row) => {
+            if (opts.cutFromBeginning) {
+              opts.cutFromBeginning--;
+            } else if (headers === null) {
+              headers = opts.headers || row.map(r => r.replace(/\W/g, '_'));
+              headers = headers.map((header, i) => header || 'Column' + (i + 1));
+            } else {
+              const line = {};
+              for (let i = 0; i < row.length; i++) {
+                line[headers[i]] = row[i];
+              }
+              line.__lineNumber = lines.length + 1;
+              lines.push(line);
             }
-            line.__lineNumber = lines.length + 1;
-            lines.push(line);
-          }
-        })
-        .on('done', () => {
-          resolve(lines);
-        });
-    });
+          })
+          .on('done', () => {
+            console.log(lines);
+            resolve(lines);
+          });
+      });
+    } else {
+      return csv.readString(file, { lineNumbers: true, ...opts });
+    }
   }
 
   /**

@@ -81,7 +81,7 @@ async function find(knex, table, keyValues) {
  * @param  {String[]} keys
  */
 async function addIf(knex, table, data, ...keys) {
-  const lookup = keys.reduce((prev, cur) => ({...prev, [cur]: data[cur]}), {});
+  const lookup = keys.reduce((prev, cur) => ({ ...prev, [cur]: data[cur] }), {});
   const old = await find(knex, table, lookup);
   if (old) {
     return old.id;
@@ -94,9 +94,9 @@ async function addIf(knex, table, data, ...keys) {
  * @param {Knex} knex
  */
 async function addAccount(knex, { fund, service, account: { name, number } }) {
-  const fundId = await addIf(knex, 'funds', {name: fund.name, tag: fund.tag}, 'name');
-  const serviceId = await addIf(knex, 'services', {name: service.name, tag: service.tag}, 'name');
-  return addIf(knex, 'accounts', {serviceId, fundId, number, name}, 'number', 'fundId', 'serviceId');
+  const fundId = await addIf(knex, 'funds', { name: fund.name, tag: fund.tag }, 'name');
+  const serviceId = await addIf(knex, 'services', { name: service.name, tag: service.tag }, 'name');
+  return addIf(knex, 'accounts', { serviceId, fundId, number, name }, 'number', 'fundId', 'serviceId');
 }
 
 /**
@@ -126,12 +126,12 @@ async function addTransfer(knex, { date, fromId = null, toId = null, amount, com
     [fromId, toId] = [toId, fromId];
   }
   if (fromId) {
-    fromId = await add(knex, 'value_changes', {accountId: fromId, date, amount: -amount, commentId});
+    fromId = await add(knex, 'value_changes', { accountId: fromId, date, amount: -amount, commentId });
   }
   if (toId) {
-    toId = await add(knex, 'value_changes', {accountId: toId, date, amount, commentId});
+    toId = await add(knex, 'value_changes', { accountId: toId, date, amount, commentId });
   }
-  return add(knex, 'transfers', {fromId, toId, commentId});
+  return add(knex, 'transfers', { fromId, toId, commentId });
 }
 
 /**
@@ -139,15 +139,15 @@ async function addTransfer(knex, { date, fromId = null, toId = null, amount, com
  * @param {Knex} knex
  */
 async function addDeposit(knex, { investorId, date, amount, comment = {} }) {
-  const fundId = (await find(knex, 'funds', {name: 'Cash'})).id;
-  const account = await find(knex, 'accounts', {number: getAccountNumber('accounts.bank')});
-  const investor = await find(knex, 'investors', {id: investorId});
+  const fundId = (await find(knex, 'funds', { name: 'Cash' })).id;
+  const account = await find(knex, 'accounts', { number: getAccountNumber('accounts.bank') });
+  const investor = await find(knex, 'investors', { id: investorId });
   const commentId = await addComment(knex, {
     type: 'deposit',
     investor: { id: investor.id, email: investor.email, name: investor.name },
     ...comment
   });
-  const transferId = await addTransfer(knex, {date, toId: account.id, amount, commentId});
+  const transferId = await addTransfer(knex, { date, toId: account.id, amount, commentId });
   await addShares(knex, { date, amount, transferId, fundId, investorId });
 }
 
@@ -156,15 +156,15 @@ async function addDeposit(knex, { investorId, date, amount, comment = {} }) {
  * @param {Knex} knex
  */
 async function addWithdrawal(knex, { investorId, date, amount, comment = {} }) {
-  const fundId = (await find(knex, 'funds', {name: 'Cash'})).id;
-  const accountId = (await find(knex, 'accounts', {number: getAccountNumber('accounts.bank')})).id;
-  const investor = await find(knex, 'investors', {id: investorId});
+  const fundId = (await find(knex, 'funds', { name: 'Cash' })).id;
+  const accountId = (await find(knex, 'accounts', { number: getAccountNumber('accounts.bank') })).id;
+  const investor = await find(knex, 'investors', { id: investorId });
   const commentId = await addComment(knex, {
     type: 'withdrawal',
     investor: { id: investor.id, email: investor.email, name: investor.name },
     ...comment
   });
-  const transferId = await addTransfer(knex, {date, fromId: accountId, amount, commentId});
+  const transferId = await addTransfer(knex, { date, fromId: accountId, amount, commentId });
   await addShares(knex, { date, amount: -amount, transferId, fundId, investorId });
 }
 
@@ -173,7 +173,7 @@ async function addWithdrawal(knex, { investorId, date, amount, comment = {} }) {
  * @param {Knex} knex
  */
 async function addInvestor(knex, { name, email, tag }) {
-  return addIf(knex, 'investors', {email, name, tag}, 'email');
+  return addIf(knex, 'investors', { email, name, tag }, 'email');
 }
 
 /**
@@ -181,7 +181,7 @@ async function addInvestor(knex, { name, email, tag }) {
  * @param {Knex} knex
  */
 async function addFund(knex, { name, tag }) {
-  return addIf(knex, 'funds', {name, tag}, 'name');
+  return addIf(knex, 'funds', { name, tag }, 'name');
 }
 
 /**
@@ -189,7 +189,7 @@ async function addFund(knex, { name, tag }) {
  * @param {Knex} knex
  */
 async function addService(knex, { name, tag }) {
-  return addIf(knex, 'services', {name, tag}, 'name');
+  return addIf(knex, 'services', { name, tag }, 'name');
 }
 
 module.exports = {

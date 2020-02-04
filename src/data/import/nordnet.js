@@ -46,9 +46,10 @@ class NordnetImport extends Import {
   }
 
   async load(file) {
-    let data = await this.loadCSV(file, {delimiter: this.delimiter});
+    let data = await this.loadCSV(file, { delimiter: this.delimiter });
     if (this.version === 2) {
-      data = data.map(e => ({...e,
+      data = data.map(e => ({
+        ...e,
         Vahvistusnumero_Laskelma: e.Vahvistusnumero,
         Valuuttakurssi: e.Vaihtokurssi
       }));
@@ -70,7 +71,7 @@ class NordnetImport extends Import {
   }
 
   grouping(entries) {
-    let ret = {};
+    const ret = {};
     entries.forEach((entry) => {
       if (!entry.Vahvistusnumero_Laskelma) {
         return;
@@ -261,11 +262,11 @@ class NordnetImport extends Import {
       const burn = group.filter(g => g.Tapahtumatyyppi === 'VAIHTO_AP_J_TT_')[0];
       return parseInt(burn.M__r_);
     }
-    let tx = group.filter((tx) => parseInt(this.num(tx.M__r_)));
+    const tx = group.filter((tx) => parseInt(this.num(tx.M__r_)));
     if (!tx.length) {
       return null;
     }
-    let sum = parseFloat(this.num(tx[0].M__r_));
+    const sum = parseFloat(this.num(tx[0].M__r_));
     return obj.type === 'sell' ? -sum : sum;
   }
 

@@ -41,10 +41,10 @@ class Fyffe {
 
   /**
    * Set the explicit initial averages.
-   * @param {Object} avgs
+   * @param {Object} averages
    */
-  setAverages(avgs) {
-    this.initialAverages = avgs;
+  setAverages(averages) {
+    this.initialAverages = averages;
   }
 
   /**
@@ -498,6 +498,10 @@ class Fyffe {
     // Sort them according to the timestamps and find the earliest timestamp.
     let minDate = null;
     Object.keys(dataPerImporter).forEach((name) => {
+      if (dataPerImporter[name].length === 0) {
+        dump.warning('No data found.');
+        return;
+      }
       const sorter = (a, b) => {
         return this.modules[name].time(a[0]) - this.modules[name].time(b[0]);
       };

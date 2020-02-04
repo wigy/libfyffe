@@ -4,7 +4,7 @@ const clone = require('clone');
 
 /**
  * Read in CSV file.
- * @param {String} path
+ * @param {String} pathOrString
  * @param {Object} options
  * @param {String} options.delimiter         Column seprator (default: ',')
  * @param {String} options.eol               End of line sequence (default: \n)
@@ -15,7 +15,7 @@ const clone = require('clone');
  * @param {String} options.output            'csv' as rows as arrays or 'json' as rows as objects.
  * @param {Boolean} options.dropEmpty        Drop entries if no data.
  */
-async function read(path, options = {}) {
+async function read(pathOrString, options = {}) {
   return new Promise((resolve, reject) => {
 
     let headers = null;
@@ -25,7 +25,7 @@ async function read(path, options = {}) {
     const lines = [];
 
     csv(options)
-      .fromString(fs.readFileSync(path))
+      .fromString(options.fromString ? pathOrString : fs.readFileSync(pathOrString))
       .on('csv', (row) => {
         if (options.cutFromBeginning) {
           options.cutFromBeginning--;
@@ -56,6 +56,11 @@ async function read(path, options = {}) {
   });
 }
 
+async function readString(str, options) {
+  return read(str, { ...options, fromString: true });
+}
+
 module.exports = {
-  read
+  read,
+  readString
 };

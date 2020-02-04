@@ -16,7 +16,7 @@ class GDAXImport extends Import {
     return matches.length ? matches : null;
   }
 
-  load(file) {
+  async load(file) {
     return this.loadCSV(file);
   }
 
