@@ -401,7 +401,7 @@ class Fyffe {
       const entries = [];
       let description;
       (rules instanceof Array ? rules : [rules]).forEach(rule => {
-        const vars = { amount };
+        const vars = { ...group[0], amount };
         const text = calc(rule.text, vars);
         description = description || text;
         entries.push({
@@ -451,11 +451,19 @@ class Fyffe {
         } else {
           tx = toTx(module, group, importRules.rules[match]['=>']);
         }
+        // Save it.
         if (tx) {
+          const tag = `${options.service}:${options.fund}`;
+          if (await tilitintin.imports.has(knex, tag, group.id)) {
+            continue;
+          }
           if (config.flags.debug) {
             console.log(tx);
           } else {
-            await tilitintin.tx.add(knex, tx.date, null, tx.entries);
+            const docId = await tilitintin.tx.add(knex, tx.date, null, tx.entries);
+            if (docId) {
+              tilitintin.imports.add(knex, tag, group.id, docId);
+            }
           }
         }
       }
