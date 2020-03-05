@@ -94,8 +94,8 @@ async function addIf(knex, table, data, ...keys) {
  * @param {Knex} knex
  */
 async function addAccount(knex, { fund, service, account: { name, number } }) {
-  const fundId = await addIf(knex, 'funds', { name: fund.name, tag: fund.tag }, 'name');
-  const serviceId = await addIf(knex, 'services', { name: service.name, tag: service.tag }, 'name');
+  const fundId = await addIf(knex, 'funds', { name: fund.name, tag: fund.tag, color: fund.color }, 'name');
+  const serviceId = await addIf(knex, 'services', { name: service.name, tag: service.tag, color: service.color }, 'name');
   return addIf(knex, 'accounts', { serviceId, fundId, number, name }, 'number', 'fundId', 'serviceId');
 }
 
@@ -172,24 +172,24 @@ async function addWithdrawal(knex, { investorId, date, amount, comment = {} }) {
  * Add an investor if it doesn't exist.
  * @param {Knex} knex
  */
-async function addInvestor(knex, { name, email, tag }) {
-  return addIf(knex, 'investors', { email, name, tag }, 'email');
+async function addInvestor(knex, { name, email, tag, color }) {
+  return addIf(knex, 'investors', { email, name, tag, color }, 'email');
 }
 
 /**
  * Add a fund if it doesn't exist.
  * @param {Knex} knex
  */
-async function addFund(knex, { name, tag }) {
-  return addIf(knex, 'funds', { name, tag }, 'name');
+async function addFund(knex, { name, tag, color }) {
+  return addIf(knex, 'funds', { name, tag, color }, 'name');
 }
 
 /**
  * Add a fund if it doesn't exist.
  * @param {Knex} knex
  */
-async function addService(knex, { name, tag }) {
-  return addIf(knex, 'services', { name, tag }, 'name');
+async function addService(knex, { name, tag, color }) {
+  return addIf(knex, 'services', { name, tag, color }, 'name');
 }
 
 module.exports = {
