@@ -168,7 +168,10 @@ class Fyffe {
     const ret = {};
     files.forEach((path) => {
       const buf = fs.readFileSync(path);
-      const { encoding } = config.encoding || dce(buf);
+      let { encoding } = config.encoding || dce(buf);
+      if (encoding === 'ISO-8859-1') {
+        encoding = 'latin1';
+      }
       ret[path] = buf.toString(encoding);
     });
     return ret;
@@ -418,7 +421,13 @@ class Fyffe {
     for (const name of Object.keys(dataPerImporter)) {
       const module = this.modules[name];
       module.setFundAndService(null, module.name);
+      if (!config.services[module.service]) {
+        throw new Error(`Service ${module.service} not defined in fyffe config.`);
+      }
       const importRules = { rules: config.services[module.service].import };
+      if (!importRules) {
+        throw new Error(`Service ${module.service} does not define import rules.`);
+      }
       const mapper = new StringMapper(importRules);
       for (const group of dataPerImporter[name]) {
         if (group.length > 1) {
