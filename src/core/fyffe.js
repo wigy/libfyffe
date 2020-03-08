@@ -398,6 +398,9 @@ class Fyffe {
 
     // Helper to construct an transaction.
     const toTx = (module, group, rules) => {
+      if (rules === 'skip') {
+        return;
+      }
       const amount = module.rawValue(group);
       const date = moment(module.time(group[0])).format('YYYY-MM-DD');
       const number = config.get('accounts.currencies.eur', module.service, module.fund);
@@ -463,7 +466,7 @@ class Fyffe {
         // Save it.
         if (tx) {
           const tag = `${options.service}:${options.fund}`;
-          if (await tilitintin.imports.has(knex, tag, group.id)) {
+          if (!config.flags.force && await tilitintin.imports.has(knex, tag, group.id)) {
             continue;
           }
           if (config.flags.debug) {
