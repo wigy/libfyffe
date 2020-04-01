@@ -39,7 +39,11 @@
     "expense.transfer18": "Siirto #18 ={notes}-palveluun",
     "expense.transfer19": "Siirto #19 ={notes}-palveluun",
     "expense.travel": "Matkakulu ={notes}",
+    "expense.meeting": "Kokouskulu",
+    "expense.mailing": "Postikulu",
     "expense.vat": "ALV maksu",
+    "expense.dividend": "Osingonmaksu",
+    "expense.dividend-tax": "Osingonmaksun ennakonpidätus",
     "fx-in": "Valuutanvaihto £{target} <- £{currency}",
     "fx-out": "Valuutanvaihto £{target} -> £{currency}",
     "income.ambiguous": "Epäselvä siirron lähde",
@@ -254,6 +258,18 @@
       "notes": ""
     },
     "expense.ambiguous": {
+      "notes": ""
+    },
+    "expense.meeting": {
+      "notes": "={notes}"
+    },
+    "expense.mailing": {
+      "notes": "={notes}"
+    },
+    "expense.dividend": {
+      "notes": "={notes}"
+    },
+    "expense.dividend-tax": {
       "notes": ""
     },
     "income.invest": {

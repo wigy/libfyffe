@@ -73,6 +73,11 @@ class NordeaImport extends Import {
     if (!name) {
       throw new Error('Unable to find a match with string mapper: ' + JSON.stringify(group));
     }
+    const rule = this.mapper.get('recognize', name);
+    if ('=>' in rule) {
+      return rule['=>'];
+    }
+    // TODO: This way of doing the mapping is pointless. Can be dropped when not in use.
     return this.mapper.get('txs', name);
   }
 
