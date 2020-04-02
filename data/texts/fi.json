@@ -19,6 +19,7 @@
     "expense.net": "Tietoliikenne",
     "expense.software": "Ohjelmistohankinnat",
     "expense.tax": "Verojen maksu",
+    "expense.furniture": "Kalusteet",
     "expense.transfer": "Siirto ={notes}-palveluun",
     "expense.transfer2": "Siirto #2 ={notes}-palveluun",
     "expense.transfer3": "Siirto #3 ={notes}-palveluun",
@@ -59,6 +60,7 @@
     "income.sales3": "Maksu #3: ={notes}",
     "income.sales4": "Maksu #4: ={notes}",
     "income.sales5": "Maksu #5: ={notes}",
+    "income.tax": "Veronpalautus",
     "income.transfer": "Siirto ={notes}-palvelusta",
     "income.transfer2": "Siirto #2 ={notes}-palvelusta",
     "income.transfer3": "Siirto #3 ={notes}-palvelusta",
@@ -78,6 +80,16 @@
     "income.transfer17": "Siirto #17 ={notes}-palvelusta",
     "income.transfer18": "Siirto #18 ={notes}-palvelusta",
     "income.transfer19": "Siirto #19 ={notes}-palvelusta",
+    "income.transfer20": "Siirto #20 ={notes}-palvelusta",
+    "income.transfer21": "Siirto #21 ={notes}-palvelusta",
+    "income.transfer22": "Siirto #22 ={notes}-palvelusta",
+    "income.transfer23": "Siirto #23 ={notes}-palvelusta",
+    "income.transfer24": "Siirto #24 ={notes}-palvelusta",
+    "income.transfer25": "Siirto #25 ={notes}-palvelusta",
+    "income.transfer26": "Siirto #26 ={notes}-palvelusta",
+    "income.transfer27": "Siirto #27 ={notes}-palvelusta",
+    "income.transfer28": "Siirto #28 ={notes}-palvelusta",
+    "income.transfer29": "Siirto #29 ={notes}-palvelusta",
     "income.vat": "ALV palautus",
     "interest": "C{service} lainakorko",
     "loan-pay": "Lainan lyhennys: C{loanName}",
@@ -197,6 +209,9 @@
     "expense.net": {
       "notes": "={notes}"
     },
+    "expense.furniture": {
+      "notes": "={notes}"
+    },
     "expense.transfer": {
       "notes": ""
     },
@@ -288,6 +303,9 @@
     },
     "income.sales5": {
     },
+    "income.tax": {
+      "notes": ""
+    },
     "income.ambiguous": {
       "notes": ""
     },
@@ -346,6 +364,36 @@
       "notes": ""
     },
     "income.transfer19": {
+      "notes": ""
+    },
+    "income.transfer20": {
+      "notes": ""
+    },
+    "income.transfer21": {
+      "notes": ""
+    },
+    "income.transfer22": {
+      "notes": ""
+    },
+    "income.transfer23": {
+      "notes": ""
+    },
+    "income.transfer24": {
+      "notes": ""
+    },
+    "income.transfer25": {
+      "notes": ""
+    },
+    "income.transfer26": {
+      "notes": ""
+    },
+    "income.transfer27": {
+      "notes": ""
+    },
+    "income.transfer28": {
+      "notes": ""
+    },
+    "income.transfer29": {
       "notes": ""
     }
   }
