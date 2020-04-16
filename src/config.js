@@ -24,6 +24,10 @@ class Config {
       loanName: null,
       // Mapping from tags and their full names to tag objects.
       tags: {},
+      // Starting date of the import range.
+      startDate: null,
+      // Final date of the import range.
+      endDate: null,
       // Various flags affecting library behavior.
       flags: {
         // If set, do not generate profit/loss entries for selling.

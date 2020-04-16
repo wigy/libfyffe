@@ -203,9 +203,14 @@ class Fyffe {
         Object.keys(dataPerImporter).forEach((name) => {
           dataPerImporter[name] = this.modules[name].makeGrouping(dataPerImporter[name]);
           // Drop entries before starting date.
-          if (config.flags.startDate) {
-            const timestamp = new Date(config.flags.startDate).getTime();
+          if (config.startDate) {
+            const timestamp = new Date(config.startDate).getTime();
             dataPerImporter[name] = dataPerImporter[name].filter(group => group.timestamp >= timestamp);
+          }
+          // Drop entries after end date.
+          if (config.endDate) {
+            const timestamp = new Date(config.endDate).getTime() + 24 * 60 * 60 * 1000;
+            dataPerImporter[name] = dataPerImporter[name].filter(group => group.timestamp < timestamp);
           }
         });
         return dataPerImporter;
