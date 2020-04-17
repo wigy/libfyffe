@@ -31,7 +31,11 @@ module.exports = class Stock {
     this.stock[target] = oldTotal + count;
     const newTotal = this.stock[target];
     if (count > 0) {
-      this.average[target] = (oldPrice + price) / newTotal;
+      if (newTotal > 0) {
+        this.average[target] = (oldPrice + price) / newTotal;
+      } else {
+        this.average[target] = 0;
+      }
     }
     // console.log('=>', count, target, this.stock[target]);
     return { amount: this.stock[target], avg: this.average[target] };
