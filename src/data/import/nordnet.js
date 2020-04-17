@@ -39,7 +39,7 @@ class NordnetImport extends Import {
   // Helper to get ID from entry.
   _id(entry) {
     let ret = entry.Vahvistusnumero_Laskelma;
-    if (entry.Tapahtumatyyppi === 'LAINAKORKO') {
+    if (entry.Tapahtumatyyppi === 'LAINAKORKO' || entry.Tapahtumatyyppi === 'P__OMIT_YLIT_KORKO') {
       ret += entry.Valuutta + entry.Kirjausp_iv_;
     }
     return ret;
@@ -98,7 +98,7 @@ class NordnetImport extends Import {
     if (types.includes('OSTO')) {
       return 'buy';
     }
-    if (types.includes('LAINAKORKO')) {
+    if (types.includes('LAINAKORKO') || types.includes('P__OMIT_YLIT_KORKO')) {
       return 'interest';
     }
     if (types.includes('TALLETUS')) {
