@@ -192,17 +192,17 @@ class LynxImport extends SinglePassImport {
 
   matchDividend(str) {
 
-    let re = /^([A-Z ]+?)\s*\([0-9A-Z]+\) (Cash Dividend) ([A-Z][A-Z][A-Z]) ([0-9.]+)/.exec(str);
+    let re = /^([.A-Z ]+?)\s*\([0-9A-Z]+\) (Cash Dividend) ([A-Z][A-Z][A-Z]) ([0-9.]+)/.exec(str);
     if (re) {
       return [this.symbol(re[1]), re[4]];
     }
     // Blah, sometimes they are other way around.
-    re = /^([A-Z ]+?)\s*\([0-9A-Z]+\) (Cash Dividend) ([0-9.]+) ([A-Z][A-Z][A-Z])/.exec(str);
+    re = /^([.A-Z ]+?)\s*\([0-9A-Z]+\) (Cash Dividend) ([0-9.]+) ([A-Z][A-Z][A-Z])/.exec(str);
     if (re) {
       return [this.symbol(re[1]), re[3]];
     }
     // Per share missing in special cases.
-    re = /^([A-Z ]+?)\s*\([0-9A-Z]+\) (Payment in Lieu of Dividend - US Tax|Payment in Lieu of Dividend \(Ordinary Dividend\))/.exec(str);
+    re = /^([.A-Z ]+?)\s*\([0-9A-Z]+\) (Payment in Lieu of Dividend - US Tax|Payment in Lieu of Dividend \(Ordinary Dividend\))/.exec(str);
     if (re) {
       return [this.symbol(re[1]), null];
     }

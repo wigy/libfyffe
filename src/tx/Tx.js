@@ -146,7 +146,7 @@ module.exports = class Tx {
    * A tradeable commodity used in the transaction.
    */
   set target(val) {
-    validator.isRegexMatch('target', val, /^[-A-Z0-9]+\**?$/);
+    validator.isRegexMatch('target', val, /^[-.A-Z0-9]+\**?$/);
     this.data.target = val;
   }
 
