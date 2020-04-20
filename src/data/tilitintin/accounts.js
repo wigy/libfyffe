@@ -54,6 +54,7 @@ async function getPeriod(knex, stamp) {
  * @param {Knex} knex Knex-instance configured for the database.
  * @param {Array<String>} numbers
  * @param {String} date If given as `YYYY-MM-DD`, calculate balance before the given date.
+ * @return {[Object, Object[]]} Balance mapping and a list of transactions after the date.
  */
 async function getBalances(knex, numbers, date = null) {
   const stamp = date === null ? new Date().getTime() + 1000 : new Date(date + ' 00:00:00').getTime();
@@ -82,6 +83,19 @@ async function getBalances(knex, numbers, date = null) {
           const ret = {};
           data.forEach((res) => (ret[res.number] = res.total || 0));
           return ret;
+        })
+        .then(async (ret) => {
+          const txs = await knex.select(knex.raw('account_id, debit * amount + (debit - 1) * amount AS amount, document.date'))
+            .from('entry')
+            .join('document', 'document.id', '=', 'entry.document_id')
+            .whereIn('account_id', numbers.map(n => idByNumber[n]))
+            .andWhere('document.period_id', '=', periodId)
+            .andWhere('document.date', '>=', stamp)
+            .orderBy('document.date');
+
+          const numberById = {};
+          Object.entries(idByNumber).forEach(([k, v]) => (numberById[v] = k));
+          return [ret, txs.map(tx => ({ time: tx.date, amount: tx.amount, number: numberById[tx.account_id] }))];
         });
     });
 }

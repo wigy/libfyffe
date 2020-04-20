@@ -92,9 +92,10 @@ class Fyffe {
    * @param {String} date
    */
   async loadBalances(dbName, date = null) {
-    return tilitintin.accounts.getBalances(this.dbs[dbName], Object.keys(config.getAllAccounts()), date)
-      .then((data) => {
+    return tilitintin.accounts.getBalances(this.dbs[dbName], Object.keys(config.getAllAccounts()), date, true)
+      .then(([data, txs]) => {
         Object.keys(data).forEach((num) => (this.ledger.accounts.setBalance(num, data[num])));
+        return txs;
       });
   }
 
@@ -544,7 +545,7 @@ class Fyffe {
 
     // Get starting balances for accounts.
     const firstDate = moment(minDate).format('YYYY-MM-DD');
-    await this.loadBalances(dbName, firstDate);
+    const additionalTxs = await this.loadBalances(dbName, firstDate);
     if (config.flags.showBalances) {
       this.ledger.accounts.showBalances('Initial balances:');
     }
@@ -556,7 +557,7 @@ class Fyffe {
     await this.createTransactions(dataPerImporter, options.ignore || new Set());
 
     // Finally apply all transactions.
-    this.ledger.apply(this.stock);
+    this.ledger.apply(this.stock, additionalTxs);
 
     if (config.flags.debug) {
       this.ledger.showTransactions('Transactions:');

@@ -57,19 +57,28 @@ module.exports = class Ledger {
   /**
    * Apply all transactions in timestamp order not yet applied to the stock.
    * @param {Stock} stock
+   * @param {Object[]} extraTxs
+   * Additional transactions can be given as an array of {number, amount, time}
    */
-  apply(stock) {
+  apply(stock, extraTxs = []) {
     this.txs = this.txs.sort((a, b) => a.time - b.time);
 
     // Apply txs.
     const loans = {};
     let service, fund;
     let lastTime = 0;
+    let extraIndex = 0;
+
     this.txs.forEach((tx) => {
       if (this.notApplied.has(tx)) {
         lastTime = Math.max(lastTime, tx.time);
         service = service || tx.service;
         fund = fund || tx.fund;
+        // Apply other txs.
+        while (extraIndex < extraTxs.length && tx.time >= extraTxs[extraIndex].time) {
+          this.accounts.transfer(extraTxs[extraIndex].number, extraTxs[extraIndex].amount);
+          extraIndex++;
+        }
         tx.updateFromStock(stock);
         const result = tx.apply(this.accounts, stock);
         for (const r of result) {
