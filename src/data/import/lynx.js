@@ -206,6 +206,10 @@ class LynxImport extends SinglePassImport {
     if (re) {
       return [this.symbol(re[1]), null];
     }
+    re = /^([.A-Z ]+?)\s*\([0-9A-Z]+\) (Stock Dividend) ([A-Z][A-Z][0-9]+) ([0-9]+ for [0-9]+) (- US TAX|\(Ordinary Dividend\))$/.exec(str);
+    if (re) {
+      return ['skip', null];
+    }
 
     throw new Error(`Cannot parse dividend '${str}'`);
   }
@@ -214,6 +218,9 @@ class LynxImport extends SinglePassImport {
     const taxes = {};
     for (const e of data.filter(e => e.Date && e.Currency && e.Amount)) {
       const [target] = this.matchDividend(e.Description);
+      if (target === 'skip') {
+        continue;
+      }
       const rate = await Tx.fetchRate(e.Date, `CURRENCY:${e.Currency}`);
       const amount = cents(-parseFloat(e.Amount) * rate);
       taxes[this.makeId('TAX', e.Date, target)] = amount;
@@ -225,6 +232,9 @@ class LynxImport extends SinglePassImport {
     const ret = [];
     for (const e of data.filter(e => e.Date && e.Currency && e.Amount)) {
       const [target, perShare] = this.matchDividend(e.Description);
+      if (target === 'skip') {
+        continue;
+      }
       const rate = await Tx.fetchRate(e.Date, `CURRENCY:${e.Currency}`);
       const id = this.makeId('DIV', e.Date, target);
       ret.push({
