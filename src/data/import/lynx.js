@@ -67,8 +67,9 @@ class LynxImport extends SinglePassImport {
     const deposits = await this.parseFunding(data['Deposits & Withdrawals']);
     const taxes = await this.parseTax(data['Withholding Tax']);
     const dividends = await this.parseDividends(data.Dividends, taxes);
+    const actions = await this.parseCorporateActions(data['Corporate Actions']);
 
-    return interest.concat(trades).concat(forex).concat(deposits).concat(dividends);
+    return interest.concat(trades).concat(forex).concat(deposits).concat(dividends).concat(actions);
   }
 
   async parseInterest(data) {
@@ -244,6 +245,15 @@ class LynxImport extends SinglePassImport {
         total: cents(parseFloat(e.Amount) * rate),
         type: 'dividend'
       });
+    }
+    return ret;
+  }
+
+  async parseCorporateActions(data) {
+    const ret = [];
+
+    for (const e of data.filter(e => e.Report_Date)) {
+      // console.log(e);
     }
     return ret;
   }
