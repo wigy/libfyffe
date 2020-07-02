@@ -532,7 +532,22 @@ class Fyffe {
         return this.modules[name].time(a[0]) - this.modules[name].time(b[0]);
       };
       dataPerImporter[name] = dataPerImporter[name].sort(sorter);
-      const first = this.modules[name].time(dataPerImporter[name][0][0]);
+      // Scan for first applicable transaction.
+      let i;
+      for (i = 0; i < dataPerImporter[name].length - 1/* Take last if nothing else. */; i++) {
+        const types = dataPerImporter[name][i].map(e => e.type);
+        let bad = false;
+        for (const type of types) {
+          if (options.ignore.has(type)) {
+            bad = true;
+          }
+        }
+        if (bad) {
+          continue;
+        }
+      }
+      // See if we got best first date.
+      const first = this.modules[name].time(dataPerImporter[name][i][0]);
       if (minDate === null || first < minDate) {
         minDate = first;
       }
