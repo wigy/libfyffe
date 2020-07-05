@@ -257,7 +257,7 @@ class LynxImport extends SinglePassImport {
 
       let re = /^([.A-Z ]+?)\s*\([0-9A-Z]+\) Merged\(Liquidation\)/.exec(e.Description);
       if (re) {
-        const target = re[1];
+        const target = this.symbol(re[1]);
         return [{
           amount: parseFloat(e.Quantity),
           currency: e.Currency,
@@ -274,7 +274,7 @@ class LynxImport extends SinglePassImport {
 
       re = /^([.A-Z ]+?)\s*\([0-9A-Z]+\) Stock Dividend/.exec(e.Description);
       if (re) {
-        const target = re[1];
+        const target = this.symbol(re[1]);
         return [{
           amount: parseFloat(e.Quantity),
           source: re[1],
@@ -289,6 +289,32 @@ class LynxImport extends SinglePassImport {
           type: 'stock-dividend'
         }];
       }
+
+      re = /^([.A-Z ]+?)\s*\([0-9A-Z]+\) Tendered to ([A-Z0-9]+) 1 FOR 1 \(([A-Z0-9]+)/.exec(e.Description);
+      if (re) {
+        const source = this.symbol(re[1]);
+        const target = this.symbol(re[3]);
+        const amount = parseFloat(e.Quantity);
+        // Drop reverse entry of the same tender.
+        if (amount < 0) {
+          return [];
+        }
+        console.log(e);
+        return [{
+          amount,
+          currency: e.Currency,
+          date,
+          fee: 0.0,
+          given: -amount,
+          id: this.makeId('TRADE', date, `${source}-${target}`),
+          notes: 'tender',
+          source,
+          target,
+          total: 0.00,
+          type: 'trade'
+        }];
+      }
+
       throw new Error(`Cannot recognize corporate action '${e.Description}'.`);
     };
 

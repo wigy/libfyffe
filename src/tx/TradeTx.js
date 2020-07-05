@@ -21,7 +21,8 @@ module.exports = class TradeTx extends Tx {
       avg2: undefined,
       fee: 0.0,
       burnTarget: undefined,
-      burnAmount: undefined
+      burnAmount: undefined,
+      notes: ''
     }, data);
   }
 
@@ -59,6 +60,9 @@ module.exports = class TradeTx extends Tx {
 
   getMyText() {
     let opts = [];
+    if (this.notes) {
+      opts.push(text.option(this.notes, this));
+    }
     if (this.burnAmount) {
       opts.push(text.option('burn', this));
     }

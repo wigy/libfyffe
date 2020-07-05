@@ -150,7 +150,8 @@
       "stock": "yht. #{stock} ={target}",
       "stockLeft": "jäi #{stock2} ={source}",
       "averageNow": "k.h. nyt ${avg} X{$}/={target}",
-      "burn": "kulu #{burnAmount} ={burnTarget}"
+      "burn": "kulu #{burnAmount} ={burnTarget}",
+      "tender": "lunastusvaraus"
     },
     "expense.loan": {
       "notes": "={notes}"

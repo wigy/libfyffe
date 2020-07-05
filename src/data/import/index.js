@@ -423,7 +423,7 @@ class Import {
     if (obj.type === 'expense') {
       obj.vat = this.vat(group, obj);
     }
-    if (obj.type === 'expense' || obj.type === 'income' || obj.type === 'sell') {
+    if (obj.type === 'expense' || obj.type === 'income' || obj.type === 'sell' || obj.type === 'trade') {
       obj.notes = this.notes(group, obj);
     }
     if (obj.type === 'buy' || obj.type === 'sell' || obj.type === 'move-in' || obj.type === 'move-out' ||
