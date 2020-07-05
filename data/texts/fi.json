@@ -110,7 +110,8 @@
     },
     "sell": {
       "stockNow": "jälj. #{stock} ={target}",
-      "average": "k.h. ${avg} X{$}/={target}"
+      "average": "k.h. ${avg} X{$}/={target}",
+      "force-sell": "pakotettu myynti"
     },
     "dividend": {
       "dividend": "osinko #{given} £{currency}",

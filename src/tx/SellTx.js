@@ -10,7 +10,7 @@ const text = require('../text/make');
 module.exports = class SellTx extends Tx {
 
   constructor(data = {}) {
-    super('sell', { target: undefined, amount: undefined, currency: config.currency, rate: undefined, fee: 0.0, stock: undefined, avg: undefined }, data);
+    super('sell', { target: undefined, amount: undefined, currency: config.currency, rate: undefined, fee: 0.0, stock: undefined, avg: undefined, notes: '' }, data);
   }
 
   getMyEntries() {
@@ -45,6 +45,9 @@ module.exports = class SellTx extends Tx {
 
   getMyText() {
     const opts = [];
+    if (this.notes) {
+      opts.push(text.option(this.notes, this));
+    }
     if (!config.flags.noProfit) {
       opts.push(text.option('average', this));
     }

@@ -253,7 +253,24 @@ class LynxImport extends SinglePassImport {
     const ret = [];
 
     for (const e of data.filter(e => e.Report_Date)) {
-      // console.log(e);
+      const date = e.Report_Date;
+      const rate = await Tx.fetchRate(date, `CURRENCY:${e.Currency}`);
+      let re = /^([.A-Z ]+?)\s*\([0-9A-Z]+\) Merged\(Liquidation\)/.exec(e.Description);
+      if (re) {
+        const target = re[1];
+        ret.push({
+          amount: parseFloat(e.Quantity),
+          currency: e.Currency,
+          date,
+          fee: 0.00,
+          id: this.makeId('MERGE', date, target),
+          rate,
+          target,
+          total: cents(parseFloat(e.Proceeds) * rate),
+          notes: 'force-sell',
+          type: 'sell'
+        });
+      }
     }
     return ret;
   }
