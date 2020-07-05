@@ -299,7 +299,6 @@ class LynxImport extends SinglePassImport {
         if (amount < 0) {
           return [];
         }
-        console.log(e);
         return [{
           amount,
           currency: e.Currency,

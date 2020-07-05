@@ -22,7 +22,7 @@ module.exports = class TradeTx extends Tx {
       fee: 0.0,
       burnTarget: undefined,
       burnAmount: undefined,
-      notes: ''
+      notes: null
     }, data);
   }
 

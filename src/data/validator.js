@@ -48,6 +48,18 @@ module.exports = {
   },
 
   /**
+   * Check that value is a string or null.
+   * @param {String} name
+   * @param {any} val
+   */
+  isStringOrNull: (name, val) => {
+    if (val === null) {
+      return;
+    }
+    return module.exports.isString(name, val);
+  },
+
+  /**
    * Check that value is a finite number greater than or equal the given limit.
    * @param {String} name
    * @param {any} val

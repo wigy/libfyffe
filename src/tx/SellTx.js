@@ -10,7 +10,7 @@ const text = require('../text/make');
 module.exports = class SellTx extends Tx {
 
   constructor(data = {}) {
-    super('sell', { target: undefined, amount: undefined, currency: config.currency, rate: undefined, fee: 0.0, stock: undefined, avg: undefined, notes: '' }, data);
+    super('sell', { target: undefined, amount: undefined, currency: config.currency, rate: undefined, fee: 0.0, stock: undefined, avg: undefined, notes: null }, data);
   }
 
   getMyEntries() {

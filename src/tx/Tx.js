@@ -306,7 +306,7 @@ module.exports = class Tx {
    * Additional description of transaction subject.
    */
   set notes(val) {
-    validator.isString('notes', val);
+    validator.isStringOrNull('notes', val);
     this.data.notes = val;
   }
 

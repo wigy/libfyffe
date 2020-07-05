@@ -196,6 +196,10 @@ class KrakenImport extends Import {
     });
     return ret;
   }
+
+  notes(group, obj) {
+    return '';
+  }
 }
 
 module.exports = new KrakenImport();

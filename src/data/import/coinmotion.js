@@ -136,6 +136,10 @@ class CoinmotionImport extends Import {
   burnAmount(group, obj) {
     return null;
   }
+
+  notes(group, obj) {
+    return '';
+  }
 }
 
 module.exports = new CoinmotionImport();

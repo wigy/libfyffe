@@ -538,7 +538,7 @@ class Fyffe {
         const types = dataPerImporter[name][i].map(e => e.type);
         let bad = false;
         for (const type of types) {
-          if (options.ignore.has(type)) {
+          if (options.ignore && options.ignore.has(type)) {
             bad = true;
           }
         }
