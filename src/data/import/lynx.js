@@ -250,15 +250,15 @@ class LynxImport extends SinglePassImport {
   }
 
   async parseCorporateActions(data) {
-    const ret = [];
 
-    for (const e of data.filter(e => e.Report_Date)) {
+    const match = async (e) => {
       const date = e.Report_Date;
       const rate = await Tx.fetchRate(date, `CURRENCY:${e.Currency}`);
+
       let re = /^([.A-Z ]+?)\s*\([0-9A-Z]+\) Merged\(Liquidation\)/.exec(e.Description);
       if (re) {
         const target = re[1];
-        ret.push({
+        return [{
           amount: parseFloat(e.Quantity),
           currency: e.Currency,
           date,
@@ -267,11 +267,36 @@ class LynxImport extends SinglePassImport {
           rate,
           target,
           total: cents(parseFloat(e.Proceeds) * rate),
-          notes: 'force-sell',
+          notes: 'forceSell',
           type: 'sell'
-        });
+        }];
       }
+
+      re = /^([.A-Z ]+?)\s*\([0-9A-Z]+\) Stock Dividend/.exec(e.Description);
+      if (re) {
+        const target = re[1];
+        return [{
+          amount: parseFloat(e.Quantity),
+          source: re[1],
+          currency: e.Currency,
+          date,
+          given: 0,
+          id: this.makeId('MERGE', date, target),
+          rate,
+          target,
+          tax: 0.00,
+          total: cents(parseFloat(e.Value) * rate),
+          type: 'stock-dividend'
+        }];
+      }
+      throw new Error(`Cannot recognize corporate action '${e.Description}'.`);
+    };
+
+    let ret = [];
+    for (const e of data.filter(e => e.Report_Date)) {
+      ret = ret.concat(await match(e));
     }
+
     return ret;
   }
 }

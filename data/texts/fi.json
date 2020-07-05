@@ -3,6 +3,7 @@
     "buy": "Osto +{amount} ={target}",
     "deposit": "Talletus C{service}-palveluun",
     "dividend": "Osinko #{amount} x ={target}",
+    "stock-dividend": "Erikoisosinko ={target}",
     "error": "Puutteellinen tuonti",
     "expense.ambiguous": "Epäselvä siirron kohde",
     "expense.bank": "Palvelumaksu",
@@ -111,10 +112,15 @@
     "sell": {
       "stockNow": "jälj. #{stock} ={target}",
       "average": "k.h. ${avg} X{$}/={target}",
-      "force-sell": "pakotettu myynti"
+      "forceSell": "pakotettu myynti"
     },
     "dividend": {
       "dividend": "osinko #{given} £{currency}",
+      "rate": "kurssi #{rate} £{currency}/X{$}"
+    },
+    "stock-dividend": {
+      "averageNow": "k.h. nyt ${avg} X{$}/={target}",
+      "stockDividend": "annettu +#{amount} ={source}",
       "rate": "kurssi #{rate} £{currency}/X{$}"
     },
     "fx-in": {

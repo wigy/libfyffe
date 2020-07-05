@@ -25,6 +25,7 @@ const types = {
   'loan-take': './LoanTakeTx',
   'loan-pay': './LoanPayTx',
   sell: './SellTx',
+  'stock-dividend': './StockDividendTx',
   trade: './TradeTx',
   withdrawal: './WithdrawalTx'
 };
@@ -293,7 +294,7 @@ module.exports = class Tx {
    * The total amount of commodity needed to pay this transaction.
    */
   set burnAmount(val) {
-    validator.isLtZeroOrNull('burnAmount', val);
+    validator.isNumOrNull('burnAmount', val);
     this.data.burnAmount = val;
   }
 

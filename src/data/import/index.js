@@ -410,11 +410,11 @@ class Import {
     if (obj.type !== 'withdrawal' && obj.type !== 'deposit' && obj.type !== 'interest') {
       obj.target = this.target(group, obj);
     }
-    if (obj.type === 'trade') {
+    if (obj.type === 'trade' || obj.type === 'stock-dividend') {
       obj.source = this.source(group, obj);
     }
     obj.total = this.total(group, obj, fyffe);
-    if (obj.type !== 'interest' && obj.type !== 'dividend' && obj.type !== 'expense' && obj.type !== 'income') {
+    if (obj.type !== 'interest' && obj.type !== 'dividend' && obj.type !== 'stock-dividend' && obj.type !== 'expense' && obj.type !== 'income') {
       obj.fee = this.fee(group, obj);
     }
     if (obj.type === 'dividend') {
@@ -427,10 +427,10 @@ class Import {
       obj.notes = this.notes(group, obj);
     }
     if (obj.type === 'buy' || obj.type === 'sell' || obj.type === 'move-in' || obj.type === 'move-out' ||
-      obj.type === 'dividend' || obj.type === 'trade') {
+      obj.type === 'dividend' || obj.type === 'stock-dividend' || obj.type === 'trade') {
       obj.amount = this.amount(group, obj);
     }
-    if (obj.type === 'trade' || obj.type === 'dividend') {
+    if (obj.type === 'trade' || obj.type === 'dividend' || obj.type === 'stock_dividend') {
       obj.given = this.given(group, obj);
     }
     if (obj.type === 'trade' || obj.type === 'move-in' || obj.type === 'move-out' || obj.type === 'buy') {
@@ -518,8 +518,16 @@ class SinglePassImport extends Import {
     return group[0].fee;
   }
 
+  source(group) {
+    return group[0].source;
+  }
+
   burnAmount(group) {
     return group[0].burnAmount || null;
+  }
+
+  burnTarget(group) {
+    return group[0].burnTarget || null;
   }
 
   notes(group) {
