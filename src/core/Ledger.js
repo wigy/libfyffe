@@ -62,6 +62,7 @@ module.exports = class Ledger {
    */
   apply(stock, extraTxs = []) {
     this.txs = this.txs.sort((a, b) => a.time - b.time);
+    extraTxs = extraTxs.sort((a, b) => a.time - b.time);
 
     // Apply txs.
     const loans = {};
