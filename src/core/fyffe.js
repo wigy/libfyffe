@@ -523,6 +523,7 @@ class Fyffe {
 
     // Sort them according to the timestamps and find the earliest timestamp.
     let minDate = null;
+    let maxDate = null;
     Object.keys(dataPerImporter).forEach((name) => {
       if (dataPerImporter[name].length === 0) {
         dump.warning('No data found.');
@@ -532,9 +533,8 @@ class Fyffe {
         return this.modules[name].time(a[0]) - this.modules[name].time(b[0]);
       };
       dataPerImporter[name] = dataPerImporter[name].sort(sorter);
-      // Scan for first applicable transaction.
-      let i;
-      for (i = 0; i < dataPerImporter[name].length - 1/* Take last if nothing else. */; i++) {
+      // Scan for first and last applicable transaction.
+      for (let i = 0; i < dataPerImporter[name].length; i++) {
         const types = dataPerImporter[name][i].map(e => e.type);
         let bad = false;
         for (const type of types) {
@@ -542,14 +542,16 @@ class Fyffe {
             bad = true;
           }
         }
-        if (bad) {
-          continue;
+        if (!bad) {
+          const time = this.modules[name].time(dataPerImporter[name][i][0]);
+          console.log(new Date(time), new Date(minDate), new Date(maxDate));
+          if (minDate === null || time < minDate) {
+            minDate = time;
+          }
+          if (maxDate === null || time > maxDate) {
+            maxDate = time;
+          }
         }
-      }
-      // See if we got best first date.
-      const first = this.modules[name].time(dataPerImporter[name][i][0]);
-      if (minDate === null || first < minDate) {
-        minDate = first;
       }
     });
 
@@ -560,6 +562,8 @@ class Fyffe {
 
     // Get starting balances for accounts.
     const firstDate = moment(minDate).format('YYYY-MM-DD');
+    const lastDate = moment(maxDate).format('YYYY-MM-DD');
+
     const additionalTxs = await this.loadBalances(dbName, firstDate);
     if (config.flags.showBalances) {
       this.ledger.accounts.showBalances('Initial balances:');
