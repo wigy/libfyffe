@@ -77,10 +77,12 @@ module.exports = class Ledger {
         fund = fund || tx.fund;
         // Apply other txs.
         while (extraIndex < extraTxs.length && tx.time >= extraTxs[extraIndex].time) {
+          // console.log('Extra', new Date(extraTxs[extraIndex].time), extraTxs[extraIndex].number, extraTxs[extraIndex].amount);
           this.accounts.transfer(extraTxs[extraIndex].number, extraTxs[extraIndex].amount);
           extraIndex++;
         }
         tx.updateFromStock(stock);
+        // console.log(tx);
         const result = tx.apply(this.accounts, stock);
         for (const r of result) {
           if (!loans[r.currency]) {
