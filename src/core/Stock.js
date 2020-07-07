@@ -97,4 +97,11 @@ module.exports = class Stock {
       }
     });
   }
+
+  /**
+   * Get a sorted list of symbols loaded with non-zero balance.
+   */
+  list() {
+    return Object.keys(this.stock).filter(sym => this.stock[sym]).sort();
+  }
 };

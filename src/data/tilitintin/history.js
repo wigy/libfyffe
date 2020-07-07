@@ -36,7 +36,8 @@ function findPriceAndStock(knex, date = null, targets = null) {
     .select()
     .from('entry')
     .where('description', 'LIKE', '%k.h.%')
-    .leftJoin('document', 'entry.document_id', 'document.id').orderBy('date', 'desc')
+    .leftJoin('document', 'entry.document_id', 'document.id')
+    .orderBy('date', 'desc')
     .then((data) => {
 
       const ret = { stock: {}, avg: {} };
