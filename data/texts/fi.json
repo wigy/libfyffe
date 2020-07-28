@@ -112,7 +112,8 @@
     "sell": {
       "stockNow": "jälj. #{stock} ={target}",
       "average": "k.h. ${avg} X{$}/={target}",
-      "forceSell": "pakotettu myynti"
+      "forceSell": "pakotettu myynti",
+      "call": "lunastus"
     },
     "dividend": {
       "dividend": "osinko #{given} £{currency}",

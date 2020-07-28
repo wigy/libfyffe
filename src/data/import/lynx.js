@@ -193,22 +193,22 @@ class LynxImport extends SinglePassImport {
 
   matchDividend(str) {
 
-    let re = /^([.A-Z ]+?)\s*\([0-9A-Z]+\) (Cash Dividend) ([A-Z][A-Z][A-Z]) ([0-9.]+)/.exec(str);
+    let re = /^([.A-Z0-9 ]+?)\s*\([0-9A-Z]+\) (Cash Dividend) ([A-Z][A-Z][A-Z]) ([0-9.]+) ((per Share )?(- [A-Z][A-Z] Tax)?)((- Reversal )?\((Ordinary|Bonus) Dividend\))?(\(Interest\))?$/.exec(str);
     if (re) {
       return [this.symbol(re[1]), re[4]];
     }
     // Blah, sometimes they are other way around.
-    re = /^([.A-Z ]+?)\s*\([0-9A-Z]+\) (Cash Dividend) ([0-9.]+) ([A-Z][A-Z][A-Z])/.exec(str);
+    re = /^([.A-Z0-9 ]+?)\s*\([0-9A-Z]+\) (Cash Dividend) ([0-9.]+) ([A-Z][A-Z][A-Z]) ((per Share )?- [A-Z][A-Z] Tax)$/.exec(str);
     if (re) {
       return [this.symbol(re[1]), re[3]];
     }
     // Per share missing in special cases.
-    re = /^([.A-Z ]+?)\s*\([0-9A-Z]+\) (Payment in Lieu of Dividend - US Tax|Payment in Lieu of Dividend \(Ordinary Dividend\))/.exec(str);
+    re = /^([.A-Z0-9 ]+?)\s*\([0-9A-Z]+\) (Payment in Lieu of Dividend - US Tax|Payment in Lieu of Dividend \(Ordinary Dividend\))$/.exec(str);
     if (re) {
       return [this.symbol(re[1]), null];
     }
     // Stock dividend tax or cash portion.
-    re = /^([.A-Z ]+?)\s*\([0-9A-Z]+\) (Stock Dividend) ([A-Z][A-Z][0-9]+) ([0-9]+ for [0-9]+) (- US TAX|\(Ordinary Dividend\))$/.exec(str);
+    re = /^([.A-Z0-9 ]+?)\s*\([0-9A-Z]+\) (Stock Dividend) ([A-Z][A-Z][0-9]+) ([0-9]+ for [0-9]+) (- US TAX|\(Ordinary Dividend\))$/.exec(str);
     if (re) {
       return [this.symbol(re[1]), null];
     }
@@ -233,6 +233,20 @@ class LynxImport extends SinglePassImport {
       const [target, perShare] = this.matchDividend(e.Description);
       const rate = await Tx.fetchRate(e.Date, `CURRENCY:${e.Currency}`);
       const id = this.makeId('DIV', e.Date, target);
+      const total = cents(parseFloat(e.Amount) * rate);
+      if (total < 0) {
+        let i;
+        for (i = ret.length - 1; i >= 0; i--) {
+          if (ret[i].target === target && cents(ret[i].total + total) === 0) {
+            ret.splice(i, 1);
+            break;
+          }
+        }
+        if (i < 0) {
+          throw new Error(`Cannot find matching negative dividend ${total} for ${target}.`);
+        }
+        continue;
+      }
       ret.push({
         amount: perShare === null ? 1 : Math.round(parseFloat(e.Amount) / parseFloat(perShare)),
         currency: e.Currency,
@@ -242,7 +256,7 @@ class LynxImport extends SinglePassImport {
         rate,
         target,
         tax: taxes[id.replace('DIV', 'TAX')] || 0,
-        total: cents(parseFloat(e.Amount) * rate),
+        total,
         type: 'dividend'
       });
     }
@@ -255,7 +269,7 @@ class LynxImport extends SinglePassImport {
       const date = e.Report_Date;
       const rate = await Tx.fetchRate(date, `CURRENCY:${e.Currency}`);
 
-      let re = /^([.A-Z ]+?)\s*\([0-9A-Z]+\) Merged\(Liquidation\)/.exec(e.Description);
+      let re = /^([.A-Z0-9 ]+?)\s*\([0-9A-Z]+\) Merged\(Liquidation\)/.exec(e.Description);
       if (re) {
         const target = this.symbol(re[1]);
         return [{
@@ -272,7 +286,24 @@ class LynxImport extends SinglePassImport {
         }];
       }
 
-      re = /^([.A-Z ]+?)\s*\([0-9A-Z]+\) Stock Dividend/.exec(e.Description);
+      re = /^([.A-Z0-9 ]+?)\s*\([0-9A-Z]+\) Merged\(Partial Call\)/.exec(e.Description);
+      if (re) {
+        const target = this.symbol(re[1]);
+        return [{
+          amount: parseFloat(e.Quantity),
+          currency: e.Currency,
+          date,
+          fee: 0.0,
+          id: this.makeId('CALL', date, target),
+          notes: 'call',
+          rate,
+          target,
+          total: cents(-parseFloat(e.Value) * rate),
+          type: 'sell'
+        }];
+      }
+
+      re = /^([.A-Z0-9 ]+?)\s*\([0-9A-Z]+\) Stock Dividend/.exec(e.Description);
       if (re) {
         const target = this.symbol(re[1]);
         return [{
@@ -290,7 +321,7 @@ class LynxImport extends SinglePassImport {
         }];
       }
 
-      re = /^([.A-Z ]+?)\s*\([0-9A-Z]+\) Tendered to ([A-Z0-9]+) 1 FOR 1 \(([A-Z0-9]+)/.exec(e.Description);
+      re = /^([.A-Z0-9 ]+?)\s*\([0-9A-Z]+\) Tendered to ([A-Z0-9]+) 1 FOR 1 \(([A-Z0-9]+)/.exec(e.Description);
       if (re) {
         const source = this.symbol(re[1]);
         const target = this.symbol(re[3]);
