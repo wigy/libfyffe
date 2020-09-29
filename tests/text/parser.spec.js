@@ -14,9 +14,9 @@ describe('class Tx', () => {
       accounts: {
       },
       tags: {
-        'Tag': {name: 'Testing tag'},
-        'MyTS': {name: 'My Test Service'},
-        'ZOO': {name: 'ZOO'}
+        Tag: { name: 'Testing tag' },
+        MyTS: { name: 'My Test Service' },
+        ZOO: { name: 'ZOO' }
       }
     });
     parser = new Parser();

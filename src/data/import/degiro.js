@@ -217,6 +217,7 @@ class DegiroImport extends Import {
   }
 
   target(group, obj) {
+    let targets;
     switch (obj.type) {
       case 'expense':
         return 'MISC';
@@ -228,7 +229,7 @@ class DegiroImport extends Import {
       case 'sell':
       case 'buy':
       case 'dividend':
-        const targets = group.filter(tx => tx.type === 'buy' || tx.type === 'sell' || tx.type === 'dividend');
+        targets = group.filter(tx => tx.type === 'buy' || tx.type === 'sell' || tx.type === 'dividend');
         if (targets.length) {
           return isin2ticker(targets[0].ISIN);
         }

@@ -33,8 +33,8 @@ describe('sub-entries', () => {
   });
 
   it('are able to handle loan', () => {
-    tx = Tx.create('buy', {total: 100, amount: 50, target: 'NEO', stock: 100, avg: 2.00});
-    sub = Tx.create('loan-take', {total: 100}, 'shark');
+    tx = Tx.create('buy', { total: 100, amount: 50, target: 'NEO', stock: 100, avg: 2.00 });
+    sub = Tx.create('loan-take', { total: 100 }, 'shark');
     tx.addSubTx(sub);
 
     assert.equal(tx.getText(), 'Osto +50 NEO (yht. 100 NEO, k.h. nyt 2.00 €/NEO)');
@@ -45,8 +45,8 @@ describe('sub-entries', () => {
       { number: 'LOAN', amount: -100, description: 'Lainanotto: Sharks Loan' }
     ]);
 
-    tx = Tx.create('dividend', {total: 50.50, amount: 5, target: 'NEO', given: 0.01});
-    sub = Tx.create('loan-pay', {total: 25.25}, 'shark');
+    tx = Tx.create('dividend', { total: 50.50, amount: 5, target: 'NEO', given: 0.01 });
+    sub = Tx.create('loan-pay', { total: 25.25 }, 'shark');
     tx.addSubTx(sub);
     assert.equal(tx.getText(), 'Osinko 5 x NEO (osinko 0.01 €)');
   });

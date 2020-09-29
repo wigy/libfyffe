@@ -84,10 +84,10 @@ describe('importing', () => {
       },
       useNullAsDefault: true
     });
-    period = await tilitintin.data.createOne(db, 'period', {start_date: '2019-01-01', end_date: '2019-12-31', locked: false});
+    period = await tilitintin.data.createOne(db, 'period', { start_date: '2019-01-01', end_date: '2019-12-31', locked: false });
     await tilitintin.tx.add(db, '2019-01-01', 'Initial cash', [
-      {number: BANK, amount: 10000},
-      {number: '2251', amount: -10000}
+      { number: BANK, amount: 10000 },
+      { number: '2251', amount: -10000 }
     ]);
 
     // Prepare library.
@@ -100,7 +100,7 @@ describe('importing', () => {
       service: 'Nordnet',
       fund: 'NNF'
     });
-    await fyffe.export('tilitintin', {dbName: 'test'});
+    await fyffe.export('tilitintin', { dbName: 'test' });
     const balance = await balances();
     check(balance, BANK, 9600.00);
     check(balance, STOCKS, 0.00);

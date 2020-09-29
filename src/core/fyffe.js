@@ -561,7 +561,7 @@ class Fyffe {
 
     // Get starting balances for accounts.
     const firstDate = minDate ? moment(minDate).format('YYYY-MM-DD') : moment().format('YYYY-MM-DD');
-    const lastDate = maxDate ? moment(maxDate).add(1, 'day').format('YYYY-MM-DD') : moment().add(1, 'day').format('YYYY-MM-DD');
+    // const lastDate = maxDate ? moment(maxDate).add(1, 'day').format('YYYY-MM-DD') : moment().add(1, 'day').format('YYYY-MM-DD');
 
     const additionalTxs = await this.loadBalances(dbName, firstDate);
     if (config.flags.showBalances) {

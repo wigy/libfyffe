@@ -161,6 +161,7 @@ class GDAXImport extends Import {
   }
 
   amount(group, obj) {
+    let targets;
     const other = group.filter((tx) => tx.amount_balance_unit !== 'EUR');
     switch (obj.type) {
       case 'move-in':
@@ -176,7 +177,7 @@ class GDAXImport extends Import {
         }
         break;
       case 'trade':
-        const targets = group.filter((tx) => tx.type !== 'fee' && parseFloat(tx.amount) > 0);
+        targets = group.filter((tx) => tx.type !== 'fee' && parseFloat(tx.amount) > 0);
         if (targets.length) {
           return parseFloat(targets[0].amount);
         }
@@ -187,9 +188,10 @@ class GDAXImport extends Import {
   }
 
   given(group, obj) {
+    let targets;
     switch (obj.type) {
       case 'trade':
-        const targets = group.filter((tx) => tx.type !== 'fee' && parseFloat(tx.amount) < 0);
+        targets = group.filter((tx) => tx.type !== 'fee' && parseFloat(tx.amount) < 0);
         if (targets.length) {
           return parseFloat(targets[0].amount);
         }

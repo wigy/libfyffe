@@ -4,7 +4,7 @@ const assert = require('assert');
 describe('config', () => {
 
   before(() => {
-    config.set({x: 99});
+    config.set({ x: 99 });
   });
 
   it('value can be set', () => {
@@ -69,12 +69,13 @@ describe('config', () => {
     assert.equal(config.get('accounts.fees', 'Empty Service', 'No such fund'), '101');
     assert.equal(config.get('accounts.losses', 'Empty Service', 'No such fund'), '201');
     assert.equal(config.get('accounts.targets.eth', 'Empty Service', 'No such fund'), '103');
-    assert.deepEqual(config.getAllAccounts(), { '101': 'fees',
-      '102': 'MyService.fees',
-      '103': 'targets.eth',
-      '104': 'MyService.targets.eth',
-      '201': 'losses',
-      '304': 'MyService.MyFund.targets.eth'
+    assert.deepEqual(config.getAllAccounts(), {
+      101: 'fees',
+      102: 'MyService.fees',
+      103: 'targets.eth',
+      104: 'MyService.targets.eth',
+      201: 'losses',
+      304: 'MyService.MyFund.targets.eth'
     });
   });
 });
