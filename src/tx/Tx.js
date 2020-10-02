@@ -535,7 +535,7 @@ module.exports = class Tx {
         const loanAcc = config.get('accounts.loans', this.service, this.fund)[this.currency.toLowerCase()];
         const curAcc = this.getAccount('currencies', this.currency);
         if (loanAcc && entry.number === curAcc) {
-          // Single update for loans, then just collect notes.
+          // If single update for loans, then just collect notes.
           if (config.flags.singleLoanUpdate) {
             ret.push({
               loan: loanAcc,

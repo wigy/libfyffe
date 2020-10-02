@@ -42,7 +42,7 @@ class Config {
         zeroMoves: false,
         // If set, force the operation.
         force: false,
-        // If import set, use simplfied version of import.
+        // If import set, use simplified version of import.
         simple: false,
         // If import fails, just print and skip the failed transaction.
         skipErrors: false,

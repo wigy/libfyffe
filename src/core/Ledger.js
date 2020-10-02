@@ -60,7 +60,7 @@ module.exports = class Ledger {
    * @param {Object[]} extraTxs
    * Additional transactions can be given as an array of {number, amount, time}
    */
-  apply(stock, extraTxs = []) {
+  async apply(stock, extraTxs = []) {
     this.txs = this.txs.sort((a, b) => a.time - b.time);
     extraTxs = extraTxs.sort((a, b) => a.time - b.time);
 
@@ -95,8 +95,8 @@ module.exports = class Ledger {
     });
 
     // Create post processing txs.
-    Object.entries(loans).forEach(([currency, specs]) => {
-      Object.entries(specs).forEach(([acc, def]) => {
+    for (const [currency, specs] of Object.entries(loans)) {
+      for (const [acc, def] of Object.entries(specs)) {
         const { loan, tags } = def;
         let loanTx;
         const accBalance = this.accounts.getBalance(acc);
@@ -113,11 +113,14 @@ module.exports = class Ledger {
         }
 
         if (loanTx) {
+          if (config.flags.addCurrencies) {
+            loanTx.rate = await Tx.fetchRate(loanTx.date, `CURRENCY:${loanTx.currency}`);
+          }
           this.add(loanTx);
           this.apply(stock);
         }
-      });
-    });
+      }
+    }
   }
 
   /**
