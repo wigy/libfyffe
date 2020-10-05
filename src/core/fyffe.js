@@ -480,7 +480,7 @@ class Fyffe {
           } else {
             const docId = await tilitintin.tx.add(knex, tx.date, null, tx.entries);
             if (docId) {
-              tilitintin.imports.add(knex, tag, group.id, docId);
+              await tilitintin.imports.add(knex, tag, group.id, docId);
             }
           }
         }
