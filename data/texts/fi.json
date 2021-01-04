@@ -181,7 +181,7 @@
       "notes": "={notes}"
     },
     "expense.travel": {
-      "notes": "={notes}"
+      "notes": ""
     },
     "income.misc": {
       "notes": "={notes}"
