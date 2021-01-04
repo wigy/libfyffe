@@ -42,6 +42,7 @@
     "expense.transfer18": "Siirto #18 ={notes}-palveluun",
     "expense.transfer19": "Siirto #19 ={notes}-palveluun",
     "expense.travel": "Matkakulu ={notes}",
+    "expense.finances": "Taloushallintokulu ={notes}",
     "expense.meeting": "Kokouskulu",
     "expense.mailing": "Postikulu",
     "expense.vat": "ALV maksu",
@@ -63,6 +64,7 @@
     "income.sales3": "Maksu #3: ={notes}",
     "income.sales4": "Maksu #4: ={notes}",
     "income.sales5": "Maksu #5: ={notes}",
+    "income.shares": "Osakemerkinnän maksu",
     "income.tax": "Veronpalautus",
     "income.transfer": "Siirto ={notes}-palvelusta",
     "income.transfer2": "Siirto #2 ={notes}-palvelusta",
@@ -153,6 +155,9 @@
       "averageNow": "k.h. nyt ${avg} X{$}/={target}",
       "burn": "kulu #{burnAmount} ={burnTarget}",
       "tender": "lunastusvaraus"
+    },
+    "expense.finances": {
+      "notes": ""
     },
     "expense.loan": {
       "notes": "={notes}"
@@ -319,6 +324,9 @@
     "income.sales4": {
     },
     "income.sales5": {
+    },
+    "income.shares": {
+      "notes": ""
     },
     "income.tax": {
       "notes": ""
