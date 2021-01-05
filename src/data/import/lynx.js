@@ -208,7 +208,7 @@ class LynxImport extends SinglePassImport {
       return [this.symbol(re[1]), re[4]];
     }
     // Per share missing in special cases.
-    re = /^([.A-Z0-9 ]+?)\s*\([0-9A-Z]+\) (Payment in Lieu of Dividend - US Tax|Payment in Lieu of Dividend \(Ordinary Dividend\))$/.exec(str);
+    re = /^([.A-Z0-9 ]+?)\s*\([0-9A-Z]+\) (Payment in Lieu of Dividend - US Tax|Payment in Lieu of Dividend \((Ordinary Dividend|Limited Partnership)\))$/.exec(str);
     if (re) {
       return [this.symbol(re[1]), null];
     }
