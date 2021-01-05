@@ -58,45 +58,42 @@ async function getPeriod(knex, stamp) {
  */
 async function getBalances(knex, numbers, date = null) {
   const stamp = date === null ? new Date().getTime() + 1000 : new Date(date + ' 00:00:00').getTime();
-  let periodId;
-  return getPeriod(knex, stamp)
-    .then((id) => {
-      periodId = id;
-      if (!periodId) {
-        dump.error(`Cannot find period for date ${stamp}.`);
-        return {};
-      }
-      return getIdsByNumber(knex, numbers);
+  const periodId = await getPeriod(knex, stamp);
+  let idByNumber;
+  if (!periodId) {
+    dump.error(`Cannot find period for date ${date} stamp ${stamp}.`);
+    return null;
+  } else {
+    idByNumber = await getIdsByNumber(knex, numbers);
+  }
+  return Promise.all(numbers.map((number) => {
+    number = parseInt(number);
+    console.log(number);
+    return knex.select(knex.raw('SUM(debit * amount) + SUM((debit - 1) * amount) AS total, ' + number + ' as number'))
+      .from('entry')
+      .join('document', 'document.id', '=', 'entry.document_id')
+      .where({ account_id: idByNumber[number] || 0 })
+      .andWhere('document.period_id', '=', periodId)
+      .andWhere('document.date', '<', stamp)
+      .then((data) => data[0]);
+  }))
+    .then((data) => {
+      const ret = {};
+      data.forEach((res) => (ret[res.number] = res.total || 0));
+      return ret;
     })
-    .then((idByNumber) => {
-      return Promise.all(numbers.map((number) => {
-        number = parseInt(number);
-        return knex.select(knex.raw('SUM(debit * amount) + SUM((debit - 1) * amount) AS total, ' + number + ' as number'))
-          .from('entry')
-          .join('document', 'document.id', '=', 'entry.document_id')
-          .where({ account_id: idByNumber[number] || 0 })
-          .andWhere('document.period_id', '=', periodId)
-          .andWhere('document.date', '<', stamp)
-          .then((data) => data[0]);
-      }))
-        .then((data) => {
-          const ret = {};
-          data.forEach((res) => (ret[res.number] = res.total || 0));
-          return ret;
-        })
-        .then(async (ret) => {
-          const txs = await knex.select(knex.raw('account_id, debit * amount + (debit - 1) * amount AS amount, document.date'))
-            .from('entry')
-            .join('document', 'document.id', '=', 'entry.document_id')
-            .whereIn('account_id', numbers.map(n => idByNumber[n]))
-            .andWhere('document.period_id', '=', periodId)
-            .andWhere('document.date', '>=', stamp)
-            .orderBy('document.date');
+    .then(async (ret) => {
+      const txs = await knex.select(knex.raw('account_id, debit * amount + (debit - 1) * amount AS amount, document.date'))
+        .from('entry')
+        .join('document', 'document.id', '=', 'entry.document_id')
+        .whereIn('account_id', numbers.map(n => idByNumber[n]))
+        .andWhere('document.period_id', '=', periodId)
+        .andWhere('document.date', '>=', stamp)
+        .orderBy('document.date');
 
-          const numberById = {};
-          Object.entries(idByNumber).forEach(([k, v]) => (numberById[v] = k));
-          return [ret, txs.map(tx => ({ time: tx.date, amount: tx.amount, number: numberById[tx.account_id] }))];
-        });
+      const numberById = {};
+      Object.entries(idByNumber).forEach(([k, v]) => (numberById[v] = k));
+      return [ret, txs.map(tx => ({ time: tx.date, amount: tx.amount, number: numberById[tx.account_id] }))];
     });
 }
 

@@ -92,11 +92,16 @@ class Fyffe {
    * @param {String} date
    */
   async loadBalances(dbName, date = null) {
-    return tilitintin.accounts.getBalances(this.dbs[dbName], Object.keys(config.getAllAccounts()), date)
-      .then(([data, txs]) => {
-        Object.keys(data).forEach((num) => (this.ledger.accounts.setBalance(num, data[num])));
-        return txs;
-      });
+    const balances = await tilitintin.accounts.getBalances(this.dbs[dbName], Object.keys(config.getAllAccounts()), date);
+
+    if (!balances) {
+      return [];
+    }
+
+    const [data, txs] = balances;
+    Object.keys(data).forEach((num) => (this.ledger.accounts.setBalance(num, data[num])));
+
+    return txs;
   }
 
   /**
