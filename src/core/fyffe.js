@@ -521,9 +521,7 @@ class Fyffe {
       return;
     }
 
-    // Sort them according to the timestamps and find the earliest timestamp.
-    let minDate = null;
-    let maxDate = null;
+    // Order data by time.
     Object.keys(dataPerImporter).forEach((name) => {
       if (dataPerImporter[name].length === 0) {
         dump.warning('No data found.');
@@ -533,15 +531,22 @@ class Fyffe {
         return this.modules[name].time(a[0]) - this.modules[name].time(b[0]);
       };
       dataPerImporter[name] = dataPerImporter[name].sort(sorter);
+    });
+
+    // Simple or not simple?
+    if (config.flags.simple) {
+      return this.importSimple(knex, dataPerImporter, options);
+    }
+
+    // Sort them according to the timestamps and find the earliest timestamp.
+    let minDate = null;
+    let maxDate = null;
+    Object.keys(dataPerImporter).forEach((name) => {
       // Scan for first and last applicable transaction.
       for (let i = 0; i < dataPerImporter[name].length; i++) {
-        const types = dataPerImporter[name][i].map(e => e.type);
-        let bad = false;
-        for (const type of types) {
-          if (options.ignore && options.ignore.has(type)) {
-            bad = true;
-          }
-        }
+        console.log(dataPerImporter[name][i][0].Kirjausp_iv_, dataPerImporter[name][i][0].Tapahtumatyyppi, dataPerImporter[name][i][0].Arvopaperi);
+        const txType = this.modules[name].recognize(dataPerImporter[name][i]);
+        const bad = options.ignore && options.ignore.has(txType);
         if (!bad) {
           const time = this.modules[name].time(dataPerImporter[name][i][0]);
           if (minDate === null || time < minDate) {
@@ -553,11 +558,6 @@ class Fyffe {
         }
       }
     });
-
-    // Simple or not simple?
-    if (config.flags.simple) {
-      return this.importSimple(knex, dataPerImporter, options);
-    }
 
     // Get starting balances for accounts.
     const firstDate = minDate ? moment(minDate).format('YYYY-MM-DD') : moment().format('YYYY-MM-DD');
