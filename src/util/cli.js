@@ -161,6 +161,20 @@ class Cli {
       n++;
     }
   }
+
+  /**
+   * Catch all, i.e. collect all zero or more remaining arguments.
+   */
+  args_(name, options, check) {
+    this.arg_(name, options, check);
+    this[name] = this[name] === undefined ? [] : [this[name]];
+    let n = this.__args.length + 2;
+    while (n < this.__remaining.length) {
+      this[name].push(this.__remaining[n]);
+      this.__args.push(this.__remaining[n]);
+      n++;
+    }
+  }
 }
 
 module.exports = new Cli();
