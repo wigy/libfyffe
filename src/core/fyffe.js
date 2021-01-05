@@ -544,7 +544,6 @@ class Fyffe {
     Object.keys(dataPerImporter).forEach((name) => {
       // Scan for first and last applicable transaction.
       for (let i = 0; i < dataPerImporter[name].length; i++) {
-        console.log(dataPerImporter[name][i][0].Kirjausp_iv_, dataPerImporter[name][i][0].Tapahtumatyyppi, dataPerImporter[name][i][0].Arvopaperi);
         const txType = this.modules[name].recognize(dataPerImporter[name][i]);
         const bad = options.ignore && options.ignore.has(txType);
         if (!bad) {

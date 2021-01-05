@@ -113,6 +113,9 @@ class NordnetImport extends Import {
     if (texts.includes('RECLASSIFICATION OF DIVIDEND')) {
       return 'income';
     }
+    if (/^RECLASSIFICATION TAX/.test(texts[0])) {
+      return 'income';
+    }
     if (types.includes('VAIHTO_AP_OTTO') && types.includes('VAIHTO_AP_J_TT_')) {
       return 'trade';
     }
@@ -291,6 +294,9 @@ class NordnetImport extends Import {
       const texts = group.map((tx) => tx.Tapahtumateksti);
       if (texts.includes('RECLASSIFICATION OF DIVIDEND')) {
         return 'Osingon uudelleenluokittelu';
+      }
+      if (/^RECLASSIFICATION TAX/.test(texts[0])) {
+        return 'Veron uudelleenluokittelu';
       }
       return 'Koron korjaus';
     }
