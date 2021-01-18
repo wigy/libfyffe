@@ -68,7 +68,6 @@ async function getBalances(knex, numbers, date = null) {
   }
   return Promise.all(numbers.map((number) => {
     number = parseInt(number);
-    console.log(number);
     return knex.select(knex.raw('SUM(debit * amount) + SUM((debit - 1) * amount) AS total, ' + number + ' as number'))
       .from('entry')
       .join('document', 'document.id', '=', 'entry.document_id')
