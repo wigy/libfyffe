@@ -1,4 +1,7 @@
 const fs = require('fs');
+const dump = require('neat-dump');
+const readline = require('readline');
+const safeEval = require('safe-eval');
 const Tx = require('../../tx/Tx');
 const StringMapper = require('../../text/StringMapper');
 const config = require('../../config');
@@ -20,6 +23,9 @@ class Import {
     this.ledger = null;
     this.idsUsed = new Set();
     this.ids = new Set();
+
+    this.questions = {};
+    this.answers = {};
   }
 
   /**
@@ -38,6 +44,7 @@ class Import {
     this.fund = fund;
     this.service = service;
     this.mapper = new StringMapper(config.get('import', service, fund) || {});
+    this.questions = this.config.get('import.questions', this.service, this.fund);
   }
 
   /**
@@ -380,6 +387,105 @@ class Import {
   }
 
   /**
+   * Use the string mapper to find data for the group.
+   * @param {Array} group
+   * @param {String} [field]
+   * @param {any} [def]
+   * @return {Object}
+   */
+  useMapper(group, obj, field, def = undefined) {
+    if (group.length > 1) {
+      throw new Error('String mapper cannot handle yet more than one item in the group.');
+    }
+    const name = this.mapper.findMatch('recognize', group[0]);
+    if (!name) {
+      throw new Error('Unable to find a match with string mapper: ' + JSON.stringify(group));
+    }
+    const rule = this.mapper.get('recognize', name);
+    let data;
+    if ('=>' in rule) {
+      data = rule['=>'];
+      for (const key of Object.keys(data)) {
+        if (key.endsWith('?')) {
+          const qkey = data[key];
+          delete data[key];
+          if (!this.questions[qkey]) {
+            throw new Error(`Cannot find defintions for import questions '${qkey}' for key '${key}'.`);
+          }
+          const key0 = key.substr(0, key.length - 1);
+          data[key0] = this.questions[qkey];
+        }
+      }
+    } else {
+      // TODO: This way of doing the mapping is pointless. Can be dropped when not in use.
+      dump.red(`Obsolete use of 'txs' string mapper for '${name}'. Please switch to '=>' notation.`);
+      data = this.mapper.get('txs', name);
+    }
+
+    if (!(field in data)) {
+      if (def === undefined) {
+        const name = this.mapper.findMatch('recognize', group[0]);
+        throw new Error('A field `' + field + '` is not configured for `' + name + '` in ' + JSON.stringify(data));
+      }
+      return def;
+    }
+    let ret = data[field];
+    if (typeof ret === 'string' && ret.substr(0, 2) === '${' && ret.substr(-1, 1) === '}') {
+      ret = safeEval(ret.substr(2, ret.length - 3), {
+        stock: (code) => this.stock.getStock(code),
+        total: obj ? obj.total : null
+      });
+      if (typeof ret !== 'string' && (isNaN(ret) || ret === Infinity)) {
+        throw Error('Invalid result NaN or Infinity from expression `' + data[field] + '`.');
+      }
+    }
+    return ret;
+  }
+
+  async readLine() {
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout
+    });
+    return new Promise((resolve) => {
+      rl.question('Select one? ', (answer) => {
+        console.log(`Thank you for your valuable feedback: ${answer}`);
+        rl.close();
+        resolve(answer);
+      });
+    });
+  }
+
+  async handleQuestions(field, group, obj, q) {
+    if (q instanceof Object) {
+      if (!obj.id) {
+        throw Error('Cannot handle questions for objects without ID.');
+      }
+      if (!this.answers[obj.id]) {
+        this.answers[obj.id] = {};
+      }
+      if (this.answers[obj.id][field]) {
+        return this.answers[obj.id][field];
+      }
+      console.log('---------------------------------------------------------------------------');
+      console.log(group);
+      console.log('---------------------------------------------------------------------------');
+      dump.cyan(`Select ${field}:`);
+      const map = {};
+      let n = 1;
+      Object.entries(q).forEach(([k, v]) => {
+        dump.cyan(`  ${n}: ${k} (${v})`);
+        map[n] = v;
+        n++;
+      });
+      const ans = await this.readLine();
+      this.answers[obj.id][field] = map[ans];
+      return map[ans];
+    }
+    return q;
+  }
+
+  /**
    * Convert a source data group to transaction.
    * @param {Array<Object>} group
    * @param {Fyffe} fyffe
@@ -394,7 +500,7 @@ class Import {
     const obj = {};
     obj.id = this.id(group);
     obj.time = this.time(group[0]);
-    obj.type = this.recognize(group);
+    obj.type = await this.handleQuestions('type', group, obj, this.recognize(group));
     if (!obj.type) {
       throw new Error('Module ' + this.name + ' failed to recognize ' + JSON.stringify(group));
     }
@@ -405,46 +511,55 @@ class Import {
 
     if (obj.type !== 'withdrawal' && obj.type !== 'deposit' && obj.type !== 'move-in' &&
       obj.type !== 'move-out' && obj.type !== 'trade') {
-      obj.currency = this.currency(group, obj);
-      obj.rate = this.rate(group, obj);
+      obj.currency = await this.handleQuestions('currency', group, obj, this.currency(group, obj));
+      obj.rate = await this.handleQuestions('rate', group, obj, this.rate(group, obj));
     }
     if (obj.type !== 'withdrawal' && obj.type !== 'deposit' && obj.type !== 'interest') {
-      obj.target = this.target(group, obj);
+      obj.target = await this.handleQuestions('target', group, obj, this.target(group, obj));
     }
     if (obj.type === 'trade' || obj.type === 'stock-dividend') {
-      obj.source = this.source(group, obj);
+      obj.source = await this.handleQuestions('source', group, obj, this.source(group, obj));
     }
     obj.total = this.total(group, obj, fyffe);
     if (obj.type !== 'interest' && obj.type !== 'dividend' && obj.type !== 'stock-dividend' && obj.type !== 'expense' && obj.type !== 'income') {
-      obj.fee = this.fee(group, obj);
+      obj.fee = await this.handleQuestions('fee', group, obj, this.fee(group, obj));
     }
     if (obj.type === 'dividend') {
-      obj.tax = this.tax(group, obj);
+      obj.tax = await this.handleQuestions('tax', group, obj, this.tax(group, obj));
     }
     if (obj.type === 'expense') {
-      obj.vat = this.vat(group, obj);
+      obj.vat = await this.handleQuestions('vat', group, obj, this.vat(group, obj));
     }
     if (obj.type === 'expense' || obj.type === 'income' || obj.type === 'sell' || obj.type === 'trade') {
-      obj.notes = this.notes(group, obj);
+      obj.notes = await this.handleQuestions('notes', group, obj, this.notes(group, obj));
     }
     if (obj.type === 'buy' || obj.type === 'sell' || obj.type === 'move-in' || obj.type === 'move-out' ||
       obj.type === 'dividend' || obj.type === 'stock-dividend' || obj.type === 'trade') {
-      obj.amount = this.amount(group, obj);
+      obj.amount = await this.handleQuestions('amount', group, obj, this.amount(group, obj));
     }
     if (obj.type === 'trade' || obj.type === 'dividend' || obj.type === 'stock_dividend') {
-      obj.given = this.given(group, obj);
+      obj.given = await this.handleQuestions('given', group, obj, this.given(group, obj));
     }
     if (obj.type === 'trade' || obj.type === 'move-in' || obj.type === 'move-out' || obj.type === 'buy') {
-      obj.burnAmount = this.burnAmount(group, obj);
+      obj.burnAmount = await this.handleQuestions('burnAmount', group, obj, this.burnAmount(group, obj));
       if (obj.burnAmount) {
-        obj.burnTarget = this.burnTarget(group, obj);
+        obj.burnTarget = await this.handleQuestions('burnTarget', group, obj, this.burnTarget(group, obj));
       }
     }
+    let tags = await this.handleQuestions('tags', group, obj, this.tags(group, obj));
 
     const type = obj.type;
     delete obj.type;
     const ret = Tx.create(type, obj, this.service, this.fund);
-    this.tags(group, obj).forEach((tag) => {
+
+    if (typeof tags === 'string') {
+      if (!/\[.+\]/.test(tags)) {
+        throw new Error('Invalid tags ' + JSON.stringify(tags));
+      }
+      tags = tags.substr(1, tags.length - 2).split('][');
+    }
+
+    tags.forEach((tag) => {
       ret.tags.push(tag);
     });
 
