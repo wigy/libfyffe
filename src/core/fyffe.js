@@ -266,17 +266,17 @@ class Fyffe {
    * @param {Set<String>} [ignore] Ignore these transactions.
    * @return {Set<String>}
    */
-  scanTargets(dataPerImporter, ignore = new Set()) {
+  async scanTargets(dataPerImporter, ignore = new Set()) {
     const txs = new Set();
-    Object.keys(dataPerImporter).forEach((name) => {
-      dataPerImporter[name].forEach((group) => {
+    for (const name of Object.keys(dataPerImporter)) {
+      for (const group of dataPerImporter[name]) {
         try {
-          const tx = this.modules[name].createTransaction(group, this, ignore);
+          const tx = await this.modules[name].createTransaction(group, this, ignore);
           txs.add(tx.getTarget());
           txs.add(tx.getSource());
         } catch (err) {}
-      });
-    });
+      }
+    }
     return txs;
   }
 
@@ -300,7 +300,7 @@ class Fyffe {
       const txs = [];
       for (const group of dataPerImporter[name]) {
         try {
-          const tx = this.modules[name].createTransaction(group, this);
+          const tx = await this.modules[name].createTransaction(group, this);
           if (tx === 'skipped') {
             continue;
           }

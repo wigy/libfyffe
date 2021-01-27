@@ -58,12 +58,13 @@ class NordeaImport extends Import {
       data = rule['=>'];
       for (const key of Object.keys(data)) {
         if (key.endsWith('?')) {
-          const qkey = data[key].substr(0, key.length - 1);
+          const qkey = data[key];
+          delete data[key];
           if (!this.questions) {
             this.questions = this.config.get('import.questions', this.service, this.fund);
           }
           if (!this.questions[qkey]) {
-            throw new Error(`Cannot find defintions for import questions '${qkey}'`);
+            throw new Error(`Cannot find defintions for import questions '${qkey}' for key '${key}'.`);
           }
           dump.blue('Not implemented questions:', this.questions[qkey]);
         }

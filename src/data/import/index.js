@@ -385,7 +385,7 @@ class Import {
    * @param {Fyffe} fyffe
    * @return {Tx|null} Transaction or null, if type `skipped`.
    */
-  createTransaction(group, fyffe) {
+  async createTransaction(group, fyffe) {
 
     this.stock = fyffe.stock;
     this.ledger = fyffe.ledger;
