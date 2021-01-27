@@ -10,6 +10,7 @@ const csv = require('../csv');
 class Import {
 
   constructor(name) {
+    this.config = config;
     this.name = name;
     this.service = null;
     this.fund = null;

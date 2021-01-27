@@ -1,4 +1,5 @@
 const safeEval = require('safe-eval');
+const dump = require('neat-dump');
 const Import = require('../import');
 const num = require('../../util/num');
 
@@ -42,30 +43,8 @@ class NordeaImport extends Import {
    * @param {any} [def]
    * @return {Object}
    */
-  useMapper(group, obj, field = undefined, def = undefined) {
-
-    if (field !== undefined) {
-      const data = this.useMapper(group, obj);
-      if (!(field in data)) {
-        if (def === undefined) {
-          const name = this.mapper.findMatch('recognize', group[0]);
-          throw new Error('A field `' + field + '` is not configured for `' + name + '` in ' + JSON.stringify(data));
-        }
-        return def;
-      }
-      let ret = data[field];
-      if (typeof ret === 'string' && ret.substr(0, 2) === '${' && ret.substr(-1, 1) === '}') {
-        ret = safeEval(ret.substr(2, ret.length - 3), {
-          stock: (code) => this.stock.getStock(code),
-          total: obj ? obj.total : null
-        });
-        if (typeof ret !== 'string' && (isNaN(ret) || ret === Infinity)) {
-          throw Error('Invalid result NaN or Infinity from expression `' + data[field] + '`.');
-        }
-      }
-      return ret;
-    }
-
+  useMapper(group, obj, field, def = undefined) {
+    // TODO: Move to general importer.
     if (group.length > 1) {
       throw new Error('String mapper cannot handle yet more than one item in the group.');
     }
@@ -74,11 +53,45 @@ class NordeaImport extends Import {
       throw new Error('Unable to find a match with string mapper: ' + JSON.stringify(group));
     }
     const rule = this.mapper.get('recognize', name);
+    let data;
     if ('=>' in rule) {
-      return rule['=>'];
+      data = rule['=>'];
+      for (const key of Object.keys(data)) {
+        if (key.endsWith('?')) {
+          const qkey = data[key].substr(0, key.length - 1);
+          if (!this.questions) {
+            this.questions = this.config.get('import.questions', this.service, this.fund);
+          }
+          if (!this.questions[qkey]) {
+            throw new Error(`Cannot find defintions for import questions '${qkey}'`);
+          }
+          dump.blue('Not implemented questions:', this.questions[qkey]);
+        }
+      }
+    } else {
+      // TODO: This way of doing the mapping is pointless. Can be dropped when not in use.
+      dump.red(`Obsolete use of 'txs' string mapper for '${name}'. Please switch to '=>' notation.`);
+      data = this.mapper.get('txs', name);
     }
-    // TODO: This way of doing the mapping is pointless. Can be dropped when not in use.
-    return this.mapper.get('txs', name);
+
+    if (!(field in data)) {
+      if (def === undefined) {
+        const name = this.mapper.findMatch('recognize', group[0]);
+        throw new Error('A field `' + field + '` is not configured for `' + name + '` in ' + JSON.stringify(data));
+      }
+      return def;
+    }
+    let ret = data[field];
+    if (typeof ret === 'string' && ret.substr(0, 2) === '${' && ret.substr(-1, 1) === '}') {
+      ret = safeEval(ret.substr(2, ret.length - 3), {
+        stock: (code) => this.stock.getStock(code),
+        total: obj ? obj.total : null
+      });
+      if (typeof ret !== 'string' && (isNaN(ret) || ret === Infinity)) {
+        throw Error('Invalid result NaN or Infinity from expression `' + data[field] + '`.');
+      }
+    }
+    return ret;
   }
 
   recognize(group) {
