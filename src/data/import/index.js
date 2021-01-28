@@ -25,6 +25,7 @@ class Import {
     this.ids = new Set();
 
     this.questions = {};
+    this.maps = {};
     this.answers = {};
   }
 
@@ -45,6 +46,7 @@ class Import {
     this.service = service;
     this.mapper = new StringMapper(config.get('import', service, fund) || {});
     this.questions = this.config.get('import.questions', this.service, this.fund);
+    this.maps = this.config.get('import.maps', this.service, this.fund);
   }
 
   /**
@@ -406,14 +408,37 @@ class Import {
     if ('=>' in rule) {
       data = rule['=>'];
       for (const key of Object.keys(data)) {
+        // Handle questions.
         if (key.endsWith('?')) {
           const qkey = data[key];
           delete data[key];
           if (!this.questions[qkey]) {
-            throw new Error(`Cannot find defintions for import questions '${qkey}' for key '${key}'.`);
+            throw new Error(`Cannot find definitions for import questions '${qkey}' for key '${key}'.`);
           }
           const key0 = key.substr(0, key.length - 1);
           data[key0] = this.questions[qkey];
+        }
+        // Handle automatic mappings.
+        if (key.endsWith('@')) {
+          dump.warning('Cannot handle @maps correctly yet.');
+          const qkey = data[key];
+          delete data[key];
+          if (!this.maps[qkey]) {
+            throw new Error(`Cannot find definitions for import mappings '${qkey}' for key '${key}'.`);
+          }
+          console.log('field', field, obj);
+          if (obj) {
+            for (const k of Object.keys(this.maps[qkey])) {
+              if (obj[k] !== undefined) {
+                for (const [k0, v0] of Object.entries(this.maps[qkey][k])) {
+                  if (k0 === obj[k]) {
+                    data[field] = v0;
+                    break;
+                  }
+                }
+              }
+            }
+          }
         }
       }
     } else {
@@ -449,7 +474,6 @@ class Import {
     });
     return new Promise((resolve) => {
       rl.question('Select one? ', (answer) => {
-        console.log(`Thank you for your valuable feedback: ${answer}`);
         rl.close();
         resolve(answer);
       });
@@ -457,7 +481,7 @@ class Import {
   }
 
   async handleQuestions(field, group, obj, q) {
-    if (q instanceof Object) {
+    if (!(q instanceof Array) && q instanceof Object) {
       if (!obj.id) {
         throw Error('Cannot handle questions for objects without ID.');
       }
@@ -470,7 +494,7 @@ class Import {
       console.log('---------------------------------------------------------------------------');
       console.log(group);
       console.log('---------------------------------------------------------------------------');
-      dump.cyan(`Select ${field}:`);
+      dump.orange(`Select ${field}:`);
       const map = {};
       let n = 1;
       Object.entries(q).forEach(([k, v]) => {
