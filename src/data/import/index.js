@@ -131,7 +131,6 @@ class Import {
             }
           })
           .on('done', () => {
-            console.log(lines);
             resolve(lines);
           });
       });

@@ -300,7 +300,6 @@ class Fyffe {
       const txs = [];
       for (const group of dataPerImporter[name]) {
         try {
-          console.log(group);
           const tx = await this.modules[name].createTransaction(group, this);
           if (tx === 'skipped') {
             continue;

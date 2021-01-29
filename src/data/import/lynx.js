@@ -157,6 +157,23 @@ class LynxImport extends SinglePassImport {
   async parseTrades(data) {
     const ret = [];
     for (const e of data.filter(e => e.Asset_Category === 'Stocks' && e.Header === 'Data')) {
+      let ok = true;
+      for (const code of e.Code.split(';')) {
+        switch (code) {
+          case 'P': // Partial.
+          case 'C': // Close.
+          case 'O': // Open.
+            break;
+          case 'Ca': // Canceled.
+            ok = false;
+            break;
+          default:
+            throw new Error(`Cannot recognize trade code ${code}.`);
+        }
+      }
+      if (!ok) {
+        continue;
+      }
       const q = this.num(e.Quantity);
       const rate = await Tx.fetchRate(e.Date_Time.substr(0, 10), `CURRENCY:${e.Currency}`);
       if (q < 0) {
@@ -351,9 +368,9 @@ class LynxImport extends SinglePassImport {
 
       re = /^([.A-Z0-9 ]+?)\s*\([0-9A-Z]+\) Split ([0-9]+) for ([0-9]+) \(.+/.exec(e.Description);
       if (re) {
-        console.log(re);
         const source = this.symbol(re[1]);
         const target = this.symbol(re[1]);
+        return ret;
         throw Error(`TODO: Split ${source} ${target}`);
         /*
         const source = this.symbol(re[1]);
