@@ -418,28 +418,6 @@ class Import {
           const key0 = key.substr(0, key.length - 1);
           data[key0] = this.questions[qkey];
         }
-        // Handle automatic mappings.
-        if (key.endsWith('@')) {
-          dump.warning('Cannot handle @maps correctly yet.');
-          const qkey = data[key];
-          delete data[key];
-          if (!this.maps[qkey]) {
-            throw new Error(`Cannot find definitions for import mappings '${qkey}' for key '${key}'.`);
-          }
-          console.log('field', field, obj);
-          if (obj) {
-            for (const k of Object.keys(this.maps[qkey])) {
-              if (obj[k] !== undefined) {
-                for (const [k0, v0] of Object.entries(this.maps[qkey][k])) {
-                  if (k0 === obj[k]) {
-                    data[field] = v0;
-                    break;
-                  }
-                }
-              }
-            }
-          }
-        }
       }
     } else {
       // TODO: This way of doing the mapping is pointless. Can be dropped when not in use.
@@ -510,6 +488,43 @@ class Import {
   }
 
   /**
+   * Process automatic field mappings.
+   * @param {Array<Object>} group
+   * @param {Object} obj
+   * @return {Set<String>}
+   */
+  processMappings(group, obj) {
+    const ret = new Set();
+    const name = this.mapper.findMatch('recognize', group[0]);
+    const rule = this.mapper.get('recognize', name);
+    if ('=>' in rule) {
+      const data = rule['=>'];
+      for (const key of Object.keys(data)) {
+        // Handle questions.
+        if (key.endsWith('@')) {
+          const qkey = data[key];
+          if (!this.maps || !this.maps[qkey]) {
+            throw new Error(`Cannot find definitions for import mappings '${qkey}' for key '${key}'.`);
+          }
+          for (const k of Object.keys(this.maps[qkey])) {
+            if (obj[k] !== undefined) {
+              for (const [k0, v0] of Object.entries(this.maps[qkey][k])) {
+                if (k0 === obj[k]) {
+                  const objKey = key.substr(0, key.length - 1);
+                  obj[objKey] = v0;
+                  ret.add(objKey);
+                  break;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    return ret;
+  }
+
+  /**
    * Convert a source data group to transaction.
    * @param {Array<Object>} group
    * @param {Fyffe} fyffe
@@ -572,10 +587,11 @@ class Import {
     }
     let tags = await this.handleQuestions('tags', group, obj, this.tags(group, obj));
 
-    const type = obj.type;
-    delete obj.type;
-    const ret = Tx.create(type, obj, this.service, this.fund);
-
+    const modified = this.processMappings(group, obj);
+    if (modified.has('tags')) {
+      tags = obj.tags;
+      delete obj.tags;
+    }
     if (typeof tags === 'string') {
       if (!/\[.+\]/.test(tags)) {
         throw new Error('Invalid tags ' + JSON.stringify(tags));
@@ -583,9 +599,15 @@ class Import {
       tags = tags.substr(1, tags.length - 2).split('][');
     }
 
-    tags.forEach((tag) => {
-      ret.tags.push(tag);
-    });
+    const type = obj.type;
+    delete obj.type;
+    const ret = Tx.create(type, obj, this.service, this.fund);
+
+    if (tags) {
+      tags.forEach((tag) => {
+        ret.tags.push(tag);
+      });
+    }
 
     return ret;
   }
