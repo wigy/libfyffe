@@ -60,14 +60,13 @@ class LynxImport extends SinglePassImport {
     delete data['Financial Instrument Information'];
     delete data.Codes;
     delete data['Notes/Legal Notes'];
-
-    const interest = await this.parseInterest(data.Interest);
-    const trades = await this.parseTrades(data.Trades);
-    const forex = await this.parseForex(data.Trades);
-    const deposits = await this.parseFunding(data['Deposits & Withdrawals']);
-    const taxes = await this.parseTax(data['Withholding Tax']);
-    const dividends = await this.parseDividends(data.Dividends, taxes);
-    const actions = await this.parseCorporateActions(data['Corporate Actions']);
+    const interest = data.Interest ? await this.parseInterest(data.Interest) : [];
+    const trades = data.Trades ? await this.parseTrades(data.Trades) : [];
+    const forex = data.Trades ? await this.parseForex(data.Trades) : [];
+    const deposits = data['Deposits & Withdrawals'] ? await this.parseFunding(data['Deposits & Withdrawals']) : [];
+    const taxes = data['Withholding Tax'] ? await this.parseTax(data['Withholding Tax']) : [];
+    const dividends = data.Dividends ? await this.parseDividends(data.Dividends, taxes) : [];
+    const actions = data['Corporate Actions'] ? await this.parseCorporateActions(data['Corporate Actions']) : [];
 
     return interest.concat(trades).concat(forex).concat(deposits).concat(dividends).concat(actions);
   }
@@ -350,6 +349,35 @@ class LynxImport extends SinglePassImport {
         }];
       }
 
+      re = /^([.A-Z0-9 ]+?)\s*\([0-9A-Z]+\) Split ([0-9]+) for ([0-9]+) \(.+/.exec(e.Description);
+      if (re) {
+        console.log(re);
+        const source = this.symbol(re[1]);
+        const target = this.symbol(re[1]);
+        throw Error(`TODO: Split ${source} ${target}`);
+        /*
+        const source = this.symbol(re[1]);
+        const target = this.symbol(re[3]);
+        const amount = parseFloat(e.Quantity);
+        // Drop reverse entry of the same tender.
+        if (amount < 0) {
+          return [];
+        }
+        return [{
+          amount,
+          currency: e.Currency,
+          date,
+          fee: 0.0,
+          given: -amount,
+          id: this.makeId('TRADE', date, `${source}-${target}`),
+          notes: 'tender',
+          source,
+          target,
+          total: 0.00,
+          type: 'trade'
+        }];
+        */
+      }
       throw new Error(`Cannot recognize corporate action '${e.Description}'.`);
     };
 

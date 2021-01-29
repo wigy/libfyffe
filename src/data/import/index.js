@@ -496,6 +496,9 @@ class Import {
   processMappings(group, obj) {
     const ret = new Set();
     const name = this.mapper.findMatch('recognize', group[0]);
+    if (!name) {
+      return ret;
+    }
     const rule = this.mapper.get('recognize', name);
     if ('=>' in rule) {
       const data = rule['=>'];
