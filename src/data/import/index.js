@@ -351,7 +351,7 @@ class Import {
   dateAndLineId(group) {
     let id = this.time(group[0]);
     id += ':';
-    id += group.map((group) => group.__lineNumber).sort((a, b) => a - b).join(',');
+    id += group.map((g) => g.__lineNumber).sort((a, b) => a - b).join(',');
     return id;
   }
 
