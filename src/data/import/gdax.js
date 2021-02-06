@@ -204,6 +204,10 @@ class GDAXImport extends Import {
   burnAmount(group, obj) {
     return null;
   }
+
+  notes(group, obj) {
+    return '';
+  }
 }
 
 module.exports = new GDAXImport();

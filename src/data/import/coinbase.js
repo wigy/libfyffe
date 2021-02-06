@@ -143,6 +143,10 @@ class CoinbaseImport extends Import {
   burnAmount(group, obj) {
     return null;
   }
+
+  notes(group, obj) {
+    return '';
+  }
 }
 
 module.exports = new CoinbaseImport();
