@@ -14,6 +14,8 @@ class Config {
 
   clear() {
     Object.assign(this, {
+      // Configuration path.
+      path: null,
       // Abbreviation of the primary currency.
       currency: 'EUR',
       // Language used in entry descriptions.
@@ -287,6 +289,7 @@ class Config {
     }
     if (path) {
       const ini = JSON.parse(fs.readFileSync(path).toString('utf-8'));
+      ini.path = path;
       this.set(ini);
     }
   }

@@ -26,7 +26,7 @@ class Import {
 
     this.questions = {};
     this.maps = {};
-    this.answers = {};
+    this.answers = null;
   }
 
   /**
@@ -457,7 +457,23 @@ class Import {
     });
   }
 
+  async loadQuestionCache() {
+    if (await fs.existsSync(config.path + '-cache')) {
+      dump.info(`Loading cache ${config.path + '-cache'}`);
+      return JSON.parse(fs.readFileSync(config.path + '-cache').toString('UTF-8'));
+    }
+    return {};
+  }
+
+  async saveQuestionCache(data) {
+    dump.info(`Saving cache ${config.path + '-cache'}`);
+    fs.writeFileSync(config.path + '-cache', JSON.stringify(data, null, 4), 'UTF-8');
+  }
+
   async handleQuestions(field, group, obj, q) {
+    if (this.answers === null) {
+      this.answers = await this.loadQuestionCache();
+    }
     if (!(q instanceof Array) && q instanceof Object) {
       if (!obj.id) {
         throw Error('Cannot handle questions for objects without ID.');
@@ -481,6 +497,7 @@ class Import {
       });
       const ans = await this.readLine();
       this.answers[obj.id][field] = map[ans];
+      await this.saveQuestionCache(this.answers);
       return map[ans];
     }
     return q;
