@@ -12,7 +12,7 @@ class CoinbaseImport extends Import {
     return content.substr(0, 17) === 'Transactions\nUser';
   }
 
-  load(file) {
+  async load(file) {
     // Remove initial lines.
     file = file.replace(/Transactions\nUser.*?\nAccount.*?\n\n/, '');
     file = file.replace(' (visit https://www.coinbase.com/transactions/[ID] in your browser)', '');

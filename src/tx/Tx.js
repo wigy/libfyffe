@@ -366,8 +366,7 @@ module.exports = class Tx {
     }
 
     if (!acc) {
-      console.log(this.service, this.fund);
-      throw new Error('Account ' + JSON.stringify(name) + ' is not configured.');
+      throw new Error(`Account ${JSON.stringify(name)} is not configured for service ${this.service} in fund ${this.fund}.`);
     }
 
     return acc;

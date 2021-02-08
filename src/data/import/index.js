@@ -140,6 +140,28 @@ class Import {
   }
 
   /**
+   * Replace the matching key with another in data.
+   * @param {*} data
+   * @param {*} regex
+   * @param {*} to
+   */
+  replaceKey(data, regex, to) {
+    let key;
+    for (const e of data) {
+      if (!key) {
+        for (const k of Object.keys(e)) {
+          if (regex.test(k)) {
+            key = k;
+            break;
+          }
+        }
+      }
+      e[to] = e[key];
+      delete e[key];
+    }
+  }
+
+  /**
    * Generate unique transaction ID.
    * @param {Array<Object>} group
    */
