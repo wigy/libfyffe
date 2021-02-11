@@ -41,6 +41,16 @@
     "expense.transfer17": "Siirto #17 ={notes}-palveluun",
     "expense.transfer18": "Siirto #18 ={notes}-palveluun",
     "expense.transfer19": "Siirto #19 ={notes}-palveluun",
+    "expense.transfer20": "Siirto #20 ={notes}-palveluun",
+    "expense.transfer21": "Siirto #21 ={notes}-palveluun",
+    "expense.transfer22": "Siirto #22 ={notes}-palveluun",
+    "expense.transfer23": "Siirto #23 ={notes}-palveluun",
+    "expense.transfer24": "Siirto #24 ={notes}-palveluun",
+    "expense.transfer25": "Siirto #25 ={notes}-palveluun",
+    "expense.transfer26": "Siirto #26 ={notes}-palveluun",
+    "expense.transfer27": "Siirto #27 ={notes}-palveluun",
+    "expense.transfer28": "Siirto #28 ={notes}-palveluun",
+    "expense.transfer29": "Siirto #29 ={notes}-palveluun",
     "expense.travel": "Matkakulu ={notes}",
     "expense.finances": "Taloushallintokulu ={notes}",
     "expense.meeting": "Kokouskulu",
@@ -289,6 +299,36 @@
       "notes": ""
     },
     "expense.transfer19": {
+      "notes": ""
+    },
+    "expense.transfer20": {
+      "notes": ""
+    },
+    "expense.transfer21": {
+      "notes": ""
+    },
+    "expense.transfer22": {
+      "notes": ""
+    },
+    "expense.transfer23": {
+      "notes": ""
+    },
+    "expense.transfer24": {
+      "notes": ""
+    },
+    "expense.transfer25": {
+      "notes": ""
+    },
+    "expense.transfer26": {
+      "notes": ""
+    },
+    "expense.transfer27": {
+      "notes": ""
+    },
+    "expense.transfer28": {
+      "notes": ""
+    },
+    "expense.transfer29": {
       "notes": ""
     },
     "expense.entertainment": {
