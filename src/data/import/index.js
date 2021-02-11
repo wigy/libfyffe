@@ -641,6 +641,9 @@ class Import {
     }
 
     const type = obj.type;
+    if (type === 'skip') {
+      return 'skipped';
+    }
     delete obj.type;
     const ret = Tx.create(type, obj, this.service, this.fund);
 
