@@ -620,7 +620,7 @@ class Import {
     if (obj.type === 'trade' || obj.type === 'dividend' || obj.type === 'stock_dividend') {
       obj.given = await this.handleQuestions('given', group, obj, this.given(group, obj));
     }
-    if (obj.type === 'trade' || obj.type === 'move-in' || obj.type === 'move-out' || obj.type === 'buy') {
+    if (obj.type === 'trade' || obj.type === 'move-in' || obj.type === 'move-out' || obj.type === 'buy' || obj.type === 'sell') {
       obj.burnAmount = await this.handleQuestions('burnAmount', group, obj, this.burnAmount(group, obj));
       if (obj.burnAmount) {
         obj.burnTarget = await this.handleQuestions('burnTarget', group, obj, this.burnTarget(group, obj));

@@ -10,7 +10,7 @@ const text = require('../text/make');
 module.exports = class SellTx extends Tx {
 
   constructor(data = {}) {
-    super('sell', { target: undefined, amount: undefined, currency: config.currency, rate: undefined, fee: 0.0, stock: undefined, avg: undefined, notes: null }, data);
+    super('sell', { target: undefined, amount: undefined, currency: config.currency, rate: undefined, fee: 0.0, stock: undefined, avg: undefined, notes: null, burnAmount: null, burnTarget: null }, data);
   }
 
   getMyEntries() {
@@ -56,6 +56,11 @@ module.exports = class SellTx extends Tx {
   }
 
   updateStock(stock) {
+    if (this.burnAmount) {
+      const burned = -this.burnAmount * this.requireAverage(stock, this.getBurnTarget());
+      stock.add(this.burnAmount, this.getBurnTarget(), burned);
+      this.fee = num.cents(this.fee + burned);
+    }
     this.avg = this.requireAverage(stock, this.getTarget());
     const { amount } = stock.add(this.amount, this.getTarget(), this.total - this.fee);
     this.stock = amount;
