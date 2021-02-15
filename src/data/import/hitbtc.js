@@ -71,68 +71,108 @@ class HitBTCImport extends Import {
     throw new Error('Cannot recognize ' + JSON.stringify(group));
   }
 
+  parse(group) {
+    let [sell, buy] = group[0].Instrument.split('/');
+    if (group[0].Side === 'buy') {
+      [buy, sell] = [sell, buy];
+    } else if (group[0].Side !== 'sell') {
+      throw new Error(`Cannot figure out trade side ${group[0].Side}.`);
+    }
+    const quantity = parseFloat(group[0].Quantity);
+    const price = parseFloat(group[0].Price);
+    const date = group[0].Date;
+    const volume = parseFloat(group[0].Volume);
+    const fee = parseFloat(group[0].Fee);
+    const total = parseFloat(group[0].Total);
+    return { quantity, price, date, buy, sell, volume, fee, total };
+  }
+
   target(group, obj) {
+    const { buy } = this.parse(group);
     switch (obj.type) {
       case 'move-in':
         return group[0].Currency;
       case 'trade':
-        switch (group[0].Side) {
-          case 'sell':
-            return group[0].Instrument.split('/')[0];
-        }
+        return buy;
     }
     throw new Error('Cannot find target from ' + JSON.stringify(group));
   }
 
   source(group, obj) {
+    const { sell } = this.parse(group);
     switch (obj.type) {
       case 'trade':
-        switch (group[0].Side) {
-          case 'sell':
-            return group[0].Instrument.split('/')[1];
-        }
+        return sell;
     }
     throw new Error('Cannot find source from ' + JSON.stringify(group));
   }
 
   async total(group, obj, fyffe) {
     if (group.length > 1) {
-      throw new Error('More than one not implemented yet in total().');
+      // throw new Error('More than one entry not implemented yet in total().');
     }
+
+    const { price, quantity, buy, date } = this.parse(group);
     switch (obj.type) {
       case 'move-in':
         return num.cents(fyffe.stock.getAverage(obj.target) * parseFloat(group[0].Amount));
+      case 'trade':
+        // There are no fiat pairs for HitBTC.
+        return (await Tx.fetchTradePair('KRAKEN', buy, 'EUR', date)) * price * quantity;
+      default:
+        throw new Error('No total() implemented for ' + JSON.stringify(group));
     }
-    // TODO: Calculate whole group.
-    const [sell, buy] = group[0].Instrument.split('/');
-    const quantity = parseFloat(group[0].Quantity);
-    console.log(group);
-    console.log(sell, buy);
-    console.log(quantity);
-    const rate = await Tx.fetchRate(group[0].Date, `KRAKEN:${buy}`);
-    console.log(rate);
-    throw new Error('No total() implemented for ' + JSON.stringify(group));
   }
 
   fee(group, obj) {
     switch (obj.type) {
       case 'move-in':
+      case 'trade':
         return 0.00;
     }
     throw new Error('No fee() implemented for ' + JSON.stringify(group));
   }
 
   amount(group, obj) {
+    const { volume } = this.parse(group);
     switch (obj.type) {
       case 'move-in':
         return parseFloat(group[0].Amount);
+      case 'trade':
+        return volume;
       default:
         throw new Error('No amount() implemented for ' + obj.type + '-type ' + JSON.stringify(group));
     }
   }
 
+  given(group, obj) {
+    const { quantity } = this.parse(group);
+    switch (obj.type) {
+      case 'trade':
+        return quantity;
+      default:
+        throw new Error('No given() implemented for ' + obj.type + '-type ' + JSON.stringify(group));
+    }
+  }
+
   burnAmount(group, obj) {
-    return null;
+    const { fee } = this.parse(group);
+    switch (obj.type) {
+      case 'trade':
+        return fee;
+      default:
+        throw new Error('No burnAmount() implemented for ' + obj.type + '-type ' + JSON.stringify(group));
+    }
+  }
+
+  burnTarget(group, obj) {
+    const { buy } = this.parse(group);
+    switch (obj.type) {
+      case 'trade':
+        return buy;
+      default:
+        throw new Error('No burnTarget() implemented for ' + obj.type + '-type ' + JSON.stringify(group));
+    }
   }
 
   notes(group, obj) {

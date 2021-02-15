@@ -36,6 +36,12 @@ const types = {
 const dailyRates = {
 };
 
+/**
+ * Trading pairs fetched.
+ */
+const tradePairs = {
+};
+
 let stockDebugTitle = false;
 
 /**
@@ -670,6 +676,29 @@ module.exports = class Tx {
     if (json && json.close) {
       const rate = json.close;
       Tx.setRate(date, target, rate);
+      return rate;
+    }
+    return null;
+  }
+
+  /**
+   * Get the value of trading pair at the given time.
+   * @param {String} date
+   * @param {String} target
+   * @return {Promise<Number|null>}
+   */
+  static async fetchTradePair(exchange, sell, buy, stamp) {
+    if (exchange in tradePairs && sell in tradePairs[exchange] && buy in tradePairs[exchange][sell] && stamp in tradePairs[exchange][sell][buy]) {
+      return tradePairs[exchange][sell][buy][stamp];
+    }
+    const url = process.env.HARVEST_URL || 'http://localhost:9001';
+    const json = await http.get(`${url}/pair/${exchange}/${sell}/${buy}/${stamp}`)
+      .catch(err => {
+        throw new Error(err);
+      });
+
+    if (json && json.price) {
+      const rate = json.price;
       return rate;
     }
     return null;
