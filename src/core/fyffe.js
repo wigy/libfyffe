@@ -281,18 +281,6 @@ class Fyffe {
   }
 
   /**
-   * Fetch the rate for the ticker.
-   */
-  async fetchRate(timestamp, service, target) {
-    let ticker = service.toUpperCase() + ':' + target;
-    // Hit BTC does not trade fiat.
-    if (ticker.startsWith('HITBTC:')) {
-      ticker = 'KRAKEN' + ':' + target;
-    }
-    return Tx.fetchRate(timestamp, ticker);
-  }
-
-  /**
    * Convert raw group data to transactions and store them to the ledger.
    * @param {Object} dataPerImporter
    * @param {Set<String>} [ignore] Ignore these transaction types.
@@ -313,7 +301,7 @@ class Fyffe {
           }
           if (tx) {
             if (config.flags.tradeProfit && tx.type === 'trade') {
-              await this.fetchRate(tx.time, tx.service, tx.target);
+              await Tx.fetchRate(tx.time, tx.service.toUpperCase() + ':' + tx.target);
             }
             txs.push(tx);
           } else {
@@ -583,7 +571,7 @@ class Fyffe {
     await this.createTransactions(dataPerImporter, options.ignore || new Set());
 
     // Finally apply all transactions.
-    await this.ledger.apply(this.stock, additionalTxs, this);
+    await this.ledger.apply(this.stock, additionalTxs);
 
     if (config.flags.debug) {
       this.ledger.showTransactions('Transactions:');

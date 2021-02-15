@@ -30,6 +30,8 @@ class Config {
       startDate: null,
       // Final date of the import range.
       endDate: null,
+      // Alternative service to query prices if actual service fails to give result.
+      fallbackService: null,
       // Various flags affecting library behavior.
       flags: {
         // If set, do not generate profit/loss entries for selling.

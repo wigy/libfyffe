@@ -61,7 +61,7 @@ module.exports = class Ledger {
    * @param {Fyffe} fyffe
    * Additional transactions can be given as an array of {number, amount, time}
    */
-  async apply(stock, extraTxs, fyffe) {
+  async apply(stock, extraTxs) {
     this.txs = this.txs.sort((a, b) => a.time - b.time);
     extraTxs = extraTxs.sort((a, b) => a.time - b.time);
 
@@ -84,15 +84,23 @@ module.exports = class Ledger {
         }
         tx.updateFromStock(stock);
         // console.log(tx);
+
+        // Get the rates needed.
+        if (tx.type === 'trade') {
+          await Tx.fetchRate(tx.time, tx.service.toUpperCase() + ':' + tx.target);
+        }
+
         if (tx.has('burnAmount') && tx.burnAmount) {
           const ticker = `${service.toUpperCase()}:${tx.burnTarget}`;
           if (!stock.getAverage(ticker)) {
-            const rate = await fyffe.fetchRate(tx.time, service, tx.burnTarget);
+            const rate = await Tx.fetchRate(tx.time, ticker);
             // console.log('Set avg', ticker, rate);
             stock.setAverages({ [ticker]: rate });
           }
         }
+
         const result = tx.apply(this.accounts, stock);
+
         for (const r of result) {
           if (!loans[r.currency]) {
             loans[r.currency] = {};

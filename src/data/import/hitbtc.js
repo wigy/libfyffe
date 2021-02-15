@@ -1,5 +1,4 @@
 const Import = require('../import');
-const Tx = require('../../tx/Tx');
 const num = require('../../util/num');
 
 const TRANSFERS_REXEG = /^Email,Date \([-+]\d\d:\d\d\),Operation id,Type,Amount,Transaction hash,Main account balance,Currency/;
@@ -73,6 +72,9 @@ class HitBTCImport extends Import {
   }
 
   parse(group) {
+    if (group[0].File !== 'trade') {
+      return {};
+    }
     const side = group[0].Side;
     const instrument = group[0].Instrument;
     if (side !== 'buy' && side !== 'sell') {
@@ -129,13 +131,11 @@ class HitBTCImport extends Import {
   }
 
   async total(group, obj, fyffe) {
-    const { price, quantity, buy, date } = this.parse(group);
     switch (obj.type) {
       case 'move-in':
         return num.cents(fyffe.stock.getAverage(obj.target) * parseFloat(group[0].Amount));
       case 'trade':
-        // There are no fiat pairs for HitBTC.
-        return (await Tx.fetchTradePair('KRAKEN', buy, 'EUR', date)) * price * quantity;
+        return 0; // Calculate later.
       default:
         throw new Error('No total() implemented for ' + JSON.stringify(group));
     }
@@ -177,6 +177,8 @@ class HitBTCImport extends Import {
     switch (obj.type) {
       case 'trade':
         return -fee;
+      case 'move-in':
+        return null;
       default:
         throw new Error('No burnAmount() implemented for ' + obj.type + '-type ' + JSON.stringify(group));
     }

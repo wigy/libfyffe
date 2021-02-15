@@ -42,6 +42,20 @@ const dailyRates = {
 const tradePairs = {
 };
 
+/**
+ * Helper to recognize string date or epoch.
+ * @param {String|Number} dateOrTime
+ */
+const toDate = (dateOrTime) => {
+  let date;
+  if (typeof dateOrTime === 'string') {
+    date = dateOrTime;
+  } else {
+    date = moment.utc(dateOrTime).format('YYYY-MM-DD HH:mm:ss');
+  }
+  return date;
+};
+
 let stockDebugTitle = false;
 
 /**
@@ -664,26 +678,31 @@ module.exports = class Tx {
    * @return {Promise<Number|null>}
    */
   static async fetchRate(dateOrTime, target) {
-    let date;
-    if (typeof dateOrTime === 'string') {
-      date = dateOrTime;
-    } else {
-      date = moment.utc(dateOrTime).format('YYYY-MM-DD HH:mm:ss');
-    }
+
+    const date = toDate(dateOrTime);
+
     if (target in dailyRates && date in dailyRates[target]) {
       return dailyRates[target][date];
     }
-    const url = process.env.HARVEST_URL || 'http://localhost:9001';
-    const json = await http.get(url + '/ticker/' + target + '/' + date)
-      .catch(err => {
-        throw new Error(err);
-      });
 
-    if (json) {
-      const rate = json.close === undefined ? json.price : json.close;
-      Tx.setRate(date, target, rate);
-      return rate;
+    async function _fetch(target) {
+      const url = process.env.HARVEST_URL || 'http://localhost:9001';
+      const json = await http.get(url + '/ticker/' + target + '/' + date)
+        .catch(() => null);
+      if (json) {
+        return json.close === undefined ? json.price : json.close;
+      }
+      return null;
     }
+
+    const backup = config.fallbackService ? config.fallbackService.toUpperCase() + ':' + target.split(':')[1] : null;
+    let rate = await _fetch(target);
+    if (!rate && backup) {
+      rate = await _fetch(backup);
+    }
+
+    Tx.setRate(date, target, rate);
+
     return null;
   }
 
@@ -716,7 +735,8 @@ module.exports = class Tx {
    * @param {String} target
    * @return {Number|null}
    */
-  static getRate(date, target) {
+  static getRate(dateOrTime, target) {
+    const date = toDate(dateOrTime);
     if (target in dailyRates && date in dailyRates[target]) {
       return dailyRates[target][date];
     }

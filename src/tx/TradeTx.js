@@ -27,6 +27,18 @@ module.exports = class TradeTx extends Tx {
     }, data);
   }
 
+  sellPrice() {
+    const ticker = this.service.toUpperCase() + ':' + this.target;
+    const buyPrice = num.cents(-this.given * this.avg2);
+    const sellRate = Tx.getRate(this.time, ticker);
+    const sellPrice = num.cents(this.amount * sellRate);
+    const diff = num.cents(buyPrice - sellPrice);
+    if (diff === 0) {
+      return num.cents(this.total - this.fee);
+    }
+    return sellPrice;
+  }
+
   getMyEntries() {
     const ret = [
       { number: this.getAccount('targets', this.source), amount: num.cents(-this.total) }
@@ -38,9 +50,9 @@ module.exports = class TradeTx extends Tx {
       // Calculate profit immediately if historical rate is found.
       const buyPrice = num.cents(-this.given * this.avg2);
       const ticker = this.service.toUpperCase() + ':' + this.target;
-      const sellRate = Tx.getRate(this.date, ticker);
+      const sellRate = Tx.getRate(this.time, ticker);
       if (sellRate !== null) {
-        const sellPrice = num.cents(this.amount * sellRate);
+        const sellPrice = this.sellPrice();
         const diff = num.cents(buyPrice - sellPrice);
         if (diff > 0) {
           // In losses, add to debit side into losses.
@@ -55,7 +67,7 @@ module.exports = class TradeTx extends Tx {
         }
         return ret;
       } else {
-        dump.warning(`Not able to find selling rate for ${ticker} on ${this.date}.`);
+        dump.warning(`Not able to find selling rate for ${ticker} on ${new Date(this.time)}.`);
       }
     }
     ret.push({ number: this.getAccount('targets', this.target), amount: num.cents(this.total - this.fee) });
@@ -95,7 +107,7 @@ module.exports = class TradeTx extends Tx {
     const src = stock.add(this.given, this.getSource(), this.total);
     this.stock2 = src.amount;
     this.avg2 = src.avg;
-    const dst = stock.add(this.amount, this.getTarget(), this.total);
+    const dst = stock.add(this.amount, this.getTarget(), this.sellPrice());
     this.stock = dst.amount;
     this.avg = dst.avg;
   }
