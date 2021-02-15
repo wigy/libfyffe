@@ -576,7 +576,7 @@ class Import {
     this.stock = fyffe.stock;
     this.ledger = fyffe.ledger;
 
-    // TODO: Cleanup. These can be figured from constructor data for each type.
+    // Construct basics for the temporary object.
     const obj = {};
     obj.id = this.id(group);
     obj.time = this.time(group[0]);
@@ -589,6 +589,7 @@ class Import {
       return 'skipped';
     }
 
+    // Fetch pieces based on the type and add them to the temporary object.
     if (obj.type !== 'withdrawal' && obj.type !== 'deposit' && obj.type !== 'move-in' &&
       obj.type !== 'move-out' && obj.type !== 'trade') {
       obj.currency = await this.handleQuestions('currency', group, obj, this.currency(group, obj));
@@ -626,6 +627,8 @@ class Import {
         obj.burnTarget = await this.handleQuestions('burnTarget', group, obj, this.burnTarget(group, obj));
       }
     }
+
+    // Post processing.
     let tags = await this.handleQuestions('tags', group, obj, this.tags(group, obj));
 
     const modified = this.processMappings(group, obj);
@@ -640,11 +643,14 @@ class Import {
       tags = tags.substr(1, tags.length - 2).split('][');
     }
 
+    // Extract type from temporary object.
     const type = obj.type;
     if (type === 'skip') {
       return 'skipped';
     }
     delete obj.type;
+
+    // Finalize Tx object and its tags.
     const ret = Tx.create(type, obj, this.service, this.fund);
 
     if (tags) {

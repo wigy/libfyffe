@@ -1,6 +1,5 @@
 const Import = require('../import');
 const Tx = require('../../tx/Tx');
-const config = require('../../config');
 const num = require('../../util/num');
 
 const TRANSFERS_REXEG = /^Email,Date \([-+]\d\d:\d\d\),Operation id,Type,Amount,Transaction hash,Main account balance,Currency/;
