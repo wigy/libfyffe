@@ -89,8 +89,6 @@ class KrakenImport extends Import {
       }
     }
 
-    console.log('group', group);
-
     throw new Error('Cannot recognize entry ' + JSON.stringify(group));
   }
 

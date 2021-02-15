@@ -227,7 +227,7 @@ class Import {
    * @param {Object} obj Data known so far.
    * @return {Number}
    */
-  total(group, obj) {
+  async total(group, obj) {
     throw new Error('Importer does not implement total().');
   }
 
@@ -600,7 +600,7 @@ class Import {
     if (obj.type === 'trade' || obj.type === 'stock-dividend') {
       obj.source = await this.handleQuestions('source', group, obj, this.source(group, obj));
     }
-    obj.total = this.total(group, obj, fyffe);
+    obj.total = await this.total(group, obj, fyffe);
     if (obj.type !== 'interest' && obj.type !== 'dividend' && obj.type !== 'stock-dividend' && obj.type !== 'expense' && obj.type !== 'income') {
       obj.fee = await this.handleQuestions('fee', group, obj, this.fee(group, obj));
     }
