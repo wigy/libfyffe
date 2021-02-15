@@ -659,11 +659,17 @@ module.exports = class Tx {
 
   /**
    * Get the daily rating for some target.
-   * @param {String} date
+   * @param {String|Number} dateOrTime
    * @param {String} target
    * @return {Promise<Number|null>}
    */
-  static async fetchRate(date, target) {
+  static async fetchRate(dateOrTime, target) {
+    let date;
+    if (typeof dateOrTime === 'string') {
+      date = dateOrTime;
+    } else {
+      date = moment.utc(dateOrTime).format('YYYY-MM-DD HH:mm:ss');
+    }
     if (target in dailyRates && date in dailyRates[target]) {
       return dailyRates[target][date];
     }

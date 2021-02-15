@@ -283,9 +283,13 @@ class Fyffe {
   /**
    * Fetch the rate for the ticker.
    */
-  async fetchRate(date, service, target) {
-    const ticker = service.toUpperCase() + ':' + target;
-    return Tx.fetchRate(date, ticker);
+  async fetchRate(timestamp, service, target) {
+    let ticker = service.toUpperCase() + ':' + target;
+    // Hit BTC does not trade fiat.
+    if (ticker.startsWith('HITBTC:')) {
+      ticker = 'KRAKEN' + ':' + target;
+    }
+    return Tx.fetchRate(timestamp, ticker);
   }
 
   /**
@@ -309,7 +313,7 @@ class Fyffe {
           }
           if (tx) {
             if (config.flags.tradeProfit && tx.type === 'trade') {
-              await this.fetchRate(tx.date, tx.service, tx.target);
+              await this.fetchRate(tx.time, tx.service, tx.target);
             }
             txs.push(tx);
           } else {
