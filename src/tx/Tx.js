@@ -679,8 +679,8 @@ module.exports = class Tx {
         throw new Error(err);
       });
 
-    if (json && json.close) {
-      const rate = json.close;
+    if (json) {
+      const rate = json.close === undefined ? json.price : json.close;
       Tx.setRate(date, target, rate);
       return rate;
     }

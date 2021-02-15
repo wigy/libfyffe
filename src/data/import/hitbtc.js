@@ -148,7 +148,7 @@ class HitBTCImport extends Import {
     const { quantity } = this.parse(group);
     switch (obj.type) {
       case 'trade':
-        return quantity;
+        return -quantity;
       default:
         throw new Error('No given() implemented for ' + obj.type + '-type ' + JSON.stringify(group));
     }
@@ -158,7 +158,7 @@ class HitBTCImport extends Import {
     const { fee } = this.parse(group);
     switch (obj.type) {
       case 'trade':
-        return fee;
+        return -fee;
       default:
         throw new Error('No burnAmount() implemented for ' + obj.type + '-type ' + JSON.stringify(group));
     }

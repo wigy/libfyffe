@@ -594,6 +594,15 @@ class Import {
       }
     }
 
+    // Fetch data needed.
+    const ticker = `${this.service.toUpperCase()}:${obj.burnTarget}`;
+    if (obj.burnAmount) {
+      if (!this.stock.getAverage(obj.burnTarget)) {
+        const rate = await fyffe.fetchRate(obj.time, this.service, obj.burnTarget);
+        this.stock.setAverages({ [ticker]: rate });
+      }
+    }
+
     // Post processing.
     let tags = await this.handleQuestions('tags', group, obj, this.tags(group, obj));
 
