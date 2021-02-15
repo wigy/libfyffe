@@ -9,16 +9,13 @@ class HitBTCImport extends Import {
 
   constructor() {
     super('HitBTC');
-    this.fileType = null;
   }
 
   isMine(content) {
     if (TRANSFERS_REXEG.test(content)) {
-      this.fileType = 'transfer';
       return true;
     }
     if (TRADE_REXEG.test(content)) {
-      this.fileType = 'trade';
       return true;
     }
   }
@@ -28,6 +25,11 @@ class HitBTCImport extends Import {
     if (TRANSFERS_REXEG.test(file)) {
       for (const e of data) {
         e.File = 'transfer';
+      }
+    }
+    if (TRADE_REXEG.test(file)) {
+      for (const e of data) {
+        e.File = 'trade';
       }
     }
     this.replaceKey(data, /Date___/, 'Date');
@@ -54,7 +56,7 @@ class HitBTCImport extends Import {
   }
 
   id(group) {
-    if (this.fileType === 'trade') {
+    if (group[0].File === 'trade') {
       return this.service + ':' + this.fund + ':' + (group[0].Order_ID);
     }
     return this.service + ':' + this.fund + ':' + (group[0].Transaction_hash);
@@ -71,19 +73,39 @@ class HitBTCImport extends Import {
   }
 
   parse(group) {
-    let [sell, buy] = group[0].Instrument.split('/');
-    if (group[0].Side === 'buy') {
-      [buy, sell] = [sell, buy];
-    } else if (group[0].Side !== 'sell') {
+    const side = group[0].Side;
+    const instrument = group[0].Instrument;
+    if (side !== 'buy' && side !== 'sell') {
       throw new Error(`Cannot figure out trade side ${group[0].Side}.`);
     }
-    const quantity = parseFloat(group[0].Quantity);
-    const price = parseFloat(group[0].Price);
+    let [sell, buy] = instrument.split('/');
     const date = group[0].Date;
-    const volume = parseFloat(group[0].Volume);
-    const fee = parseFloat(group[0].Fee);
-    const total = parseFloat(group[0].Total);
-    return { quantity, price, date, buy, sell, volume, fee, total };
+    let quantity = 0;
+    let price = 0;
+    let volume = 0;
+    let fee = 0;
+    let total = 0;
+    for (let i = 0; i < group.length; i++) {
+      if (group[i].Side !== side) {
+        throw new Error(`Strange. Two different sides '${group[i].Side}' and '${side}' in the same trade ${JSON.stringify(group)}.`);
+      }
+      if (group[i].Instrument !== instrument) {
+        throw new Error(`Strange. Two different instruments '${group[i].Instrument}' and '${instrument}' in the same trade ${JSON.stringify(group)}.`);
+      }
+      const q = parseFloat(group[i].Quantity);
+      quantity += q;
+      price += parseFloat(group[i].Price) * q;
+      volume += parseFloat(group[i].Volume);
+      fee += parseFloat(group[i].Fee);
+      total += parseFloat(group[i].Total);
+    }
+    price /= quantity;
+    if (side === 'buy') {
+      [sell, buy] = [buy, sell];
+      [quantity, volume] = [volume, quantity];
+      price = 1 / price;
+    }
+    return { side, quantity, price, date, buy, sell, volume, fee, total };
   }
 
   target(group, obj) {
@@ -107,10 +129,6 @@ class HitBTCImport extends Import {
   }
 
   async total(group, obj, fyffe) {
-    if (group.length > 1) {
-      // throw new Error('More than one entry not implemented yet in total().');
-    }
-
     const { price, quantity, buy, date } = this.parse(group);
     switch (obj.type) {
       case 'move-in':
@@ -165,10 +183,10 @@ class HitBTCImport extends Import {
   }
 
   burnTarget(group, obj) {
-    const { buy } = this.parse(group);
+    const { side, buy, sell } = this.parse(group);
     switch (obj.type) {
       case 'trade':
-        return buy;
+        return side === 'sell' ? buy : sell;
       default:
         throw new Error('No burnTarget() implemented for ' + obj.type + '-type ' + JSON.stringify(group));
     }

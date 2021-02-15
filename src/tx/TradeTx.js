@@ -2,6 +2,7 @@ const config = require('../config');
 const Tx = require('./Tx');
 const num = require('../util/num');
 const text = require('../text/make');
+const dump = require('neat-dump');
 
 /**
  * Tradeable commodity `given` x `source` is exchanged into the other tradable commodity `amount` x `target`.
@@ -36,7 +37,8 @@ module.exports = class TradeTx extends Tx {
     if (config.flags.tradeProfit) {
       // Calculate profit immediately if historical rate is found.
       const buyPrice = num.cents(-this.given * this.avg2);
-      const sellRate = Tx.getRate(this.date, this.service.toUpperCase() + ':' + this.target);
+      const ticker = this.service.toUpperCase() + ':' + this.target;
+      const sellRate = Tx.getRate(this.date, ticker);
       if (sellRate !== null) {
         const sellPrice = num.cents(this.amount * sellRate);
         const diff = num.cents(buyPrice - sellPrice);
@@ -52,6 +54,8 @@ module.exports = class TradeTx extends Tx {
           ret.push({ number: this.getAccount('targets', this.target), amount: num.cents(this.total - this.fee) });
         }
         return ret;
+      } else {
+        dump.warning(`Not able to find selling rate for ${ticker} on ${this.date}.`);
       }
     }
     ret.push({ number: this.getAccount('targets', this.target), amount: num.cents(this.total - this.fee) });

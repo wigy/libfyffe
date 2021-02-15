@@ -583,7 +583,7 @@ class Fyffe {
     await this.createTransactions(dataPerImporter, options.ignore || new Set());
 
     // Finally apply all transactions.
-    await this.ledger.apply(this.stock, additionalTxs);
+    await this.ledger.apply(this.stock, additionalTxs, this);
 
     if (config.flags.debug) {
       this.ledger.showTransactions('Transactions:');

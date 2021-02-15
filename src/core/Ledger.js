@@ -58,9 +58,10 @@ module.exports = class Ledger {
    * Apply all transactions in timestamp order not yet applied to the stock.
    * @param {Stock} stock
    * @param {Object[]} extraTxs
+   * @param {Fyffe} fyffe
    * Additional transactions can be given as an array of {number, amount, time}
    */
-  async apply(stock, extraTxs = []) {
+  async apply(stock, extraTxs, fyffe) {
     this.txs = this.txs.sort((a, b) => a.time - b.time);
     extraTxs = extraTxs.sort((a, b) => a.time - b.time);
 
@@ -70,7 +71,7 @@ module.exports = class Ledger {
     let lastTime = 0;
     let extraIndex = 0;
 
-    this.txs.forEach((tx) => {
+    for (const tx of this.txs) {
       if (this.notApplied.has(tx)) {
         lastTime = Math.max(lastTime, tx.time);
         service = service || tx.service;
@@ -83,6 +84,14 @@ module.exports = class Ledger {
         }
         tx.updateFromStock(stock);
         // console.log(tx);
+        if (tx.has('burnAmount') && tx.burnAmount) {
+          const ticker = `${service.toUpperCase()}:${tx.burnTarget}`;
+          if (!stock.getAverage(ticker)) {
+            const rate = await fyffe.fetchRate(tx.time, service, tx.burnTarget);
+            // console.log('Set avg', ticker, rate);
+            stock.setAverages({ [ticker]: rate });
+          }
+        }
         const result = tx.apply(this.accounts, stock);
         for (const r of result) {
           if (!loans[r.currency]) {
@@ -92,7 +101,7 @@ module.exports = class Ledger {
         }
         this.notApplied.delete(tx);
       }
-    });
+    }
 
     // Create post processing txs.
     for (const [currency, specs] of Object.entries(loans)) {
