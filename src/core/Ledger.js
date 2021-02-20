@@ -61,7 +61,7 @@ module.exports = class Ledger {
    * @param {Fyffe} fyffe
    * Additional transactions can be given as an array of {number, amount, time}
    */
-  async apply(stock, extraTxs) {
+  async apply(stock, extraTxs = []) {
     this.txs = this.txs.sort((a, b) => a.time - b.time);
     extraTxs = extraTxs.sort((a, b) => a.time - b.time);
 
@@ -131,7 +131,8 @@ module.exports = class Ledger {
 
         if (loanTx) {
           if (config.flags.addCurrencies) {
-            loanTx.rate = await Tx.fetchRate(loanTx.date, `CURRENCY:${loanTx.currency}`);
+            const rate = loanTx.currency === 'EUR' ? 1.0 : await Tx.fetchRate(loanTx.date, `CURRENCY:${loanTx.currency}`);
+            loanTx.rate = rate;
           }
           this.add(loanTx);
           this.apply(stock);

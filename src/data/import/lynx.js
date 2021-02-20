@@ -76,6 +76,9 @@ class LynxImport extends SinglePassImport {
     const ret = [];
     for (const e of data.filter(e => e.Date && e.Amount && e.Header === 'Data')) {
       const rate = await Tx.fetchRate(e.Date, `CURRENCY:${e.Currency}`);
+      if (!rate) {
+        throw new Error(`Failed to fetch currency rate ${e.Currency} on ${e.Date}.`);
+      }
       ret.push({
         currency: e.Currency,
         date: e.Date,

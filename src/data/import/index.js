@@ -2,6 +2,7 @@ const fs = require('fs');
 const dump = require('neat-dump');
 const readline = require('readline');
 const safeEval = require('safe-eval');
+const moment = require('moment');
 const Tx = require('../../tx/Tx');
 const StringMapper = require('../../text/StringMapper');
 const config = require('../../config');
@@ -560,6 +561,9 @@ class Import {
       obj.type !== 'move-out' && obj.type !== 'trade') {
       obj.currency = await this.handleQuestions('currency', group, obj, this.currency(group, obj));
       obj.rate = await this.handleQuestions('rate', group, obj, this.rate(group, obj));
+      if (obj.rate === null) {
+        delete obj.rate;
+      }
     }
     if (obj.type !== 'withdrawal' && obj.type !== 'deposit' && obj.type !== 'interest') {
       obj.target = await this.handleQuestions('target', group, obj, this.target(group, obj));
@@ -615,6 +619,12 @@ class Import {
       return 'skipped';
     }
     delete obj.type;
+
+    // Fetch additional data.
+    if (obj.currency && obj.currency !== 'EUR' && !obj.rate) {
+      const rate = await Tx.fetchRate(moment.utc(obj.time).format('YYYY-MM-DD'), `CURRENCY:${obj.currency}`);
+      obj.rate = rate;
+    }
 
     // Finalize Tx object and its tags.
     const ret = Tx.create(type, obj, this.service, this.fund);

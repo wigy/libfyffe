@@ -688,7 +688,10 @@ module.exports = class Tx {
     async function _fetch(target) {
       const url = process.env.HARVEST_URL || 'http://localhost:9001';
       const json = await http.get(url + '/ticker/' + target + '/' + date)
-        .catch(() => null);
+        .catch((err) => {
+          dump.error(err);
+        });
+
       if (json) {
         return json.close === undefined ? json.price : json.close;
       }
@@ -703,7 +706,7 @@ module.exports = class Tx {
 
     Tx.setRate(date, target, rate);
 
-    return null;
+    return rate;
   }
 
   /**
