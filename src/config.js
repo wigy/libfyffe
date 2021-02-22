@@ -57,7 +57,9 @@ class Config {
         // If set, show converted currency values for entries with rate and currency set different from default.
         addCurrencies: false,
         // If set, add loan update only at the end of the import.
-        singleLoanUpdate: false
+        singleLoanUpdate: false,
+        // If set, allow short selling.
+        shortSelling: false
       },
       // Account numbers.
       accounts: {

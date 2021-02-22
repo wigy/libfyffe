@@ -384,6 +384,9 @@ module.exports = class Tx {
     if (!acc && arg1 === 'incomes') {
       acc = config.get('accounts.incomes.default', this.service, this.fund);
     }
+    if (!acc && arg1 === 'loans') {
+      acc = config.get('accounts.loans.default', this.service, this.fund);
+    }
 
     if (!acc) {
       throw new Error(`Account ${JSON.stringify(name)} is not configured for service ${this.service} in fund ${this.fund}.`);

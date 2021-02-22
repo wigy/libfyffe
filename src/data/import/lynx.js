@@ -216,7 +216,7 @@ class LynxImport extends SinglePassImport {
       return [this.symbol(re[1]), null];
     }
     // Stock dividend tax or cash portion.
-    re = /^([.A-Z0-9 ]+?)\s*\([0-9A-Z]+\) (Stock Dividend) ([A-Z][A-Z][0-9]+) ([0-9]+ for [0-9]+) (- US TAX|\(Ordinary Dividend\))$/.exec(str);
+    re = /^([.A-Z0-9 ]+?)\s*\([0-9A-Z]+\) (Stock Dividend) ([A-Z0-9]+) ([0-9]+ for [0-9]+) (- US TAX|\(Ordinary Dividend\))$/.exec(str);
     if (re) {
       return [this.symbol(re[1]), null];
     }

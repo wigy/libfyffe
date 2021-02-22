@@ -122,6 +122,10 @@ class NordnetImport extends Import {
     if (group.length === 2 && group[0].Tapahtumateksti.startsWith('REVERSE SPLIT')) {
       return 'trade';
     }
+    if (types.includes('ETF_KK_S__ST_N_PALVELUMAKSU')) {
+      return 'expense';
+    }
+
     throw new Error('Cannot recognize entry with types ' + types.join(', ') + ': ' + JSON.stringify(group));
   }
 
@@ -172,6 +176,8 @@ class NordnetImport extends Import {
       ticker = group.filter(g => g.Tapahtumatyyppi === 'VAIHTO_AP_J_TT_')[0].Arvopaperi;
     } else if (obj.type === 'income') {
       return 'MISC';
+    } else if (obj.type === 'expense') {
+      return 'BANK';
     } else {
       ticker = group[0].Arvopaperi;
     }
@@ -290,6 +296,10 @@ class NordnetImport extends Import {
   }
 
   notes(group, obj) {
+    if (obj.type === 'expense') {
+      return 'Kuukausisäästömaksu';
+    }
+
     if (obj.target === 'MISC') {
       const texts = group.map((tx) => tx.Tapahtumateksti);
       if (texts.includes('RECLASSIFICATION OF DIVIDEND')) {

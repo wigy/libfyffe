@@ -119,13 +119,15 @@
     "buy": {
       "burn": "kulu +{burnAmount} ={burnTarget}",
       "stock": "yht. #{stock} ={target}",
-      "averageNow": "k.h. nyt ${avg} X{$}/={target}"
+      "averageNow": "k.h. nyt ${avg} X{$}/={target}",
+      "shortPosition": "suljettu lyhyt positio"
     },
     "sell": {
       "stockNow": "jälj. #{stock} ={target}",
       "average": "k.h. ${avg} X{$}/={target}",
       "forceSell": "pakotettu myynti",
-      "call": "lunastus"
+      "call": "lunastus",
+      "shortPosition": "lyhyeksi myynti"
     },
     "dividend": {
       "dividend": "osinko #{given} £{currency}",
