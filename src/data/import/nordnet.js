@@ -125,6 +125,9 @@ class NordnetImport extends Import {
     if (types.includes('ETF_KK_S__ST_N_PALVELUMAKSU')) {
       return 'expense';
     }
+    if (types.includes('LUNASTUS_AP_OTTO') && /knock out/i.test(group[0].Instrumenttityyppi)) {
+      return 'sell';
+    }
 
     throw new Error('Cannot recognize entry with types ' + types.join(', ') + ': ' + JSON.stringify(group));
   }
@@ -133,6 +136,9 @@ class NordnetImport extends Import {
     let acc = this._received(group);
     if (!acc) {
       acc = this._given(group);
+    }
+    if (!acc && /knock out/i.test(group[0].Instrumenttityyppi)) {
+      acc = group[0];
     }
     switch (acc.Valuutta) {
       case 'USD':
@@ -254,7 +260,7 @@ class NordnetImport extends Import {
     const dividend = group.filter((tx) => tx.Tapahtumatyyppi === 'OSINKO');
     const text = dividend[0].Tapahtumateksti;
     if (text) {
-      const match = /^(VOPR )?OSINKO .*? ([0-9,.]+) /.exec(text);
+      const match = /^(VOPR )?OSINKO .*? ([0-9,.]+) /i.exec(text);
       if (match) {
         return parseFloat(match[2].replace(/,/, '.'));
       }

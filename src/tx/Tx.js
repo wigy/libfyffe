@@ -6,6 +6,7 @@ const http = require('request-promise-json');
 const config = require('../config');
 const validator = require('../data/validator');
 const num = require('../util/num');
+const d = require('neat-dump');
 
 /**
  * A map from valid type names to the module paths implementing them.
@@ -705,6 +706,9 @@ module.exports = class Tx {
     let rate = await _fetch(target);
     if (!rate && backup) {
       rate = await _fetch(backup);
+      if (rate) {
+        d.warning(`Using value from fallback ${backup}.`);
+      }
     }
 
     Tx.setRate(date, target, rate);
