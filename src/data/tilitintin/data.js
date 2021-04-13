@@ -275,7 +275,7 @@ async function getPeriodCredits(db, periodId) {
     .where({ 'document.period_id': periodId })
     .where({ 'entry.debit': 0 })
     .orderBy('account.number')
-    .groupBy('entry.account_id');
+    .groupBy('account.id');
 }
 
 async function getPeriodDebits(db, periodId) {
@@ -285,7 +285,7 @@ async function getPeriodDebits(db, periodId) {
     .where({ 'document.period_id': periodId })
     .where({ 'entry.debit': 1 })
     .orderBy('account.number')
-    .groupBy('entry.account_id');
+    .groupBy('account.id');
 }
 
 /**
@@ -298,18 +298,19 @@ async function getPeriodBalances(db, periodId) {
     .then(data => {
       return getPeriodCredits(db, periodId)
         .then(entries => {
-          data.credit = entries;
+          if (data) data.credit = entries;
           return data;
         });
     })
     .then(data => {
       return getPeriodDebits(db, periodId)
         .then(entries => {
-          data.debit = entries;
+          if (data) data.debit = entries;
           return data;
         });
     })
     .then(data => {
+      if (!data) return data;
       const accounts = {};
       data.debit.forEach(item => {
         accounts[item.id] = item;
