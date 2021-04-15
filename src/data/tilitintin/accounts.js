@@ -1,4 +1,5 @@
 const dump = require('neat-dump');
+const moment = require('moment');
 
 /**
  * Convert account number to ID.
@@ -39,13 +40,13 @@ async function getAll(knex) {
 /**
  * Get the period ID for the given timestamp.
  * @param {Knex} knex Knex-instance configured for the database.
- * @param {Number} stamp
+ * @param String} date
  * @return {Promise<Number|null>}
  */
-async function getPeriod(knex, stamp) {
+async function getPeriod(knex, date) {
   return knex.select('id').from('period')
-    .where('start_date', '<=', stamp)
-    .andWhere('end_date', '>', stamp)
+    .where('start_date', '<=', date)
+    .andWhere('end_date', '>', date)
     .then((res) => res && res.length ? res[0].id : null);
 }
 
@@ -57,23 +58,26 @@ async function getPeriod(knex, stamp) {
  * @return {[Object, Object[]]} Balance mapping and a list of transactions after the date.
  */
 async function getBalances(knex, numbers, date = null) {
-  const stamp = date === null ? new Date().getTime() + 1000 : new Date(date + ' 00:00:00').getTime();
-  const periodId = await getPeriod(knex, stamp);
+  if (!date) date = moment().format('YYYY-MM-DD');
+  if (/sqlite/.test(knex.client.config.client)) {
+    date = new Date(date + ' 00:00:00').getTime();
+  }
+  const periodId = await getPeriod(knex, date);
   let idByNumber;
   if (!periodId) {
-    dump.error(`Cannot find period for date ${date} stamp ${stamp}.`);
+    dump.error(`Cannot find period for date ${date}.`);
     return null;
   } else {
     idByNumber = await getIdsByNumber(knex, numbers);
   }
   return Promise.all(numbers.map((number) => {
     number = parseInt(number);
-    return knex.select(knex.raw('SUM(debit * amount) + SUM((debit - 1) * amount) AS total, ' + number + ' as number'))
+    return knex.select(knex.raw('SUM(CASE WHEN debit THEN amount ELSE -amount END) AS total, ' + number + ' as number'))
       .from('entry')
       .join('document', 'document.id', '=', 'entry.document_id')
       .where({ account_id: idByNumber[number] || 0 })
       .andWhere('document.period_id', '=', periodId)
-      .andWhere('document.date', '<', stamp)
+      .andWhere('document.date', '<', date)
       .then((data) => data[0]);
   }))
     .then((data) => {
@@ -82,12 +86,12 @@ async function getBalances(knex, numbers, date = null) {
       return ret;
     })
     .then(async (ret) => {
-      const txs = await knex.select(knex.raw('account_id, debit * amount + (debit - 1) * amount AS amount, document.date'))
+      const txs = await knex.select(knex.raw('account_id, (CASE WHEN debit THEN amount ELSE -amount END) AS amount, document.date'))
         .from('entry')
         .join('document', 'document.id', '=', 'entry.document_id')
         .whereIn('account_id', numbers.map(n => idByNumber[n]))
         .andWhere('document.period_id', '=', periodId)
-        .andWhere('document.date', '>=', stamp)
+        .andWhere('document.date', '>=', date)
         .orderBy('document.date');
 
       const numberById = {};
