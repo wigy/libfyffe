@@ -206,7 +206,7 @@ class LynxImport extends SinglePassImport {
       return [this.symbol(re[1]), re[3]];
     }
     // And more special cases.
-    re = /^([.A-Z0-9 ]+?)\s*\([0-9A-Z]+\) (Cash Dividend) ([A-Z][A-Z][A-Z]) ([0-9.]+) (per Share|Payment in Lieu of Dividend)? \((Ordinary Dividend|Limited Partnership)\)$/i.exec(str);
+    re = /^([.A-Z0-9 ]+?)\s*\([0-9A-Z]+\) (Cash Dividend) ([A-Z][A-Z][A-Z]) ([0-9.]+) (per Share|Payment in Lieu of Dividend)? \((Ordinary Dividend|Limited Partnership|Return of Capital)\)$/i.exec(str);
     if (re) {
       return [this.symbol(re[1]), re[4]];
     }
