@@ -395,6 +395,7 @@ class Import {
     let data;
     if ('=>' in rule) {
       data = rule['=>'];
+      // TODO: Do we need to handle somehow here if we want to ask VAT amount directly.
       for (const key of Object.keys(data)) {
         // Handle questions.
         if (key.endsWith('?')) {
