@@ -421,6 +421,7 @@ class Import {
       return def;
     }
     let ret = data[field];
+    // TODO: Extract parsing to separate function.
     if (typeof ret === 'string' && ret.substr(0, 2) === '${' && ret.substr(-1, 1) === '}') {
       ret = safeEval(ret.substr(2, ret.length - 3), {
         stock: (code) => this.stock.getStock(code),
@@ -479,6 +480,10 @@ class Import {
       dump.orange(`Select ${field}:`);
       const map = {};
       let n = 1;
+      // TODO: Support for direct VAT questions for example.
+      // "Numeric VAT": {
+      //    "Enter VAT": "#"
+      // }
       Object.entries(q).forEach(([k, v]) => {
         dump.cyan(`  ${n}: ${k} (${v})`);
         map[n] = v;
