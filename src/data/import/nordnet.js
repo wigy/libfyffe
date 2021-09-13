@@ -211,7 +211,7 @@ class NordnetImport extends Import {
         const rate = Math.abs(this.num(tx.Valuuttakurssi));
         sum += value * rate;
         if (obj.type === 'sell') {
-          const fees = Math.abs(this.num(tx.Maksut));
+          const fees = Math.abs(this.num(tx.Maksut !== undefined ? tx.Maksut : tx.Kokonaiskulut));
           sum += fees * rate;
         }
       });
@@ -222,7 +222,10 @@ class NordnetImport extends Import {
   fee(group) {
     let sum = 0;
     group.forEach((tx) => {
-      const fees = Math.abs(this.num(tx.Maksut));
+      if (tx.Kokonaiskulut_Valuutta && tx.Kokonaiskulut_Valuutta !== 'EUR') {
+        throw new Error('No handling for fee in other currency than EUR.');
+      }
+      const fees = Math.abs(this.num(tx.Maksut !== undefined ? tx.Maksut : tx.Kokonaiskulut));
       const rate = Math.abs(this.num(tx.Valuuttakurssi));
       sum += fees * rate;
     });
