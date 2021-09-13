@@ -21,6 +21,7 @@
     "expense.software": "Ohjelmistohankinnat",
     "expense.tax": "Verojen maksu",
     "expense.furniture": "Kalusteet",
+    "expense.machinery": "Kalusto",
     "expense.loan": "Osakaslainan maksu",
     "expense.transfer": "Siirto ={notes}-palveluun",
     "expense.transfer2": "Siirto #2 ={notes}-palveluun",
@@ -244,6 +245,9 @@
       "notes": "={notes}"
     },
     "expense.furniture": {
+      "notes": "={notes}"
+    },
+    "expense.machinery": {
       "notes": "={notes}"
     },
     "expense.transfer": {
