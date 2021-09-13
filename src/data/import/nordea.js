@@ -53,8 +53,8 @@ class NordeaImport extends Import {
 
   vat(group, obj) {
     const vatPct = this.useMapper(group, obj, 'vat', null);
-    if (vatPct === null) {
-      return null;
+    if (vatPct === null || vatPct.endsWith === '?' || typeof vatPct === 'object') {
+      return vatPct;
     }
     const total = this.total(group, obj);
     const withoutVat = num.cents(total / (1 + vatPct / 100));

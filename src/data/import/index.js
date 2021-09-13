@@ -395,8 +395,15 @@ class Import {
     let data;
     if ('=>' in rule) {
       data = rule['=>'];
-      // TODO: Do we need to handle somehow here if we want to ask VAT amount directly.
       for (const key of Object.keys(data)) {
+        if (typeof data[key] === 'string' && data[key].endsWith('?')) {
+          const key0 = key.substr(0, key.length - 1);
+          data[key0] = {
+            [`Please enter ${data[key].substr(0, data[key].length - 1)} value:`]: data[key]
+          };
+          delete data[key];
+          continue;
+        }
         // Handle questions.
         if (key.endsWith('?')) {
           const qkey = data[key];
@@ -409,7 +416,7 @@ class Import {
         }
       }
     } else {
-      // TODO: This way of doing the mapping is pointless. Can be dropped when not in use.
+      // TODO: This way of doing the mapping is pointless. Can be dropped when not in use anymore.
       dump.red(`Obsolete use of 'txs' string mapper for '${name}'. Please switch to '=>' notation.`);
       data = this.mapper.get('txs', name);
     }
@@ -435,13 +442,13 @@ class Import {
     return ret;
   }
 
-  async readLine() {
+  async readLine(title = 'Select one?') {
     const rl = readline.createInterface({
       input: process.stdin,
       output: process.stdout
     });
     return new Promise((resolve) => {
-      rl.question('Select one? ', (answer) => {
+      rl.question(title, (answer) => {
         rl.close();
         resolve(answer);
       });
@@ -478,13 +485,31 @@ class Import {
       console.log('---------------------------------------------------------------------------');
       console.log(group);
       console.log('---------------------------------------------------------------------------');
+
+      // Handle direct answers.
+      if (Object.keys(q).length === 1) {
+        const question = Object.keys(q)[0];
+        const qtype = q[question];
+        if (/^[a-z]+\?$/.test(qtype)) {
+          dump.orange(question);
+          let ans = await this.readLine('Answer: ');
+          switch (qtype) {
+            case 'money?':
+              ans = parseFloat(ans.replace(',', '.'));
+              break;
+            default:
+              throw new Error(`We don't have hander for direct question of type '${qtype}'.`);
+          }
+          this.answers[obj.id][field] = ans;
+          await this.saveQuestionCache(this.answers);
+          return ans;
+        }
+      }
+
+      // Handle multiple choice.
       dump.orange(`Select ${field}:`);
       const map = {};
       let n = 1;
-      // TODO: Support for direct VAT questions for example.
-      // "Numeric VAT": {
-      //    "Enter VAT": "#"
-      // }
       Object.entries(q).forEach(([k, v]) => {
         dump.cyan(`  ${n}: ${k} (${v})`);
         map[n] = v;
