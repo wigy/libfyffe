@@ -222,7 +222,7 @@ class NordnetImport extends Import {
   fee(group) {
     let sum = 0;
     group.forEach((tx) => {
-      if (tx.Kokonaiskulut_Valuutta && tx.Kokonaiskulut_Valuutta !== 'EUR') {
+      if (tx.Kokonaiskulut_Valuutta && tx.Kokonaiskulut !== '0' && tx.Kokonaiskulut_Valuutta !== 'EUR') {
         throw new Error('No handling for fee in other currency than EUR.');
       }
       const fees = Math.abs(this.num(tx.Maksut !== undefined ? tx.Maksut : tx.Kokonaiskulut));
