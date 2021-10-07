@@ -62,14 +62,14 @@ class LynxImport extends SinglePassImport {
     delete data.Codes;
     delete data['Notes/Legal Notes'];
     const interest = data.Interest ? await this.parseInterest(data.Interest) : [];
-    const trades = data.Trades ? await this.parseTrades(data.Trades) : [];
     const forex = data.Trades ? await this.parseForex(data.Trades) : [];
     const deposits = data['Deposits & Withdrawals'] ? await this.parseFunding(data['Deposits & Withdrawals']) : [];
     const taxes = data['Withholding Tax'] ? await this.parseTax(data['Withholding Tax']) : [];
     const dividends = data.Dividends ? await this.parseDividends(data.Dividends, taxes) : [];
     const actions = data['Corporate Actions'] ? await this.parseCorporateActions(data['Corporate Actions']) : [];
+    const trades = data.Trades ? await this.parseTrades(data.Trades) : [];
 
-    return interest.concat(trades).concat(forex).concat(deposits).concat(dividends).concat(actions);
+    return interest.concat(forex).concat(deposits).concat(dividends).concat(actions).concat(trades);
   }
 
   async parseInterest(data) {
@@ -273,6 +273,8 @@ class LynxImport extends SinglePassImport {
 
   async parseCorporateActions(data) {
 
+    const acquisitions = {};
+
     const match = async (e) => {
       const date = e.Report_Date;
       const rate = await Tx.fetchRate(date, `CURRENCY:${e.Currency}`);
@@ -292,6 +294,42 @@ class LynxImport extends SinglePassImport {
           notes: 'forceSell',
           type: 'sell'
         }];
+      }
+
+      re = /^([.A-Z0-9 ]+?)\s*\([0-9A-Z]+\) Merged\(Acquisition\).*\(([.A-Z0-9 ]+?),.*\)/.exec(e.Description);
+      if (re) {
+        const what = this.symbol(re[1]);
+        const sym = this.symbol(re[2]);
+        const q = this.num(e.Quantity);
+        if (!acquisitions[what]) {
+          acquisitions[what] = {};
+        }
+        if (q < 0) {
+          acquisitions[what].source = sym;
+          acquisitions[what].given = q;
+        } else {
+          acquisitions[what].target = sym;
+          acquisitions[what].amount = q;
+        }
+        if (Object.keys(acquisitions[what]).length >= 4) {
+          const { source, given, target, amount } = acquisitions[what];
+          delete acquisitions[what];
+          return [{
+            amount,
+            given,
+            currency: e.Currency,
+            date,
+            fee: 0.0,
+            id: this.makeId('CALL', date, `${source}-${target}`),
+            notes: 'call',
+            source,
+            target,
+            total: Math.abs(this.num(e.Value)),
+            type: 'trade'
+          }];
+        } else {
+          return [];
+        }
       }
 
       re = /^([.A-Z0-9 ]+?)\s*\([0-9A-Z]+\) Merged\(Partial Call\)/.exec(e.Description);
@@ -320,7 +358,7 @@ class LynxImport extends SinglePassImport {
           currency: e.Currency,
           date,
           given: 0,
-          id: this.makeId('MERGE', date, target),
+          id: this.makeId('STOCKDIV', date, target),
           rate,
           target,
           tax: 0.00,

@@ -167,6 +167,7 @@
       "stockLeft": "jäi #{stock2} ={source}",
       "averageNow": "k.h. nyt ${avg} X{$}/={target}",
       "burn": "kulu #{burnAmount} ={burnTarget}",
+      "call": "lunastus",
       "tender": "lunastusvaraus"
     },
     "expense.finances": {
