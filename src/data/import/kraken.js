@@ -34,6 +34,8 @@ class KrakenImport extends Import {
         return 'BCH';
       case 'EOS':
         return 'EOS';
+      case 'SOL':
+        return 'SOL';
     }
     throw new Error('Cannot recognize asset ' + asset);
   }
