@@ -86,6 +86,10 @@ async function getBalances(knex, numbers, date = null) {
       return ret;
     })
     .then(async (ret) => {
+      const missing = numbers.map(n => [n, idByNumber[n]]).filter(pair => pair[1] === undefined).map(pair => pair[0]);
+      if (missing.length) {
+        throw new Error(`Configured accounts ${missing.join(' ')} do not exist.`);
+      }
       const txs = await knex.select(knex.raw('account_id, (CASE WHEN debit THEN amount ELSE -amount END) AS amount, document.date'))
         .from('entry')
         .join('document', 'document.id', '=', 'entry.document_id')
