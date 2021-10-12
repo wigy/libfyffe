@@ -52,7 +52,7 @@ function addDocument(knex, date) {
               date: seconds
             })
             .then((ids) => {
-              d.info('TX add:', date, '#' + number);
+              d.blue('TX add:', date, '#' + number);
               return ids[0];
             });
         });
@@ -90,7 +90,7 @@ function addEntry(knex, accountId, documentId, debit, amount, desc, row, flags) 
       })
     )
     .then((res) => {
-      d.info('  ', account.number + ' ' + account.name + ':', (debit ? '+' : '-') + amount + '€', desc);
+      d.cyan('  ', account.number + ' ' + account.name + ':', (debit ? '+' : '-') + amount + '€', desc);
       return res;
     });
 }
