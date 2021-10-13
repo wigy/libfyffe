@@ -12,6 +12,9 @@ class NordeaImport extends Import {
   }
 
   isMine(content) {
+    if (/^\s*"Kirjauspäivä";"Arvopäivä";"Määrä EUROA";/.test(content)) {
+      return true
+    }
     return /^Kirjauspäivä;Arvopäivä;Määrä  EUROA;/.test(content);
   }
 
