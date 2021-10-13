@@ -31,8 +31,18 @@ class NordeaImport extends Import {
   }
 
   time(entry) {
-    const match = /(\d+)\.(\d+)\.(\d+)/.exec(entry.Kirjausp_iv_);
-    const stamp = match[3] + '-' + match[2] + '-' + match[1] + 'T12:00:00.000Z';
+    let stamp;
+    let match = /(\d+)\.(\d+)\.(\d+)/.exec(entry.Kirjausp_iv_);
+    if (match) {
+      stamp = match[3] + '-' + match[2] + '-' + match[1] + 'T12:00:00.000Z';
+    } else {
+      match = /(\d+-\d+-\d+)/.exec(entry.Kirjausp_iv_);
+      if (match) {
+        stamp = match[1] + 'T12:00:00.000Z';
+      } else {
+        throw new Error(`Cannot parse time ${entry.Kirjausp_iv_}.`);
+      }
+    }
     return new Date(stamp).getTime();
   }
 
@@ -40,7 +50,7 @@ class NordeaImport extends Import {
     if (group.length > 1) {
       throw new Error('Only single entry raw values supported.');
     }
-    return this.num(group[0].M__r___EUROA);
+    return group[0].M__r___EUROA === undefined ? this.num(group[0].M__r__EUROA) : this.num(group[0].M__r___EUROA);
   }
 }
 

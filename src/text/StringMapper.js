@@ -66,6 +66,10 @@ class StringMapper {
    * @param {any} value
    */
   compare(rule, value) {
+    // Missing members of object won't match.
+    if (value === undefined) {
+      return false;
+    }
     if (rule instanceof Array) {
       for (let i = 0; i < rule.length; i++) {
         if (this.compare(rule[i], value)) {
