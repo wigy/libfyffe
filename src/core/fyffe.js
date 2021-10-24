@@ -406,12 +406,10 @@ class Fyffe {
           match = /\$\{(.*?)\}/.exec(str);
           if (match) {
             const expr = parser.parse(match[1]);
-            console.log(str);
             const resp = expr.evaluate({ ...vars, ...functions() });
             str = str.replace(match[0], resp);
           }
         } while (match);
-        console.log('=>', str);
         if (/^-?[0-9]+([.,][0-9]+)/.test(str)) {
           str = parseFloat(str.replace(',', '.'));
         }
@@ -434,10 +432,15 @@ class Fyffe {
         const vars = { ...group[0], amount };
         const text = calc(rule.text, vars);
         description = description || text;
+        const entryAmount = num.cents(calc(rule.amount, vars) || -amount);
+        // Drop empty lines.
+        if (Math.abs(entryAmount) < 0.001) {
+          return;
+        }
         entries.push({
           number: calc(rule.account, vars),
           description,
-          amount: num.cents(calc(rule.amount, vars) || -amount)
+          amount: entryAmount
         });
       });
       entries.push({ number, amount: num.cents(amount), description });
