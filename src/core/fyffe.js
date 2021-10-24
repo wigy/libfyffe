@@ -475,7 +475,7 @@ class Fyffe {
           if (config.flags.debug) {
             console.log(tx);
           } else {
-            const docId = await tilitintin.tx.add(knex, tx.date, null, tx.entries);
+            const docId = await tilitintin.tx.add(knex, tx.date, null, tx.entries, { force: config.flags.force });
             if (docId) {
               await tilitintin.imports.add(knex, tag, group.id, docId);
             }
