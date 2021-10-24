@@ -381,18 +381,39 @@ class Fyffe {
 
     // Helper to substitute expressions.
     const calc = (str, vars) => {
+      // Collection of utility functions to use in expressions.
+      const functions = () => ({
+        // regex('text (pick this) more text', 'variable', default)
+        regex: (re, variable, def = '') => {
+          if (!vars[variable]) {
+            return def;
+          }
+          const out = new RegExp(re).exec(vars[variable]);
+          if (!out) {
+            return def;
+          }
+          let ret = out[1];
+          if (/^-?[0-9]+([.,][0-9]+)/.test(ret)) {
+            ret = parseFloat(ret.replace(',', '.'));
+          }
+          return ret;
+        }
+      });
+
       if (typeof str === 'string') {
         let match;
         do {
           match = /\$\{(.*?)\}/.exec(str);
           if (match) {
             const expr = parser.parse(match[1]);
-            const resp = expr.evaluate(vars);
+            console.log(str);
+            const resp = expr.evaluate({ ...vars, ...functions() });
             str = str.replace(match[0], resp);
           }
         } while (match);
-        if (/^-?[0-9]+(\.[0-9]+)/.test(str)) {
-          str = parseFloat(str);
+        console.log('=>', str);
+        if (/^-?[0-9]+([.,][0-9]+)/.test(str)) {
+          str = parseFloat(str.replace(',', '.'));
         }
         return str;
       }
