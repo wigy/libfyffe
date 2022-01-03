@@ -1,4 +1,3 @@
-const dump = require('neat-dump');
 const moment = require('moment');
 
 /**
@@ -65,8 +64,7 @@ async function getBalances(knex, numbers, date = null) {
   const periodId = await getPeriod(knex, date);
   let idByNumber;
   if (!periodId) {
-    dump.error(`Cannot find period for date ${date}.`);
-    return null;
+    throw new Error(`Cannot find period for date ${date}.`);
   } else {
     idByNumber = await getIdsByNumber(knex, numbers);
   }
