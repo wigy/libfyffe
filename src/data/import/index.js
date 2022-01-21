@@ -1,4 +1,5 @@
 const fs = require('fs');
+const path = require('path');
 const dump = require('neat-dump');
 const readline = require('readline');
 const safeEval = require('safe-eval');
@@ -7,6 +8,12 @@ const Tx = require('../../tx/Tx');
 const StringMapper = require('../../text/StringMapper');
 const config = require('../../config');
 const csv = require('../csv');
+let collect;
+if (fs.existsSync(path.join(__dirname, '/stats.js'))) {
+  collect = require('./stats').collect;
+} else {
+  collect = () => {};
+}
 
 /**
  * Base class for importing data.
@@ -395,6 +402,7 @@ class Import {
     let data;
     if ('=>' in rule) {
       data = rule['=>'];
+      collect(this.mapper, group, rule);
       for (const key of Object.keys(data)) {
         if (typeof data[key] === 'string' && data[key].endsWith('?')) {
           const key0 = key.substr(0, key.length - 1);

@@ -59,3 +59,4 @@ typings/
 .vscode
 
 test.sqlite
+src/data/import/stats.js
