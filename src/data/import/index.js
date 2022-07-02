@@ -66,7 +66,9 @@ class Import {
     const ret = new Map();
     fs.readdirSync(__dirname).filter((file) => file !== 'index.js').map((file) => file.replace(/\.js$/, ''))
       .forEach((name) => {
-        ret[name] = require('./' + name);
+        if (name !== 'stats') {
+          ret[name] = require('./' + name);
+        }
       });
 
     return ret;
