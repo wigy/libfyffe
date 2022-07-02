@@ -145,6 +145,17 @@ class NordnetImport extends Import {
       case 'EUR':
       case 'SEK':
         return acc.Valuutta;
+      case '':
+        if (acc.Valuuttakurssi === '1') {
+          return 'EUR';
+        }
+        if (acc.Tapahtumatyyppi === 'OSINKO') {
+          const match = / ([A-Z]{3})\/OSAKE$/.exec(acc.Tapahtumateksti);
+          if (match) {
+            return match[1];
+          }
+        }
+      // eslint-disable-next-line no-fallthrough
       default:
         throw new Error('Cannot figure out currency from ' + JSON.stringify(group));
     }
