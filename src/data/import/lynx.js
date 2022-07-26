@@ -26,6 +26,7 @@ class LynxImport extends SinglePassImport {
     let header;
     let prefix;
     let body = '';
+    let appendix = '';
     // Drop 0xfeff from the string pos 0.
     for (const line of file.substr(1).split('\n')) {
       const same = prefix && line.substr(0, prefix.length) === prefix;
@@ -34,7 +35,7 @@ class LynxImport extends SinglePassImport {
         continue;
       }
       if (header && !same) {
-        data[prefix] = await this.loadCSV(header + '\n' + body);
+        data[prefix + appendix] = await this.loadCSV(header + '\n' + body);
         header = undefined;
         prefix = undefined;
         body = '';
@@ -45,6 +46,12 @@ class LynxImport extends SinglePassImport {
           break;
         }
         prefix = line.match(/^([^,]+),/)[1];
+        // Hmm, what is this section?
+        if (prefix === 'Dividends' && line.endsWith(',Code')) {
+          appendix = '2';
+        } else {
+          appendix = '';
+        }
         continue;
       }
     }
@@ -61,6 +68,7 @@ class LynxImport extends SinglePassImport {
     delete data['Financial Instrument Information'];
     delete data.Codes;
     delete data['Notes/Legal Notes'];
+
     const interest = data.Interest ? await this.parseInterest(data.Interest) : [];
     const forex = data.Trades ? await this.parseForex(data.Trades) : [];
     const deposits = data['Deposits & Withdrawals'] ? await this.parseFunding(data['Deposits & Withdrawals']) : [];
@@ -237,10 +245,17 @@ class LynxImport extends SinglePassImport {
 
   async parseDividends(data, taxes) {
     const ret = [];
+    const count = {};
     for (const e of data.filter(e => e.Date && e.Currency && e.Amount)) {
       const [target, perShare] = this.matchDividend(e.Description);
       const rate = await Tx.fetchRate(e.Date, `CURRENCY:${e.Currency}`);
-      const id = this.makeId('DIV', e.Date, target);
+      count[`${e.Date}${target}`] = (count[`${e.Date}${target}`] || 0) + 1;
+      let id;
+      if (count[`${e.Date}${target}`] > 1) {
+        id = this.makeId('DIV', e.Date, target, count[`${e.Date}${target}`]);
+      } else {
+        id = this.makeId('DIV', e.Date, target);
+      }
       const total = cents(parseFloat(e.Amount) * rate);
       if (total < 0) {
         let i;
