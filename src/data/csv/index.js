@@ -32,6 +32,14 @@ async function read(pathOrString, options = {}) {
         } else if (headers === null) {
           headers = options.headers || row.map(r => r.replace(/\W/g, '_'));
           headers = headers.map((header, i) => header || 'Column' + (i + 1));
+          const count = {};
+          for (const i in headers) {
+            count[headers[i]] = count[headers[i]] || 0;
+            count[headers[i]]++;
+            if (count[headers[i]] > 1) {
+              headers[i] += count[headers[i]];
+            }
+          }
         } else {
           if (options.dropEmpty && !row.length) {
             return;
