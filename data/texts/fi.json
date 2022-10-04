@@ -61,6 +61,8 @@
     "expense.dividend": "Osingonmaksu",
     "expense.dividend-tax": "Osingonmaksun ennakonpidätus",
     "expense.phone": "Puhelinliittymä",
+    "expense.office": "Toimistotarvikkeet",
+    "expense.other": "Muut kulut",
     "fx-in": "Valuutanvaihto £{target} <- £{currency}",
     "fx-out": "Valuutanvaihto £{target} -> £{currency}",
     "income.ambiguous": "Epäselvä siirron lähde",
@@ -107,6 +109,7 @@
     "income.transfer27": "Siirto #27 ={notes}-palvelusta",
     "income.transfer28": "Siirto #28 ={notes}-palvelusta",
     "income.transfer29": "Siirto #29 ={notes}-palvelusta",
+    "income.other": "Muut tulot",
     "income.vat": "ALV palautus",
     "interest": "C{service} lainakorko",
     "loan-pay": "Lainan lyhennys: C{loanName}",
@@ -360,6 +363,12 @@
     "expense.dividend-tax": {
       "notes": ""
     },
+    "expense.office": {
+      "notes": "={notes}"
+    },
+    "expense.other": {
+      "notes": "={notes}"
+    },
     "income.invest": {
       "notes": "={notes}"
     },
@@ -471,6 +480,9 @@
     },
     "income.transfer29": {
       "notes": ""
+    },
+    "income.other": {
+      "notes": "={notes}"
     }
   }
 }
