@@ -76,8 +76,34 @@ class LynxImport extends SinglePassImport {
     const dividends = data.Dividends ? await this.parseDividends(data.Dividends, taxes) : [];
     const actions = data['Corporate Actions'] ? await this.parseCorporateActions(data['Corporate Actions']) : [];
     const trades = data.Trades ? await this.parseTrades(data.Trades) : [];
+    const fees = data.Fees ? await this.parseFees(data.Fees) : [];
 
-    return interest.concat(forex).concat(deposits).concat(dividends).concat(actions).concat(trades);
+    return interest.concat(forex).concat(deposits).concat(dividends).concat(actions).concat(trades).concat(fees);
+  }
+
+  async parseFees(data) {
+    const ret = [];
+    for (const e of data.filter(e => e.Date && e.Amount && e.Header === 'Data')) {
+
+      const rate = await Tx.fetchRate(e.Date, `CURRENCY:${e.Currency}`);
+      if (!rate) {
+        throw new Error(`Failed to fetch currency rate ${e.Currency} on ${e.Date}.`);
+      }
+
+      ret.push({
+        currency: e.Currency,
+        date: e.Date,
+        id: this.makeId('INTEREST', e.Date),
+        rate,
+        time: e.Date,
+        total: cents(-parseFloat(e.Amount) * rate),
+        type: 'expense',
+        target: 'OTHER',
+        notes: e.Description.toLowerCase()
+      });
+    }
+
+    return ret;
   }
 
   async parseInterest(data) {
@@ -421,6 +447,10 @@ class LynxImport extends SinglePassImport {
     }
 
     return ret;
+  }
+
+  vat(group, obj) {
+    return null
   }
 }
 
