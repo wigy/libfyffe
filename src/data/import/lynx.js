@@ -395,7 +395,7 @@ class LynxImport extends SinglePassImport {
         const target = this.symbol(re[1]);
         return [{
           amount: parseFloat(e.Quantity),
-          source: re[1],
+          source: this.symbol(re[1]),
           currency: e.Currency,
           date,
           given: 0,
@@ -438,6 +438,29 @@ class LynxImport extends SinglePassImport {
         return [];
       }
 
+      re = /^([.A-Z0-9 ]+?)\s*\([0-9A-Z]+\) Spinoff +([0-9]+) for ([0-9]+) \((\S+)\s*,/.exec(e.Description);
+      if (re) {
+        const source = this.symbol(re[1]);
+        const target = this.symbol(re[4]);
+        const amount = parseFloat(e.Quantity);
+        const ratio = parseInt(re[2]) / parseInt(re[3]);
+        console.log(source, target, ratio, amount);
+        return [{
+          given: 0,
+          source: this.symbol(re[1]),
+          amount: parseFloat(e.Quantity),
+          target,
+          currency: e.Currency,
+          date,
+          id: this.makeId('SPINOFF', date, `${source}-${target}`),
+          tax: 0.00,
+          total: 0.00,
+          fee: 0.00,
+          notes: 'spinoff',
+          type: 'trade'
+        }];
+      }
+
       throw new Error(`Cannot recognize corporate action '${e.Description}'.`);
     };
 
@@ -450,7 +473,7 @@ class LynxImport extends SinglePassImport {
   }
 
   vat(group, obj) {
-    return null
+    return null;
   }
 }
 
