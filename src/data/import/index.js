@@ -490,7 +490,7 @@ class Import {
       if (!this.answers[obj.id]) {
         this.answers[obj.id] = {};
       }
-      if (this.answers[obj.id][field]) {
+      if (field in this.answers[obj.id]) {
         return this.answers[obj.id][field];
       }
       console.log('---------------------------------------------------------------------------');

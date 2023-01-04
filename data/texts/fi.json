@@ -23,6 +23,7 @@
     "expense.furniture": "Kalusteet",
     "expense.machinery": "Kalusto",
     "expense.loan": "Osakaslainan maksu",
+    "expense.services": "={notes}",
     "expense.transfer": "Siirto ={notes}-palveluun",
     "expense.transfer2": "Siirto #2 ={notes}-palveluun",
     "expense.transfer3": "Siirto #3 ={notes}-palveluun",
@@ -359,6 +360,9 @@
       "notes": "={notes}"
     },
     "expense.dividend": {
+      "notes": "={notes}"
+    },
+    "expense.services": {
       "notes": "={notes}"
     },
     "expense.dividend-tax": {
