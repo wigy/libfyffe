@@ -27,7 +27,7 @@
     "detect-character-encoding": "^0.8.0",
     "escape-string-regexp": "^2.0.0",
     "expr-eval": "^2.0.2",
-    "knex": "^0.20.15",
+    "knex": "^2.4.0",
     "moment": "^2.29.0",
     "neat-dump": "^1.0.17",
     "object-merge": "^2.5.1",
